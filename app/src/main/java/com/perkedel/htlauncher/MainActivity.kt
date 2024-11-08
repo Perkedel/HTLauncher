@@ -59,31 +59,31 @@ class MainActivity : ComponentActivity() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeGreeting(){
-    val navController = rememberNavController()
     HTLauncherTheme {
-        Scaffold (
-            modifier = Modifier.fillMaxSize(),
-            topBar = {
-                TopAppBar(
-                    title = { Text("HAHA") },
-                    colors = topAppBarColors(
-                        containerColor = MaterialTheme.colorScheme.primaryContainer,
-                        titleContentColor = MaterialTheme.colorScheme.primary,
-                    ),
-                )
-            }
-        ) {
-            innerPadding -> Column(
-                modifier = Modifier.padding(innerPadding),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
-            ){
-
-            }
-//            NavHost(navController, startDestination = Profile, Modifier.padding(innerPadding)) {
+//        Scaffold (
+//            modifier = Modifier.fillMaxSize(),
+//            topBar = {
+//                TopAppBar(
+//                    title = { Text("HAHA") },
+//                    colors = topAppBarColors(
+//                        containerColor = MaterialTheme.colorScheme.primaryContainer,
+//                        titleContentColor = MaterialTheme.colorScheme.primary,
+//                    ),
+//                )
+//            }
+//        ) {
+//            innerPadding -> Column(
+//                modifier = Modifier.padding(innerPadding),
+//                verticalArrangement = Arrangement.spacedBy(16.dp)
+//            ){
 //
 //            }
-
-        }
+////            NavHost(navController, startDestination = Profile, Modifier.padding(innerPadding)) {
+////
+////            }
+//
+//        }
+        Navigation()
     }
 }
 
