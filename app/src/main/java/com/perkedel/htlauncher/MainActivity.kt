@@ -4,6 +4,8 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import android.content.Context;
+import android.content.pm.PackageManager;
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -30,29 +32,9 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-//            HTLauncherTheme {
-//                Scaffold(
-//                    modifier = Modifier.fillMaxSize(),
-//                    topBar = {
-//                        TopAppBar(
-//                            title = {
-//                                Text("haha")
-//                            }
-//                        )
-//                    }
-//                ) { innerPadding ->
-//                    Greeting(
-//                        name = "Android",
-//                        modifier = Modifier.padding(innerPadding)
-//                    )
-//                }
-//            }
-//            Column {
-//                Text("Haha")
-//                Text("Hihi")
-//            }
             HomeGreeting()
         }
+
     }
 }
 
@@ -60,29 +42,6 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun HomeGreeting(){
     HTLauncherTheme {
-//        Scaffold (
-//            modifier = Modifier.fillMaxSize(),
-//            topBar = {
-//                TopAppBar(
-//                    title = { Text("HAHA") },
-//                    colors = topAppBarColors(
-//                        containerColor = MaterialTheme.colorScheme.primaryContainer,
-//                        titleContentColor = MaterialTheme.colorScheme.primary,
-//                    ),
-//                )
-//            }
-//        ) {
-//            innerPadding -> Column(
-//                modifier = Modifier.padding(innerPadding),
-//                verticalArrangement = Arrangement.spacedBy(16.dp)
-//            ){
-//
-//            }
-////            NavHost(navController, startDestination = Profile, Modifier.padding(innerPadding)) {
-////
-////            }
-//
-//        }
         Navigation()
     }
 }

@@ -3,6 +3,9 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.INTERNET" /> <!-- <uses-sdk -->
+<!--  https://github.com/Neamar/KISS/blob/master/app/src/main/AndroidManifest.xml  -->
+    <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES"
+        tools:ignore="QueryAllPackagesPermission" />
     <!-- android:targetSdkVersion="35" -->
     <!-- android:minSdkVersion="21"/> -->
     <uses-feature
@@ -10,7 +13,16 @@
         android:required="false" />
     <uses-feature
         android:name="android.software.leanback"
-        android:required="true" />
+        android:required="false" />
+    <uses-feature
+        android:name="android.hardware.bluetooth"
+        android:required="false" />
+    <uses-feature
+        android:name="android.hardware.wifi"
+        android:required="false" />
+    <uses-feature
+        android:name="android.hardware.nfc"
+        android:required="false" />
 
     <application
         android:allowBackup="true"
@@ -23,24 +35,10 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.HTLauncher"
         tools:targetApi="31">
-        <activity
-            android:name=".navigation.Navigation"
-            android:exported="false"
-            android:label="@string/title_activity_navigation"
-            android:theme="@style/Theme.HTLauncher" />
-        <activity
-            android:name=".AllApps"
-            android:exported="true"
-            android:launchMode="singleTask"
-            android:theme="@style/Theme.HTLauncher">
-            <intent-filter>
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-        </activity>
+
         <activity
             android:name=".MainActivity"
             android:exported="true"
-            android:label="@string/app_name"
             android:launchMode="singleTask"
             android:theme="@style/Theme.HTLauncher">
             <intent-filter>
