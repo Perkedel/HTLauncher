@@ -20,6 +20,12 @@
     <string name="configuration_screen">Configuration</string>
     <string name="back_button">Back</string>
 
+    <!--  Home More Menu  -->
+    <string name="Home_more_edit">Edit Launcher Buttons</string>
+    <string name="Home_more_configuration">Configure Launchers</string>
+    <string name="Home_more_sys_setting">System Settings</string>
+    <string name="Home_more_all_apps">All Apps</string>
+
     <!-- Error messages -->
     <string name="error_fragment_message">An error occurred</string>
     <string name="dismiss_error">Dismiss</string>

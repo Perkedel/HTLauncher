@@ -39,19 +39,30 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.perkedel.htlauncher.ui.theme.HTLauncherTheme
 import android.content.Context;
+import androidx.compose.material3.Card
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
+import com.perkedel.htlauncher.ui.dialog.HomeMoreMenu
+import com.perkedel.htlauncher.widgets.FirstPageCard
+import com.perkedel.htlauncher.ui.navigation.HomeScreen
 
 @Composable
 fun Navigation(
-    navController: NavHostController = rememberNavController()
+    navController: NavHostController = rememberNavController(),
+    anViewModel: HTViewModel = viewModel()
 ){
     // https://youtu.be/4gUeyNkGE3g
     // https://github.com/philipplackner/NavigationMultiModule
+    // https://youtube.com/shorts/SAD8flVdILY?si=9L164ahugFtx0g-J
     val backStackEntry by navController.currentBackStackEntryAsState()
     val currentScreen = Screen.valueOf(
         backStackEntry?.destination?.route ?: Screen.HomeScreen.name
     )
     val hideTopBar:Boolean = false
+    val htuiState : HTUIState by anViewModel.uiState.collectAsState()
+
     Scaffold (
         topBar = {
             HTAppBar(
@@ -61,7 +72,7 @@ fun Navigation(
 //                hideIt = hideTopBar
                 hideIt = navController.previousBackStackEntry == null
             )
-        }
+        },
 
     ) { innerPadding ->
 //        val uiState by viewModel.uiState.collectAsState()
@@ -72,11 +83,40 @@ fun Navigation(
             ) {
             composable(route = Screen.HomeScreen.name) {
                 HomeScreen(
-                    navController = navController,
+//                    navController = navController,
                     onAllAppButtonClicked = {
                         navController.navigate(Screen.AllAppsScreen.name)
+                    },
+                    onMoreMenuButtonClicked = {
+                        anViewModel.openTheMoreMenu(true)
                     }
                 )
+                if(htuiState.openMoreMenu){
+                    HomeMoreMenu(
+                        modifier = Modifier,
+                        onChosenMenu = {
+                            // https://stackoverflow.com/a/53138234
+                            when(it){
+                                0->{
+                                    // Edit
+                                }
+                                1->{
+                                    // Configurations
+                                }
+                                2->{
+                                    // System Setting
+                                }
+                                3->{
+                                    // All Apps
+                                    navController.navigate(Screen.AllAppsScreen.name)
+                                }
+                                else->{}
+                            }
+                            anViewModel.openTheMoreMenu(false)
+                        },
+                        onDismissRequest = {anViewModel.openTheMoreMenu(false)}
+                    )
+                }
             }
             composable(
                 route = Screen.AllAppsScreen.name,
@@ -144,30 +184,7 @@ private fun getAllApps(){
 
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun HomeScreen(
-    navController: NavController?,
-    onAllAppButtonClicked: () -> Unit?,
-    hideTopBar:Boolean? = true,
-    modifier: Modifier = Modifier
-    ){
-    Column(
-        modifier = modifier,
-        verticalArrangement = Arrangement.spacedBy(16.dp)
-    ) {
-        Button(
-            onClick = {
-//                    navController?.navigate(Screen.AllAppsScreen)
-//                navController?.navigate(Screen.AllAppsScreen.name)
-                onAllAppButtonClicked()
-            },
-            modifier = Modifier.align(Alignment.End)
-        ) {
-            Text(text="All Apps")
-        }
-    }
-}
+
 
 
 @OptIn(ExperimentalMaterial3Api::class)
