@@ -39,6 +39,8 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.perkedel.htlauncher.ui.theme.HTLauncherTheme
 import android.content.Context;
+import androidx.compose.foundation.pager.PagerState
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.Card
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.compose.runtime.collectAsState
@@ -47,11 +49,13 @@ import androidx.compose.ui.platform.LocalContext
 import com.perkedel.htlauncher.ui.dialog.HomeMoreMenu
 import com.perkedel.htlauncher.widgets.FirstPageCard
 import com.perkedel.htlauncher.ui.navigation.HomeScreen
+import com.perkedel.htlauncher.ui.bars.HTAppBar
 
 @Composable
 fun Navigation(
     navController: NavHostController = rememberNavController(),
-    anViewModel: HTViewModel = viewModel()
+    anViewModel: HTViewModel = viewModel(),
+    homePagerState: PagerState = rememberPagerState(pageCount = {10}),
 ){
     // https://youtu.be/4gUeyNkGE3g
     // https://github.com/philipplackner/NavigationMultiModule
@@ -89,7 +93,8 @@ fun Navigation(
                     },
                     onMoreMenuButtonClicked = {
                         anViewModel.openTheMoreMenu(true)
-                    }
+                    },
+                    handoverPagerState = homePagerState,
                 )
                 if(htuiState.openMoreMenu){
                     HomeMoreMenu(
@@ -129,56 +134,7 @@ fun Navigation(
 
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun HTAppBar(
-    currentScreen: Screen,
-    canNavigateBack: Boolean = false,
-    navigateUp: () -> Unit = {},
-    hideIt:Boolean = false,
-    modifier: Modifier = Modifier
-){
-    // https://developer.android.com/codelabs/basic-android-kotlin-compose-navigation#8
-    if (hideIt) {
-//        a
 
-    } else {
-        TopAppBar(
-            title = { Text(stringResource(currentScreen.title)) },
-            colors = topAppBarColors(
-                containerColor = MaterialTheme.colorScheme.primaryContainer,
-                titleContentColor = MaterialTheme.colorScheme.primary,
-            ),
-            modifier = modifier,
-            navigationIcon = {
-                if (canNavigateBack) {
-                    IconButton(onClick = navigateUp) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = stringResource(R.string.back_button)
-                        )
-                    }
-                }
-            },
-            actions = {
-                IconButton(
-                    onClick = {
-
-                    }
-                ) {
-                    Icon(
-                        imageVector = Icons.Filled.Menu,
-                        contentDescription = "Menu"
-                    )
-                }
-            }
-        )
-    }
-}
-
-private fun setShowTopBar(into:Boolean = true,handover:()->Boolean){
-
-}
 
 private fun getAllApps(){
 
