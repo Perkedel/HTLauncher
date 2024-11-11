@@ -1,7 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="Theme.HTLauncher" parent="android:Theme.Material.Light.NoActionBar" />
+    <style name="Theme.HTLauncher" parent="android:Theme.Material.Light.NoActionBar" >
+        <!--  https://stackoverflow.com/questions/68896101/how-to-show-a-transparent-app-background-in-jetpack-compose  -->
+        <!--  https://medium.com/@shivathapaa/enable-edge-to-edge-in-android-jetpack-compose-transparent-status-bar-89f565f3ed70  -->
+        <!--  https://stackoverflow.com/questions/73562504/how-to-make-surface-background-transparent-jetpack-compose  -->
+        <!--  https://www.youtube.com/watch?v=Ruu44ZUhkBM  -->
+        <!--  https://stackoverflow.com/questions/66940091/how-do-i-start-an-intent-inside-a-compose-functions-button-click  -->
+        <item name="android:windowShowWallpaper">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+    </style>
 
     <style name="Theme.HTLauncher.NoActionBar">
         <item name="windowActionBar">false</item>

@@ -1,5 +1,6 @@
 package com.perkedel.htlauncher.ui.navigation
 
+import android.content.Context
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -14,31 +15,36 @@ import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.Button
+import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.hapticfeedback.HapticFeedback
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.perkedel.htlauncher.ui.page.BasePage
 import com.perkedel.htlauncher.ui.theme.HTLauncherTheme
+import com.perkedel.htlauncher.ui.theme.rememberColorScheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
 //    navController: NavController?,
 //    isFirstPage:Boolean = false,
-    howManyPages:Int = 0,
+    howManyPages: Int = 0,
     handoverPagerState: PagerState,
     onAllAppButtonClicked: () -> Unit,
     onMoreMenuButtonClicked: () -> Unit,
     modifier: Modifier = Modifier.fillMaxSize(),
-    hideTopBar:Boolean = true,
+    hideTopBar: Boolean = true,
+    context: Context = LocalContext.current,
+    colorScheme: ColorScheme = rememberColorScheme(),
+    haptic: HapticFeedback = LocalHapticFeedback.current,
 ){
     // https://developer.android.com/develop/ui/compose/layouts/pager
     Box(
@@ -70,7 +76,10 @@ fun HomeScreen(
                     // TODO: a JSON file `PageCollection.json` lists the pages included. It includes some JSON files in `Pages` folder. Basically, it's just 1 array for it, making this in order.
                     onMoreMenuButtonClicked = onMoreMenuButtonClicked,
                     howManyItemsHere = 25,
-                    modifier = Modifier
+                    modifier = Modifier,
+                    context = context,
+                    colorScheme = colorScheme,
+                    haptic = haptic,
                 )
             }
 
@@ -91,7 +100,8 @@ fun HomeScreen(
                         .padding(2.dp)
                         .clip(CircleShape)
                         .background(color)
-                        .size(16.dp)
+                        .size(16.dp),
+
                 )
             }
         }
@@ -105,9 +115,9 @@ fun HomeScreenPreview(){
     HTLauncherTheme {
         HomeScreen(
             howManyPages = 10,
+            handoverPagerState = rememberPagerState(pageCount = {10}),
             onAllAppButtonClicked = {},
             onMoreMenuButtonClicked = {},
-            handoverPagerState = rememberPagerState(pageCount = {10})
         )
     }
 }
