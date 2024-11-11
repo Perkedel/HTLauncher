@@ -25,9 +25,10 @@ import com.perkedel.htlauncher.ui.theme.HTLauncherTheme
 @Composable
 fun HTAppBar(
     currentScreen: Screen,
+    title: @Composable () -> Unit = { Text(text = (stringResource(currentScreen.title))) },
     canNavigateBack: Boolean = false,
     navigateUp: () -> Unit = {},
-    hideIt:Boolean = false,
+    hideIt: Boolean = false,
     modifier: Modifier = Modifier
 ){
     // https://developer.android.com/codelabs/basic-android-kotlin-compose-navigation#8
@@ -36,7 +37,9 @@ fun HTAppBar(
 
     } else {
         TopAppBar(
-            title = { Text(stringResource(currentScreen.title)) },
+//            title = { Text(text = (if (title!!.isNotBlank()) title.toString() else stringResource(currentScreen.title))) },
+//            title = { Text(text = (stringResource(currentScreen.title))) },
+            title = title,
             colors = topAppBarColors(
                 containerColor = MaterialTheme.colorScheme.primaryContainer,
                 titleContentColor = MaterialTheme.colorScheme.primary,
@@ -80,8 +83,9 @@ fun HTAppBarPreview(){
 
             topBar = { HTAppBar(
                 currentScreen = Screen.HomeScreen,
+
                 canNavigateBack = true,
-                hideIt = false
+                hideIt = false,
             ) }
         ) { innerPadding ->
             Column (

@@ -40,7 +40,7 @@ import me.zhanghai.compose.preference.preference
 @Composable
 fun HomeMoreMenu (
     modifier: Modifier,
-    onChosenMenu: (Int) -> Unit,
+    onChosenMenu: (String) -> Unit,
     onDismissRequest: () -> Unit,
 ){
     // https://developer.android.com/develop/ui/compose/components/dialog
@@ -93,7 +93,7 @@ fun HomeMoreMenu (
                         icon = { Icon(imageVector = Icons.Filled.Edit, contentDescription = null) },
 //                        summary = { Text(text = "") },
                         onClick = {
-                            onChosenMenu(0)
+                            onChosenMenu("edit")
                         }
                     )
                     preference(
@@ -102,7 +102,7 @@ fun HomeMoreMenu (
                         icon = { Icon(imageVector = Icons.Filled.Build, contentDescription = null) },
 //                        summary = { Text(text = "") },
                         onClick = {
-                            onChosenMenu(1)
+                            onChosenMenu("configuration")
                         }
                     )
                     preference(
@@ -111,7 +111,7 @@ fun HomeMoreMenu (
                         icon = { Icon(imageVector = Icons.Filled.Settings, contentDescription = null) },
 //                        summary = { Text(text = "") },
                         onClick = {
-                            onChosenMenu(1)
+                            onChosenMenu("system_setting")
                         }
                     )
                     preference(
@@ -120,7 +120,7 @@ fun HomeMoreMenu (
                         icon = { Icon(imageVector = Icons.Filled.Menu, contentDescription = null) },
 //                        summary = { Text(text = "") },
                         onClick = {
-                            onChosenMenu(3)
+                            onChosenMenu("all_apps")
                         }
                     )
                 }

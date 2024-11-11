@@ -35,7 +35,7 @@ import com.perkedel.htlauncher.ui.theme.HTLauncherTheme
 import java.text.SimpleDateFormat
 import java.util.Date
 
-@RequiresApi(Build.VERSION_CODES.S)
+//@RequiresApi(Build.VERSION_CODES.S)
 @Composable
 fun FirstPageCard(
     isOnNumberWhat:Int = 0,

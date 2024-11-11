@@ -15,6 +15,7 @@ android {
         versionCode = 1
         versionName = "2025.1.0"
 
+
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
             useSupportLibrary = true
@@ -41,6 +42,8 @@ android {
     buildFeatures {
         compose = true
         viewBinding = true
+        buildConfig = true // https://stackoverflow.com/a/21119027
+
     }
     composeOptions {
         kotlinCompilerExtensionVersion = "1.5.1"
@@ -86,6 +89,9 @@ dependencies {
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.library)
     implementation("me.zhanghai.compose.preference:library:1.1.1")
+    implementation(libs.androidx.material.icons.extended) // https://youtu.be/Vj9k0cmBqZE
+//    implementation(libs.xicon.pack.z) // https://github.com/DevSrSouza/compose-icons
+//    implementation("br.com.devsrsouza.compose.icons:font-awesome:1.1.1") // https://github.com/DevSrSouza/compose-icons
 
     //
 

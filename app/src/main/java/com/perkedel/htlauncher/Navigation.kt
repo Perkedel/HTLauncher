@@ -1,76 +1,96 @@
 package com.perkedel.htlauncher
 
-import android.content.pm.PackageManager
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material3.Button
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults.topAppBarColors
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.perkedel.htlauncher.ui.theme.HTLauncherTheme
 import android.content.Context;
+import android.content.Intent
+import android.content.pm.PackageInfo
+import android.content.pm.PackageManager
+import android.os.Build
+import android.provider.Settings
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
-import androidx.compose.material3.Card
+import androidx.compose.material3.Text
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
+import androidx.core.content.pm.PackageInfoCompat
+
+import androidx.lifecycle.ViewModel
 import com.perkedel.htlauncher.ui.dialog.HomeMoreMenu
-import com.perkedel.htlauncher.widgets.FirstPageCard
 import com.perkedel.htlauncher.ui.navigation.HomeScreen
 import com.perkedel.htlauncher.ui.bars.HTAppBar
+import com.perkedel.htlauncher.ui.navigation.AllAppsScreen
+import com.perkedel.htlauncher.ui.navigation.Configurationing
 
 @Composable
 fun Navigation(
     navController: NavHostController = rememberNavController(),
+    context: Context = LocalContext.current,
+    pm: PackageManager = context.packageManager,
     anViewModel: HTViewModel = viewModel(),
     homePagerState: PagerState = rememberPagerState(pageCount = {10}),
 ){
     // https://youtu.be/4gUeyNkGE3g
     // https://github.com/philipplackner/NavigationMultiModule
-    // https://youtube.com/shorts/SAD8flVdILY?si=9L164ahugFtx0g-J
+    // https://youtube.com/shorts/SAD8flVdILY
+    // https://www.tutorialspoint.com/how-to-get-the-build-version-number-of-an-android-application
+    // https://medium.com/make-apps-simple/get-the-android-app-version-programmatically-5ba27d6a37fe
     val backStackEntry by navController.currentBackStackEntryAsState()
     val currentScreen = Screen.valueOf(
         backStackEntry?.destination?.route ?: Screen.HomeScreen.name
     )
     val hideTopBar:Boolean = false
     val htuiState : HTUIState by anViewModel.uiState.collectAsState()
+//    val context: Context = LocalContext.current
+
+    // https://www.tutorialspoint.com/how-to-get-the-build-version-number-of-an-android-application
+    // https://medium.com/make-apps-simple/get-the-android-app-version-programmatically-5ba27d6a37fe
+//    try {
+        val packageName: String = context.packageName
+        val packageInfo:PackageInfo = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            pm.getPackageInfo(packageName, PackageManager.PackageInfoFlags.of(0))
+        } else {
+            pm.getPackageInfo(packageName, 0)
+        }
+        val versionName: String = packageInfo.versionName
+        val versionNumber: Long = PackageInfoCompat.getLongVersionCode(packageInfo)
+//    } catch (e : Exception) {
+//        val packageName: String = ""
+//        val packageInfo: PackageInfo
+//        val versionName: String = ""
+//        val versionNumber: Long = 0
+//    }
+
 
     Scaffold (
         topBar = {
             HTAppBar(
                 currentScreen = currentScreen,
+                title = {
+                    when(currentScreen){
+                        Screen.HomeScreen -> {
+                            Text(text = "HT Launcher")
+                        }
+                        Screen.AllAppsScreen -> {
+                            Text(text = "All Apps")
+                        }
+                        Screen.ConfigurationScreen -> {
+                            Text(text = "Config | v${versionName}")
+                        }
+                        else -> {
+                            Text(text = "")
+                        }
+                    }
+                },
                 canNavigateBack =navController.previousBackStackEntry != null,
                 navigateUp = {navController.navigateUp()},
 //                hideIt = hideTopBar
@@ -102,20 +122,26 @@ fun Navigation(
                         onChosenMenu = {
                             // https://stackoverflow.com/a/53138234
                             when(it){
-                                0->{
+                                "edit"->{
                                     // Edit
                                 }
-                                1->{
+                                "configuration"->{
                                     // Configurations
+                                    navController.navigate(Screen.ConfigurationScreen.name)
                                 }
-                                2->{
+                                "system_setting"->{
                                     // System Setting
+                                    // https://www.geeksforgeeks.org/android-jetpack-compose-open-specific-settings-screen/
+//                                    val i = Intent(ACTION_WIRELESS_SETTINGS)
+                                    startIntent(context = context, what = Settings.ACTION_SETTINGS)
                                 }
-                                3->{
+                                "all_apps"->{
                                     // All Apps
                                     navController.navigate(Screen.AllAppsScreen.name)
                                 }
-                                else->{}
+                                else->{
+
+                                }
                             }
                             anViewModel.openTheMoreMenu(false)
                         },
@@ -127,46 +153,36 @@ fun Navigation(
                 route = Screen.AllAppsScreen.name,
 
                 ) {
-                AllAppsScreen(navController = navController)
+                AllAppsScreen(
+                    navController = navController,
+                    pm = pm,
+                    context = context
+                )
+            }
+            composable(
+                route = Screen.ConfigurationScreen.name,
+            ){
+                Configurationing(
+                    navController = navController,
+                    context = context,
+                    pm = pm,
+                )
             }
         }
     }
 
 }
 
-
-
-private fun getAllApps(){
-
+private fun goBackHome(
+    viewModel: ViewModel,
+    navController: NavHostController
+){
+    navController.popBackStack(Screen.HomeScreen.name, inclusive = false)
 }
 
-
-
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun AllAppsScreen(
-    navController: NavController?,
-
-){
-    // https://stackoverflow.com/questions/64377518/how-to-initialize-or-access-packagemanager-out-from-coroutinecontext
-    // https://www.geeksforgeeks.org/different-ways-to-get-list-of-all-apps-installed-in-your-android-phone/
-    val context = LocalContext.current
-//    val pm:PackageManager = getPackageManager()
-    val pm:PackageManager = context.packageManager
-//    val pm:PackageManager = context.getApp
-    val packList = pm.getInstalledPackages(0)
-    LazyColumn(
-        verticalArrangement = Arrangement.spacedBy(16.dp)
-    ) {
-//        Text("HAI ALL")
-//        items(5){
-//            Text("HAH ${it}")
-//        }
-//        pm.getInstalledPackages(0)
-        items(packList.size){
-            Text("${packList.get(it).applicationInfo.loadLabel(pm)}")
-        }
-    }
+public fun startIntent(context: Context, what: String){
+    // https://www.geeksforgeeks.org/android-jetpack-compose-open-specific-settings-screen/
+    val i : Intent = Intent(what)
+    context.startActivity(i)
 }
 

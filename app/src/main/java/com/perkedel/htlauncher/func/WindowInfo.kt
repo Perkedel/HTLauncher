@@ -5,6 +5,19 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
+data class WindowInfo(
+    val screenWidthInfo: WindowType,
+    val screenHeightInfo: WindowType,
+    val screenWidth: Dp,
+    val screenHeight: Dp,
+) {
+    sealed class WindowType{
+        object Compact: WindowType()
+        object Medium: WindowType()
+        object Expanded: WindowType()
+    }
+}
+
 @Composable
 fun rememberWindowInfo() : WindowInfo{
     // https://youtu.be/HmXgVBys7BU
@@ -23,17 +36,4 @@ fun rememberWindowInfo() : WindowInfo{
         screenWidth = configuration.screenWidthDp.dp,
         screenHeight = configuration.screenHeightDp.dp,
     )
-}
-
-data class WindowInfo(
-    val screenWidthInfo: WindowType,
-    val screenHeightInfo: WindowType,
-    val screenWidth: Dp,
-    val screenHeight: Dp,
-) {
-    sealed class WindowType{
-        object Compact: WindowType()
-        object Medium: WindowType()
-        object Expanded: WindowType()
-    }
 }
