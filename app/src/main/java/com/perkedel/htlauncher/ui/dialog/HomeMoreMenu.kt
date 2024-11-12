@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Apps
 import androidx.compose.material.icons.filled.Build
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Menu
@@ -63,7 +64,7 @@ fun HomeMoreMenu (
         Card(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(250.dp)
+//                .height(250.dp)
                 .padding(16.dp),
             shape = RoundedCornerShape(16.dp),
         ) {
@@ -117,7 +118,7 @@ fun HomeMoreMenu (
                     preference(
                         key = "all_apps",
                         title = { Text(text = stringResource(R.string.Home_more_all_apps)) },
-                        icon = { Icon(imageVector = Icons.Filled.Menu, contentDescription = null) },
+                        icon = { Icon(imageVector = Icons.Filled.Apps, contentDescription = null) },
 //                        summary = { Text(text = "") },
                         onClick = {
                             onChosenMenu("all_apps")

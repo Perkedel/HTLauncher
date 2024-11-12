@@ -39,6 +39,7 @@ import com.perkedel.htlauncher.func.rememberWindowInfo
 import com.perkedel.htlauncher.ui.theme.HTLauncherTheme
 import com.perkedel.htlauncher.ui.theme.rememberColorScheme
 import com.perkedel.htlauncher.widgets.FirstPageCard
+import com.perkedel.htlauncher.widgets.ItemCell
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -94,59 +95,9 @@ fun BasePage(
 //                        ) {
 //                            Text(text = "item $i")
 //                        }
-                        Surface(
-                            modifier = Modifier
-                                .combinedClickable(
-                                    // https://gist.github.com/dovahkiin98/95157e662daacddfbc1b60e0fb8bb7c0
-                                    // https://developer.android.com/develop/ui/compose/touch-input/pointer-input/tap-and-press
-                                    // https://stackoverflow.com/questions/65835642/button-long-press-listener-in-android-jetpack-compose
-                                    //
-                                    onClick = {
-                                        haptic.performHapticFeedback(
-                                            HapticFeedbackType.LongPress
-                                        )
-                                        Toast
-                                            .makeText(context, "Item ${i}", Toast.LENGTH_SHORT)
-                                            .show()
-                                    },
-                                    onLongClick = {
-                                        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                                        Toast
-                                            .makeText(
-                                                context,
-                                                "Long Click ${i}",
-                                                Toast.LENGTH_SHORT
-                                            )
-                                            .show()
-                                    },
-
-                                    )
-                                .padding(8.dp)
-                                .aspectRatio(1f)
-//                                .background(Color.Transparent)
-                                .clip(RoundedCornerShape(10.dp)),
-                            color = Color.Transparent,
-
-//                            shape = RoundedCornerShape(10.dp),
-//                            colors = ButtonColors(
-//                                containerColor = Color.Transparent,
-//                                contentColor = colorScheme.onPrimary,
-//                                disabledContentColor = Color.Unspecified,
-//                                disabledContainerColor = Color.Unspecified,
-//                            ),
-//                            onClick = {
-//                                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-//                                Toast.makeText(context, "Item ${i}",Toast.LENGTH_SHORT).show()
-//                            },
-
-                        ) {
-                            Text(
-                                modifier = Modifier.weight(1f),
-                                text = "item $i",
-                                textAlign = TextAlign.Center,
-                            )
-
-                        }
+                        ItemCell(
+                            handoverText = "Item ${i}",
+                        )
                     }
 
                 }
@@ -169,16 +120,9 @@ fun BasePage(
                     content = {
                         // Rest of the items
                         items(howManyItemsHere){i->
-                            Box(
-                                modifier = Modifier
-                                    .padding(8.dp)
-                                    .aspectRatio(1f)
-                                    .clip(RoundedCornerShape(5.dp))
-                                    .background(Color.Blue),
-
-                                ){
-                                Text(text = "item $i")
-                            }
+                            ItemCell(
+                                handoverText = "Item ${i}",
+                            )
                         }
                     }
                 )

@@ -1,7 +1,9 @@
 package com.perkedel.htlauncher.ui.navigation
 
 import android.content.Context
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -31,13 +33,12 @@ import com.perkedel.htlauncher.ui.page.BasePage
 import com.perkedel.htlauncher.ui.theme.HTLauncherTheme
 import com.perkedel.htlauncher.ui.theme.rememberColorScheme
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun HomeScreen(
 //    navController: NavController?,
 //    isFirstPage:Boolean = false,
-    howManyPages: Int = 0,
-    handoverPagerState: PagerState,
+    handoverPagerState: PagerState = rememberPagerState(pageCount = {10}),
     onAllAppButtonClicked: () -> Unit,
     onMoreMenuButtonClicked: () -> Unit,
     modifier: Modifier = Modifier.fillMaxSize(),
@@ -100,7 +101,16 @@ fun HomeScreen(
                         .padding(2.dp)
                         .clip(CircleShape)
                         .background(color)
-                        .size(16.dp),
+                        .size(16.dp)
+                        .combinedClickable (
+                            onClick = {
+                                // Set to what page
+                            },
+                            onLongClick = {
+
+                            }
+                        )
+                    ,
 
                 )
             }
@@ -114,8 +124,7 @@ fun HomeScreen(
 fun HomeScreenPreview(){
     HTLauncherTheme {
         HomeScreen(
-            howManyPages = 10,
-            handoverPagerState = rememberPagerState(pageCount = {10}),
+
             onAllAppButtonClicked = {},
             onMoreMenuButtonClicked = {},
         )

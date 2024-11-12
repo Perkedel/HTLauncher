@@ -4,6 +4,13 @@ plugins {
 //    alias(libs.plugins.kotlin.serialization)
 }
 
+//allprojects{
+//    repositories{
+////        mavenCentral()
+////        maven("https://jitpack.io")
+//    }
+//}
+
 android {
     namespace = "com.perkedel.htlauncher"
     compileSdk = 34
@@ -11,7 +18,7 @@ android {
     defaultConfig {
         applicationId = "com.perkedel.htlauncher"
         minSdk = 21
-        targetSdk = 34
+        targetSdk = 35
         versionCode = 1
         versionName = "2025.1.0"
 
@@ -92,9 +99,34 @@ dependencies {
     implementation(libs.androidx.material.icons.extended) // https://youtu.be/Vj9k0cmBqZE
 //    implementation(libs.xicon.pack.z) // https://github.com/DevSrSouza/compose-icons
 //    implementation("br.com.devsrsouza.compose.icons:font-awesome:1.1.1") // https://github.com/DevSrSouza/compose-icons
-
-    //
-
+//    implementation("br.com.devsrsouza.compose.icons:simple-icons:1.1.1") // https://github.com/DevSrSouza/compose-icons
+//    implementation("br.com.devsrsouza.compose.icons:feather:1.1.1") // https://github.com/DevSrSouza/compose-icons
+//    implementation("br.com.devsrsouza.compose.icons:tabler-icons:1.1.1") // https://github.com/DevSrSouza/compose-icons
+//    implementation("br.com.devsrsouza.compose.icons:tabler-icons:1.1.1") // https://github.com/DevSrSouza/compose-icons
+//    implementation("br.com.devsrsouza.compose.icons:eva-icons:1.1.1") // https://github.com/DevSrSouza/compose-icons
+//    implementation("br.com.devsrsouza.compose.icons:octicons:1.1.1") // https://github.com/DevSrSouza/compose-icons
+//    implementation("br.com.devsrsouza.compose.icons:linea:1.1.1") // https://github.com/DevSrSouza/compose-icons
+//    implementation("br.com.devsrsouza.compose.icons:line-awesome:1.1.1") // https://github.com/DevSrSouza/compose-icons
+//    implementation("br.com.devsrsouza.compose.icons:erikflowers-weather-icons:1.1.1") // https://github.com/DevSrSouza/compose-icons
+//    implementation("br.com.devsrsouza.compose.icons:css-gg:1.1.1") // https://github.com/DevSrSouza/compose-icons
 //    implementation(libs.navigation.compose)
 //    implementation(libs.kotlinx.serialization.json)
+
+    // https://github.com/google/accompanist
+//    implementation(libs.accompanist.drawablepainter)
+//    implementation(libs.accompanist.permissions)
+//    implementation(libs.accompanist.adaptive)
+//    implementation("com.google.accompanist:accompanist-drawablepainter")
+//    implementation("com.google.accompanist:accompanist-permissions")
+//    implementation("com.google.accompanist:accompanist-adaptive")
+
+    // https://github.com/coil-kt/coil
+    implementation(libs.coil.compose)
+    implementation(libs.coil.network.okhttp)
+
+    // https://jitpack.io
+    implementation(libs.kryptoprefs) // https://github.com/rumboalla/KryptoPrefs
+//    implementation(libs.kryptoprefs.gson) // https://github.com/rumboalla/KryptoPrefs
+
+    implementation(libs.kotlinx.serialization.json) // https://github.com/Kotlin/kotlinx.serialization
 }

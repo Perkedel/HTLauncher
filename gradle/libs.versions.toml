@@ -1,10 +1,16 @@
 [versions]
 agp = "8.6.0"
+coilCompose = "3.0.2"
+coilNetworkOkhttp = "3.0.2"
 kotlin = "1.9.0"
 coreKtx = "1.10.1"
 junit = "4.13.2"
 junitVersion = "1.1.5"
 espressoCore = "3.5.1"
+kotlinxSerialization = "2.0.20"
+kotlinxSerializationJson = "1.7.3"
+kryptoprefs = "0.4.3"
+kryptoprefsGson = "0.4.3"
 library = "1.1.1"
 lifecycleRuntimeKtx = "2.6.1"
 activityCompose = "1.8.0"
@@ -23,10 +29,15 @@ retrofit = "2.11.0"
 xicon_pack_z = "1.1.1"
 
 [libraries]
+accompanist-adaptive = { module = "com.google.accompanist:accompanist-adaptive" }
+accompanist-drawablepainter = { module = "com.google.accompanist:accompanist-drawablepainter" }
+accompanist-permissions = { module = "com.google.accompanist:accompanist-permissions" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 androidx-lifecycle-viewmodel-compose = { module = "androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "lifecycleRuntimeKtx" }
 androidx-material-icons-extended = { module = "androidx.compose.material:material-icons-extended" }
 androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigationCompose" }
+coil-compose = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coilCompose" }
+coil-network-okhttp = { module = "io.coil-kt.coil3:coil-network-okhttp", version.ref = "coilNetworkOkhttp" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
@@ -43,6 +54,9 @@ androidx-material3 = { group = "androidx.compose.material3", name = "material3" 
 androidx-leanback = { group = "androidx.leanback", name = "leanback", version.ref = "leanback" }
 glide = { group = "com.github.bumptech.glide", name = "glide", version.ref = "glide" }
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
+kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
+kryptoprefs = { module = "com.github.rumboalla.KryptoPrefs:kryptoprefs", version.ref = "kryptoprefs" }
+kryptoprefs-gson = { module = "com.github.rumboalla.KryptoPrefs:kryptoprefs-gson", version.ref = "kryptoprefsGson" }
 library = { module = "me.zhanghai.compose.preference:library", version.ref = "library" }
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 androidx-constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintlayout" }
@@ -56,4 +70,5 @@ xicon_pack_z = { module = "br.com.devsrsouza.compose.icons:{ICON_PACK}", version
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+kotlin-serialization = {id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlinxSerialization"}
 

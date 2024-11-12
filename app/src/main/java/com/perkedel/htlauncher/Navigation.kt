@@ -105,7 +105,8 @@ fun Navigation(
                             }
 
                             Screen.AllAppsScreen -> {
-                                Text(text = "All Apps | (${pm.getInstalledPackages(0).size})")
+//                                Text(text = "All Apps | (${pm.getInstalledPackages(0).size})")
+                                Text(text = "All Apps | (${pm.getInstalledApplications(0).size})")
                             }
 
                             Screen.ConfigurationScreen -> {
@@ -223,9 +224,22 @@ private fun goBackHome(
     navController.popBackStack(Screen.HomeScreen.name, inclusive = false)
 }
 
+
 public fun startIntent(context: Context, what: String){
     // https://www.geeksforgeeks.org/android-jetpack-compose-open-specific-settings-screen/
     val i : Intent = Intent(what)
     context.startActivity(i)
 }
 
+public fun startIntent(context: Context, what: Intent){
+    // https://www.geeksforgeeks.org/android-jetpack-compose-open-specific-settings-screen/
+    val i : Intent = what
+    context.startActivity(i)
+}
+
+public fun startApplication(context: Context, what: String, pm: PackageManager = context.packageManager){
+    // https://developer.android.com/reference/android/content/pm/PackageManager.html#getLaunchIntentForPackage(java.lang.String)
+    // https://stackoverflow.com/questions/3422758/start-application-knowing-package-name
+    val launchIntent : Intent = pm.getLaunchIntentForPackage(what)!!
+    startIntent(context,launchIntent)
+}
