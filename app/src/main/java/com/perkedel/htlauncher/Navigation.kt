@@ -14,24 +14,40 @@ import android.content.Context;
 import android.content.Intent
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Build
 import android.provider.Settings
+import androidx.activity.compose.ManagedActivityResultLauncher
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.ColorScheme
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.hapticfeedback.HapticFeedback
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.unit.dp
 import androidx.core.content.pm.PackageInfoCompat
 
 import androidx.lifecycle.ViewModel
@@ -42,6 +58,7 @@ import com.perkedel.htlauncher.ui.navigation.AllAppsScreen
 import com.perkedel.htlauncher.ui.navigation.Configurationing
 import com.perkedel.htlauncher.ui.theme.rememberColorScheme
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Navigation(
     navController: NavHostController = rememberNavController(),
@@ -86,6 +103,22 @@ fun Navigation(
 //        val versionNumber: Long = 0
 //    }
 //    val colorScheme = if (isSystemInDarkTheme()) darkColorScheme() else lightColorScheme()
+
+    // https://medium.com/@yogesh_shinde/implementing-image-video-documents-picker-in-jetpack-compose-73ef846cfffb
+    // https://composables.com/jetpack-compose-tutorials/activityresultcontract
+    // https://developer.android.com/reference/androidx/activity/result/contract/ActivityResultContracts.OpenDocumentTree
+//    val saveDirResult = remember { mutableStateOf<Uri?>(null) }
+    val saveDirLauncher = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocumentTree()) { dirUri ->
+        if (dirUri != null){
+            println("Selected Save Dir `${dirUri}`")
+//            saveDirResult.value = dirUri
+
+//            onSelectedSaveDir(dirUri)
+            anViewModel.selectSaveDirUri(dirUri)
+        } else {
+            println("No Save Dir Selected")
+        }
+    }
 
     Surface(
         modifier = Modifier,
@@ -202,14 +235,59 @@ fun Navigation(
                 composable(
                     route = Screen.ConfigurationScreen.name,
                 ) {
+                    val areYouSureChangeSaveDir = remember { mutableStateOf(false) }
                     Configurationing(
                         navController = navController,
                         context = context,
                         pm = pm,
+                        saveDirResult = htuiState.selectedSaveDir,
+                        onSelectedSaveDir = {
+                            anViewModel.selectSaveDirUri(it)
+                        },
+                        onChooseSaveDir = {
+                            areYouSureChangeSaveDir.value = true
+                        },
                         haptic = haptic,
                         versionName = versionName,
                         versionNumber = versionNumber,
                     )
+                    if (areYouSureChangeSaveDir.value){
+                        BasicAlertDialog(
+                            onDismissRequest = {
+                                areYouSureChangeSaveDir.value = false
+                            },
+                            content = {
+                                Column(
+                                    modifier = Modifier.padding(16.dp)
+                                ) {
+                                    Text("Configuration Directory")
+                                    Spacer(
+                                        Modifier.fillMaxWidth().size(16.dp)
+                                    )
+                                    Text("Your Config Folder is currently at:\n${htuiState.selectedSaveDir}")
+                                    Spacer(
+                                        Modifier.fillMaxWidth().size(16.dp)
+                                    )
+                                    Row {
+                                        TextButton(
+                                            onClick = {
+                                                areYouSureChangeSaveDir.value = false
+
+                                            }
+                                        ) { Text("Change") }
+                                        TextButton(
+                                            onClick = {
+                                                areYouSureChangeSaveDir.value = false
+                                            }
+                                        ) { Text("Dismiss") }
+                                    }
+                                }
+                            }
+                        )
+
+                    } else {
+                        // Close dialog
+                    }
                 }
             }
         }
@@ -224,7 +302,6 @@ private fun goBackHome(
     navController.popBackStack(Screen.HomeScreen.name, inclusive = false)
 }
 
-
 public fun startIntent(context: Context, what: String){
     // https://www.geeksforgeeks.org/android-jetpack-compose-open-specific-settings-screen/
     val i : Intent = Intent(what)
@@ -237,9 +314,30 @@ public fun startIntent(context: Context, what: Intent){
     context.startActivity(i)
 }
 
+//public fun startIntent(context: Context, what:ManagedActivityResultLauncher<I,O>, args){
+//    what.launch(args)
+//}
+
 public fun startApplication(context: Context, what: String, pm: PackageManager = context.packageManager){
     // https://developer.android.com/reference/android/content/pm/PackageManager.html#getLaunchIntentForPackage(java.lang.String)
     // https://stackoverflow.com/questions/3422758/start-application-knowing-package-name
     val launchIntent : Intent = pm.getLaunchIntentForPackage(what)!!
     startIntent(context,launchIntent)
 }
+
+@Composable
+//public fun changeSaveDir(): Uri? {
+//    var nowUri: Uri? = null
+//    val saveDirLauncher = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocumentTree()) { dirUri ->
+//        if (dirUri != null){
+//            println("Selected Save Dir `${dirUri}`")
+////            saveDirResult.value = dirUri
+//
+//            nowUri = dirUri
+//        } else {
+//            println("No Save Dir Selected")
+//        }
+//
+//    }
+//    return nowUri
+//}

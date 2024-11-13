@@ -1,8 +1,16 @@
+@file:OptIn(ExperimentalFoundationApi::class)
+
 package com.perkedel.htlauncher.ui.navigation
 
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
+import android.net.Uri
+import android.provider.DocumentsContract
 import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
@@ -19,6 +27,7 @@ import androidx.compose.material.icons.filled.Contacts
 import androidx.compose.material.icons.filled.DisplaySettings
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Error
+import androidx.compose.material.icons.filled.Folder
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Pages
 import androidx.compose.material.icons.filled.Phone
@@ -32,6 +41,9 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.hapticfeedback.HapticFeedback
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
@@ -39,13 +51,17 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.app.ActivityCompat.startActivityForResult
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.perkedel.htlauncher.HTViewModel
 import com.perkedel.htlauncher.ui.theme.HTLauncherTheme
 import me.zhanghai.compose.preference.ProvidePreferenceLocals
 import me.zhanghai.compose.preference.footerPreference
 import me.zhanghai.compose.preference.listPreference
 import me.zhanghai.compose.preference.preference
+import java.net.URI
+
 //import com.perkedel.htlauncher.BuildConfig
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -55,6 +71,9 @@ fun Configurationing(
     context: Context = LocalContext.current,
     pm: PackageManager = context.packageManager,
     haptic: HapticFeedback = LocalHapticFeedback.current,
+    onSelectedSaveDir: (Uri) -> Unit = {  },
+    onChooseSaveDir: () -> Unit = {},
+    saveDirResult: Uri? = null,
     versionName:String = "XXXX.XX.XX",
     versionNumber:Long = 0,
 ){
@@ -62,6 +81,20 @@ fun Configurationing(
     // https://composeexamples.com/components/application-ui/screens/settings
 //    val versionName:String = BuildConfig.VERSION_NAME
 //    val versionName:String
+    // https://medium.com/@yogesh_shinde/implementing-image-video-documents-picker-in-jetpack-compose-73ef846cfffb
+    // https://composables.com/jetpack-compose-tutorials/activityresultcontract
+    // https://developer.android.com/reference/androidx/activity/result/contract/ActivityResultContracts.OpenDocumentTree
+//    val saveDirResult = remember { mutableStateOf<Uri?>(null) }
+    val saveDirLauncher = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocumentTree()) { dirUri ->
+        if (dirUri != null){
+            println("Selected Save Dir `${dirUri}`")
+//            saveDirResult.value = dirUri
+
+            onSelectedSaveDir(dirUri)
+        } else {
+            println("No Save Dir Selected")
+        }
+    }
 
     ProvidePreferenceLocals {
         LazyColumn(
@@ -112,6 +145,7 @@ fun Configurationing(
                 title = { Text(text = "Menu Options" ) },
                 icon = { Icon(imageVector = Icons.Default.SettingsInputComponent, contentDescription = null) },
                 onClick = {
+
                 }
             )
 
@@ -221,6 +255,18 @@ fun Configurationing(
                 onClick = {
                 }
             )
+            preference(
+                key = "save_location",
+                title = { Text(text = "Change Configuration Folder Location" ) },
+                summary = {
+//                    Text(text = "Selected: ${saveDirResult.value}" )
+                    Text(text = "Selected: ${saveDirResult}" )
+                          },
+                icon = { Icon(imageVector = Icons.Default.Folder, contentDescription = null) },
+                onClick = {
+                    saveDirLauncher.launch(null)
+                }
+            )
 
             footerPreference(
                 key = "about",
@@ -245,14 +291,26 @@ fun Configurationing(
 fun SettingCategoryBar(
     title:String = "",
     modifier: Modifier = Modifier,
+    haptic: HapticFeedback = LocalHapticFeedback.current,
     icon: @Composable() (() -> Unit?)? = null,
 ){
     Card(
         modifier = Modifier
             .fillMaxWidth()
+            .combinedClickable(
+                onClick = {
+
+                },
+                onLongClick = {
+                    // TODO: Talkback read this title!
+                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                },
+                onClickLabel = "Category `${title}`"
+            )
         ,
     ) {
         if(icon != null){
+            // ikr? just eval `(icon)` does not work unlike in most game engines. What a
             Box(
                 modifier = Modifier.padding(25.dp)
             ){
@@ -260,7 +318,9 @@ fun SettingCategoryBar(
             }
         }
         Text(
-            modifier = Modifier.fillMaxSize().padding(20.dp),
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(20.dp),
             text = title
         )
     }
@@ -276,3 +336,15 @@ fun ConfigurationingPreview(){
         )
     }
 }
+
+// https://developer.android.com/training/data-storage/shared/documents-files#grant-access-directory
+//fun openSaveDir(pickerInitialUri: Uri){
+//// Choose a directory using the system's file picker.
+//    val intent = Intent(Intent.ACTION_OPEN_DOCUMENT_TREE).apply {
+//        // Optionally, specify a URI for the directory that should be opened in
+//        // the system file picker when it loads.
+//        putExtra(DocumentsContract.EXTRA_INITIAL_URI, pickerInitialUri)
+//    }
+//
+//    startActivityForResult(intent, 23748923)
+//}

@@ -1,5 +1,6 @@
 package com.perkedel.htlauncher
 
+import android.net.Uri
 import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -18,6 +19,14 @@ class HTViewModel : ViewModel() {
         _uiState.update {
             currentState -> currentState.copy(
                 openMoreMenu = opened
+            )
+        }
+    }
+
+    fun selectSaveDirUri(dirUri: Uri? = null){
+        _uiState.update {
+            currentState -> currentState.copy(
+                selectedSaveDir = dirUri
             )
         }
     }
