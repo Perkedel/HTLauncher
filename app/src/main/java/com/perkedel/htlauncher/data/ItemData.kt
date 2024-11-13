@@ -1,0 +1,16 @@
+package com.perkedel.htlauncher.data
+
+import android.graphics.Color
+import com.perkedel.htlauncher.ui.theme.rememberColorScheme
+
+data class ItemData(
+    val name:String, // Name of this item. Not showing
+    val label:String, // Label that shows above the icon. If empty, showLabel shows name above.
+    val aria:String, // Aria says to be read by A11y narrator system
+    val action:List<ActionData>, // What should this item do?
+
+    // Customize
+    val showLabel:Boolean = true, // Show the label
+    val textFillColor: String = "Black", // Color say of this label text
+    val textOutlineColor: String = "White", // Color say of this label text stroke
+)

@@ -2,6 +2,7 @@
 
 package com.perkedel.htlauncher.ui.navigation
 
+import android.content.ContentResolver
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -36,6 +37,7 @@ import androidx.compose.material.icons.filled.SettingsInputComponent
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material.icons.filled.Sms
 import androidx.compose.material.icons.filled.Sos
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.Translate
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
@@ -73,7 +75,9 @@ fun Configurationing(
     haptic: HapticFeedback = LocalHapticFeedback.current,
     onSelectedSaveDir: (Uri) -> Unit = {  },
     onChooseSaveDir: () -> Unit = {},
+    onChooseTextFile: () -> Unit = {},
     saveDirResult: Uri? = null,
+    onOpenTextFile: ((uri:Uri,contentResolver:ContentResolver)->Unit)? = {uri,contentResolver -> {}},
     versionName:String = "XXXX.XX.XX",
     versionNumber:Long = 0,
 ){
@@ -85,16 +89,16 @@ fun Configurationing(
     // https://composables.com/jetpack-compose-tutorials/activityresultcontract
     // https://developer.android.com/reference/androidx/activity/result/contract/ActivityResultContracts.OpenDocumentTree
 //    val saveDirResult = remember { mutableStateOf<Uri?>(null) }
-    val saveDirLauncher = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocumentTree()) { dirUri ->
-        if (dirUri != null){
-            println("Selected Save Dir `${dirUri}`")
-//            saveDirResult.value = dirUri
-
-            onSelectedSaveDir(dirUri)
-        } else {
-            println("No Save Dir Selected")
-        }
-    }
+//    val saveDirLauncher = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocumentTree()) { dirUri ->
+//        if (dirUri != null){
+//            println("Selected Save Dir `${dirUri}`")
+////            saveDirResult.value = dirUri
+//
+//            onSelectedSaveDir(dirUri)
+//        } else {
+//            println("No Save Dir Selected")
+//        }
+//    }
 
     ProvidePreferenceLocals {
         LazyColumn(
@@ -234,16 +238,17 @@ fun Configurationing(
                 onClick = {
                 }
             )
-            preference(
-                key = "terms",
-                title = { Text(text = "Terms of Service" ) },
-                icon = { Icon(imageVector = Icons.Default.Balance, contentDescription = null) },
-                onClick = {
-                }
-            )
+//            preference(
+//                key = "terms",
+//                title = { Text(text = "Terms of Service" ) },
+//                icon = { Icon(imageVector = Icons.Default.Balance, contentDescription = null) },
+//                onClick = {
+            // combined to About screen
+//                }
+//            )
             preference(
                 key = "remove_default",
-                title = { Text(text = "Remove `HT Launcher` as default launchers" ) },
+                title = { Text(text = "Remove `HT Launcher` as default launcher" ) },
                 icon = { Icon(imageVector = Icons.Default.Restore, contentDescription = null) },
                 onClick = {
                 }
@@ -264,7 +269,20 @@ fun Configurationing(
                           },
                 icon = { Icon(imageVector = Icons.Default.Folder, contentDescription = null) },
                 onClick = {
-                    saveDirLauncher.launch(null)
+//                    saveDirLauncher.launch(null)
+                    onChooseSaveDir()
+                }
+            )
+            preference(
+                key = "debug_testJson",
+                title = { Text(text = "[DEBUG] Test Json" ) },
+                summary = {
+//                    Text(text = "Selected: ${saveDirResult.value}" )
+                    Text(text = "Selected: ${saveDirResult}" )
+                },
+                icon = { Icon(imageVector = Icons.Default.Star, contentDescription = null) },
+                onClick = {
+                    onChooseTextFile()
                 }
             )
 

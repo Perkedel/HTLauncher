@@ -129,4 +129,5 @@ dependencies {
 //    implementation(libs.kryptoprefs.gson) // https://github.com/rumboalla/KryptoPrefs
 
     implementation(libs.kotlinx.serialization.json) // https://github.com/Kotlin/kotlinx.serialization
+    //    implementation(libs.androidx.compose.material3)
 }

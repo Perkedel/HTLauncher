@@ -27,6 +27,7 @@ navigationFragmentKtx = "2.6.0"
 navigationUiKtx = "2.6.0"
 retrofit = "2.11.0"
 xicon_pack_z = "1.1.1"
+composeMaterial3 = "1.0.0-alpha28"
 
 [libraries]
 accompanist-adaptive = { module = "com.google.accompanist:accompanist-adaptive" }
@@ -66,6 +67,7 @@ androidx-navigation-fragment-ktx = { group = "androidx.navigation", name = "navi
 androidx-navigation-ui-ktx = { group = "androidx.navigation", name = "navigation-ui-ktx", version.ref = "navigationUiKtx" }
 retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
 xicon_pack_z = { module = "br.com.devsrsouza.compose.icons:{ICON_PACK}", version.ref = "xicon_pack_z" }
+androidx-compose-material3 = { group = "androidx.wear.compose", name = "compose-material3", version.ref = "composeMaterial3" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

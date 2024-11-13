@@ -31,6 +31,14 @@ class HTViewModel : ViewModel() {
         }
     }
 
+    fun changeTestResult(into:String = "HOAHOA"){
+        _uiState.update {
+            currentState -> currentState.copy(
+                testResult = into,
+            )
+        }
+    }
+
     fun openTheMoreMenu(){
         _uiState.update {
                 currentState -> currentState.copy(

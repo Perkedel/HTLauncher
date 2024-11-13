@@ -2,44 +2,35 @@ package com.perkedel.htlauncher.ui.navigation
 
 import android.content.Context
 import android.content.pm.PackageManager
-import android.content.pm.PackageManager.GET_ACTIVITIES
-import android.graphics.drawable.Drawable
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.MarqueeAnimationMode
 import androidx.compose.foundation.MarqueeSpacing
-import androidx.compose.foundation.background
 import androidx.compose.foundation.basicMarquee
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
-import androidx.compose.material3.darkColorScheme
-import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.hapticfeedback.HapticFeedback
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.core.graphics.createBitmap
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import coil3.compose.AsyncImage
 import com.perkedel.htlauncher.startApplication
-import com.perkedel.htlauncher.startIntent
 import com.perkedel.htlauncher.ui.theme.HTLauncherTheme
 import com.perkedel.htlauncher.ui.theme.rememberColorScheme
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import me.zhanghai.compose.preference.Preference
 import me.zhanghai.compose.preference.ProvidePreferenceLocals
 
@@ -51,6 +42,9 @@ fun AllAppsScreen(
     pm: PackageManager = context.packageManager,
     colorScheme: ColorScheme = rememberColorScheme(),
     haptic: HapticFeedback = LocalHapticFeedback.current,
+    coroutineScope: CoroutineScope = rememberCoroutineScope(),
+    snackbarHostState: SnackbarHostState = remember {SnackbarHostState()},
+    onSnackbarResult:(SnackbarResult) -> Unit = {  },
     ) {
     // https://stackoverflow.com/questions/64377518/how-to-initialize-or-access-packagemanager-out-from-coroutinecontext
     // https://www.geeksforgeeks.org/different-ways-to-get-list-of-all-apps-installed-in-your-android-phone/
@@ -148,7 +142,11 @@ fun AllAppsScreen(
 //                                startApplication(context, packList[it].applicationInfo.packageName)
                                 startApplication(context, appList[it].packageName)
                             } catch (e: Exception) {
-                                println(e)
+//                                println(e)
+                                e.printStackTrace()
+                                coroutineScope.launch {
+                                    onSnackbarResult(snackbarHostState.showSnackbar("WERROR 404! Launcher Activity undefined"))
+                                }
                             }
 
 
@@ -171,6 +169,7 @@ fun AllAppsScreenPreview() {
     HTLauncherTheme {
         AllAppsScreen(
             navController = rememberNavController(),
+
         )
     }
 }
