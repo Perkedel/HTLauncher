@@ -78,6 +78,7 @@ fun Configurationing(
     onChooseSaveDir: () -> Unit = {},
     onChooseTextFile: () -> Unit = {},
     onCheckPermission: () -> Unit = {},
+    onClickVersion:() -> Unit = {/* GO TO ABOUT SCREEN*/},
     saveDirResult: Uri? = null,
     testTextResult:String = "",
     onOpenTextFile: ((uri:Uri,contentResolver:ContentResolver)->Unit)? = {uri,contentResolver -> {}},
@@ -300,9 +301,7 @@ fun Configurationing(
                 summary = { Text(text = "${"HT Launcher"} v${versionName} (Itteration No. ${versionNumber})") },
                 modifier = Modifier
                     .combinedClickable(
-                        onClick = {
-
-                        },
+                        onClick = onClickVersion,
                         onLongClick = {
                             haptic.performHapticFeedback(HapticFeedbackType.LongPress)
                             Toast.makeText(context,"HELLO A", Toast.LENGTH_SHORT).show()

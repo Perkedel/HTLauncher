@@ -431,6 +431,9 @@ fun Navigation(
                         onCheckPermission = {
                             attemptPermission.value = true
                         },
+                        onClickVersion = {
+                            navController.navigate(Screen.AboutScreen.name)
+                        },
                         testTextResult = htuiState.testResult,
                         haptic = haptic,
                         versionName = versionName,

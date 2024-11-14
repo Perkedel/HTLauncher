@@ -163,8 +163,10 @@ fun AboutTerms(
             item{
                 // Disclaimer Card! Expandable
                 Box(
-                    modifier = Modifier.fillMaxWidth()
-                )
+                    modifier = Modifier.fillMaxWidth().padding(16.dp)
+                ) {
+                    Text(text = stringResource(R.string.disclaimer_full))
+                }
             }
         }
     }
