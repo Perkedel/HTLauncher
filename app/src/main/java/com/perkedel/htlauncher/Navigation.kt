@@ -19,22 +19,14 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import android.provider.Settings
-import android.webkit.PermissionRequest
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Folder
-import androidx.compose.material3.BasicAlertDialog
-import androidx.compose.material3.Card
 import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -42,27 +34,26 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
+import androidx.compose.runtime.MutableState
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.hapticfeedback.HapticFeedback
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
-import androidx.compose.ui.unit.dp
 import androidx.core.app.ActivityCompat.shouldShowRequestPermissionRationale
 import androidx.core.content.pm.PackageInfoCompat
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
-import androidx.documentfile.provider.DocumentFile.fromTreeUri
+import androidx.documentfile.provider.DocumentFile
 
 import androidx.lifecycle.ViewModel
+import com.perkedel.htlauncher.enumerations.Screen
 import com.perkedel.htlauncher.func.createDataStore
 //import androidx.wear.compose.material3.ScaffoldState
 import com.perkedel.htlauncher.ui.dialog.HomeMoreMenu
@@ -73,12 +64,15 @@ import com.perkedel.htlauncher.ui.dialog.HTAlertDialog
 import com.perkedel.htlauncher.ui.dialog.PermissionDialog
 import com.perkedel.htlauncher.ui.dialog.PhoneCallPermissionTextProvider
 import com.perkedel.htlauncher.ui.dialog.RecordAudioPermissionTextProvider
+import com.perkedel.htlauncher.ui.navigation.AboutTerms
 import com.perkedel.htlauncher.ui.navigation.AllAppsScreen
 import com.perkedel.htlauncher.ui.navigation.Configurationing
 import com.perkedel.htlauncher.ui.theme.rememberColorScheme
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.jsonObject
 import java.io.BufferedReader
 import java.io.IOException
 import java.io.InputStreamReader
@@ -199,6 +193,12 @@ fun Navigation(
     // https://www.linkedin.com/pulse/displaying-files-from-local-storage-jetpack-compose-wajahat-jawaid
             // https://fvilarino.medium.com/using-activity-result-contracts-in-jetpack-compose-14b179fb87de
     // https://github.com/DrVipinKumar/Android-Jetpack-Compose/tree/main/FileRWInternalStorageJetpackCompose
+    // https://github.com/philipplackner/PermissionsGuideCompose/blob/master/app/src/main/java/com/plcoding/permissionsguidecompose/MainActivity.kt
+    // https://developer.android.com/training/data-storage/shared/documents-files#grant-access-directory
+    // https://stackoverflow.com/questions/68730711/how-to-set-text-size-in-android-jetpack-compose-text
+    // https://github.com/abdallahmehiz/mpvKt/blob/main/app%2Fsrc%2Fmain%2Fjava%2Flive%2Fmehiz%2Fmpvkt%2Fui%2Fpreferences%2FAdvancedPreferencesScreen.kt WORK
+    // https://github.com/abdallahmehiz/mpvKt
+    //
 //    val saveDirResult = remember { mutableStateOf<Uri?>(null) }
     val takeFlags: Int = Intent.FLAG_GRANT_READ_URI_PERMISSION or
             Intent.FLAG_GRANT_WRITE_URI_PERMISSION
@@ -207,8 +207,9 @@ fun Navigation(
         if (dirUri != null){
             println("Selected Save Dir `${dirUri}`")
 //            saveDirResult.value = dirUri
-
+            val totalUriTest = "${htuiState.selectedSaveDir}%2Ftest.json"
 //            onSelectedSaveDir(dirUri)
+            val jsonTestRaw:MutableState<String> = mutableStateOf<String>("")
             anViewModel.selectSaveDirUri(dirUri)
             saveDirResolver.takePersistableUriPermission(dirUri,takeFlags)
             coroutineScope.launch {
@@ -218,17 +219,24 @@ fun Navigation(
                 }
             }
             println("Let's try test.json!")
-            println("Parse URI! ${Uri.parse("${htuiState.selectedSaveDir}%2Ftest.json")}")
+            println("Parse URI! ${Uri.parse(totalUriTest)}")
             try {
-                val jsonTestRaw = openATextFile(
+                val tempFile = kotlin.io.path.createTempFile()
+//                println(runCatching {
+                    val urei = DocumentFile.fromTreeUri(context,Uri.parse("${htuiState.selectedSaveDir}")!!)!!.findFile("test.json")!!.uri
+                println("Urei! ${urei}")
+                    jsonTestRaw.value = openATextFile(
 //                    Uri.withAppendedPath(htuiState.selectedSaveDir, "test.json"),
 //                    htuiState.selectedSaveDir!!.path,
 //                    fromTreeUri(context, Uri.withAppendedPath(htuiState.selectedSaveDir, "test.json"))!!.uri,
-                    Uri.parse("${htuiState.selectedSaveDir!!}%2Ftest.json"), // FUCK YOU WHY CAN'T YOU GIVE ME FUCKING EXAMPLE!??!?!
-                    saveDirResolver
-                )
-                println("JSON Test:\n${jsonTestRaw}")
-                anViewModel.changeTestResult(jsonTestRaw)
+//                    Uri.parse(totalUriTest), // FUCK YOU WHY CAN'T YOU GIVE ME FUCKING EXAMPLE!??!?!
+                        urei, // FRUCKING FRNALLY!!! THANCC MPV KT
+                        saveDirResolver
+                    )
+                    println("JSON Test:\n${jsonTestRaw.value}")
+                    println("Find Parser!\n\n${Json.parseToJsonElement(jsonTestRaw.value)}")
+                    anViewModel.changeTestResult(jsonTestRaw.value)
+//                })
             } catch (e:Exception){
                 println("WERROR EXCEPTION")
                 e.printStackTrace()
@@ -236,7 +244,17 @@ fun Navigation(
                 println("WERROR IOEXCEPTION")
                 e.printStackTrace()
             }
-//            anViewModel.changeTestResult()
+
+            println("Okay Parser Found, let's interpret!")
+            try{
+                anViewModel.injectTestJsonResult(Json.parseToJsonElement(jsonTestRaw.value))
+
+                println("READ THE INJECT JSON ${htuiState.testJsonElement}")
+                println("& TEST VALUE IS `${htuiState.testJsonElement.jsonObject.getValue("test")}`")
+            } catch (e:Exception){
+                println("WERROR EXCEPTION JSON")
+                e.printStackTrace()
+            }
         } else {
             println("No Save Dir Selected")
         }
@@ -518,6 +536,16 @@ fun Navigation(
                             )
                         }
                 }
+                composable(Screen.AboutScreen.name) {
+                    AboutTerms(
+                        navController = navController,
+                        context = context,
+                        pm = pm,
+                        haptic = haptic,
+                        versionName = versionName,
+                        versionNumber = versionNumber,
+                    )
+                }
             }
         }
     }
@@ -556,19 +584,23 @@ public fun startApplication(context: Context, what: String, pm: PackageManager =
 }
 
 @Throws(IOException::class)
-public fun openATextFile(uri:Uri, contentResolver: ContentResolver):String{
+public fun openATextFile(uri:Uri, contentResolver: ContentResolver,newLine:Boolean = true):String{
     // https://developer.android.com/training/data-storage/shared/documents-files#input_stream
     val stringBuilder = StringBuilder()
     contentResolver.openInputStream(uri)?.use { inputStream ->
         BufferedReader(InputStreamReader(inputStream)).use { reader ->
             var line: String? = reader.readLine()
             while (line != null) {
-                stringBuilder.append(line)
+                stringBuilder.append(line+(if (newLine) "\n" else ""))
                 line = reader.readLine()
             }
         }
     }
     return stringBuilder.toString()
+}
+
+public fun writeATextFile(uri:Uri, contentResolver: ContentResolver){
+
 }
 
 //private fun setNewSaveDir(intoUri: Uri){

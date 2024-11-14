@@ -18,7 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.perkedel.htlauncher.R
-import com.perkedel.htlauncher.Screen
+import com.perkedel.htlauncher.enumerations.Screen
 import com.perkedel.htlauncher.ui.theme.HTLauncherTheme
 
 @OptIn(ExperimentalMaterial3Api::class)

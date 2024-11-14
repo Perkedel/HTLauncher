@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import kotlinx.coroutines.flow.update
+import kotlinx.serialization.json.JsonElement
 
 class HTViewModel : ViewModel() {
     // https://developer.android.com/codelabs/basic-android-kotlin-compose-viewmodel-and-state#11
@@ -55,6 +56,14 @@ class HTViewModel : ViewModel() {
         _uiState.update {
             currentState -> currentState.copy(
                 testResult = into,
+            )
+        }
+    }
+
+    fun injectTestJsonResult(into:JsonElement){
+        _uiState.update {
+            currentState -> currentState.copy(
+                testJsonElement = into,
             )
         }
     }

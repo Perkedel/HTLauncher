@@ -1,6 +1,8 @@
 package com.perkedel.htlauncher
 
 import android.net.Uri
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonElement
 
 data class HTUIState(
     val currentPage: Int = 0,
@@ -11,5 +13,6 @@ data class HTUIState(
     val dismissDialogClickOutside: Boolean = true,
     val testResult:String = "HAIHAHA",
 //    val testFilePath:Uri,
+    val testJsonElement:JsonElement = Json.parseToJsonElement(string = "{ \"test\" \n: \"HUAHAHU\" }")
 ) {
 }

@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">HT Launcher</string>
+    <string name="app_name" translatable="false">HT Launcher</string>
     <string name="title_activity_main2">Leanback MainActivity2</string>
     <string name="browse_title">Videos by Your Company</string>
     <string name="related_movies">Related Videos</string>
@@ -14,13 +14,15 @@
     <string name="buy_2">AT $9.99</string>
     <string name="movie">Movie</string>
 
-    <!--  About  -->
-<!--    <string name="version">2025.1.0</string>-->
+    <!--  Site  -->
+    <string name="source_code_site_0">https://github.com/Perkedel/HTLauncher</string>
+    <string name="web_site_0">https://perkedel.netlify.app/ht</string>
 
     <!--  Home Screen  -->
     <string name="home_screen">Home</string>
     <string name="all_apps">All Apps</string>
     <string name="configuration_screen">Configuration</string>
+    <string name="about_screen">About</string>
     <string name="back_button">Back</string>
 
     <!--  Home More Menu  -->
@@ -28,6 +30,17 @@
     <string name="Home_more_configuration">Configure Launchers</string>
     <string name="Home_more_sys_setting">System Settings</string>
     <string name="Home_more_all_apps">All Apps</string>
+
+    <!--  Configurations  -->
+    <string name="version_option">Version</string>
+    <string name="source_code_option">Source Code</string>
+    <string name="version_code_option">Version Code</string>
+    <string name="terms_option">Terms of Use</string>
+    <string name="terms_option_desc">Read Terms of Use</string>
+    <string name="disclaimer_option">Disclaimer</string>
+    <string name="disclaimer_option_desc">Something to keep in mind</string>
+
+    <!--  a  -->
 
     <!-- Error messages -->
     <string name="error_fragment_message">An error occurred</string>
@@ -134,4 +147,16 @@
         "when a user tries to pick up one of cards.\n\n"
     </string>
     <string name="title_activity_navigation">Navigation</string>
+
+    <!--  Long Text  -->
+    <string name="disclaimer_full">
+        "Disclaimer\n\n"
+
+        "This piece of software was made for the purpose for parody. Any resemblance of software "
+        "product, real, fake, or defunct, are purely coincidental and made up."
+
+        "Creation of this product subjects for act of satire, hence does not condone nor express "
+        "any disparagement, insult, nor callouts whatsoever (even some strings may found to have"
+        "said so)."
+    </string>
 </resources>

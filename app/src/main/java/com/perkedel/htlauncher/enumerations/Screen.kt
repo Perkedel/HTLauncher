@@ -1,7 +1,7 @@
-package com.perkedel.htlauncher
+package com.perkedel.htlauncher.enumerations
 
 import androidx.annotation.StringRes
-import androidx.navigation.NavArgs
+import com.perkedel.htlauncher.R
 
 //sealed class Screen (val route:String) {
 //    data object HomeScreen : Screen("home")
@@ -22,4 +22,5 @@ enum class Screen (@StringRes val title: Int){
     HomeScreen(title = R.string.app_name),
     AllAppsScreen(title = R.string.all_apps),
     ConfigurationScreen(title = R.string.configuration_screen),
+    AboutScreen(title = R.string.about_screen),
 }

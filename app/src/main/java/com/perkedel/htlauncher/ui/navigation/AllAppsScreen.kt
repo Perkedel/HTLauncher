@@ -37,7 +37,7 @@ import me.zhanghai.compose.preference.ProvidePreferenceLocals
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AllAppsScreen(
-    navController: NavController?,
+    navController: NavController? = rememberNavController(),
     context: Context = LocalContext.current,
     pm: PackageManager = context.packageManager,
     colorScheme: ColorScheme = rememberColorScheme(),
@@ -168,8 +168,6 @@ private fun getAllApps() {
 fun AllAppsScreenPreview() {
     HTLauncherTheme {
         AllAppsScreen(
-            navController = rememberNavController(),
-
         )
     }
 }
