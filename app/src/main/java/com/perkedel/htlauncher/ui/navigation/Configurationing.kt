@@ -33,6 +33,7 @@ import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Pages
 import androidx.compose.material.icons.filled.Phone
 import androidx.compose.material.icons.filled.Restore
+import androidx.compose.material.icons.filled.Security
 import androidx.compose.material.icons.filled.SettingsInputComponent
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material.icons.filled.Sms
@@ -76,7 +77,9 @@ fun Configurationing(
     onSelectedSaveDir: (Uri) -> Unit = {  },
     onChooseSaveDir: () -> Unit = {},
     onChooseTextFile: () -> Unit = {},
+    onCheckPermission: () -> Unit = {},
     saveDirResult: Uri? = null,
+    testTextResult:String = "",
     onOpenTextFile: ((uri:Uri,contentResolver:ContentResolver)->Unit)? = {uri,contentResolver -> {}},
     versionName:String = "XXXX.XX.XX",
     versionNumber:Long = 0,
@@ -261,6 +264,16 @@ fun Configurationing(
                 }
             )
             preference(
+                key = "check_permission",
+                title = { Text(text = "Check Permission" ) },
+                summary = {
+//                    Text(text = "Selected: ${saveDirResult.value}" )
+                    Text(text = "Check & grant required permissions" )
+                },
+                icon = { Icon(imageVector = Icons.Default.Security, contentDescription = null) },
+                onClick = onCheckPermission
+            )
+            preference(
                 key = "save_location",
                 title = { Text(text = "Change Configuration Folder Location" ) },
                 summary = {
@@ -268,22 +281,17 @@ fun Configurationing(
                     Text(text = "Selected: ${saveDirResult}" )
                           },
                 icon = { Icon(imageVector = Icons.Default.Folder, contentDescription = null) },
-                onClick = {
-//                    saveDirLauncher.launch(null)
-                    onChooseSaveDir()
-                }
+                onClick = onChooseSaveDir
             )
             preference(
                 key = "debug_testJson",
                 title = { Text(text = "[DEBUG] Test Json" ) },
                 summary = {
 //                    Text(text = "Selected: ${saveDirResult.value}" )
-                    Text(text = "Selected: ${saveDirResult}" )
+                    Text(text = "Selected file content:\n${testTextResult}" )
                 },
                 icon = { Icon(imageVector = Icons.Default.Star, contentDescription = null) },
-                onClick = {
-                    onChooseTextFile()
-                }
+                onClick = onChooseTextFile
             )
 
             footerPreference(

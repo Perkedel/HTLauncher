@@ -1,5 +1,6 @@
 package com.perkedel.htlauncher
 
+import android.Manifest
 import android.content.ContentResolver
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
@@ -18,6 +19,8 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import android.provider.Settings
+import android.webkit.PermissionRequest
+import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -28,10 +31,13 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Folder
 import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
@@ -48,6 +54,7 @@ import androidx.compose.ui.hapticfeedback.HapticFeedback
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.unit.dp
+import androidx.core.app.ActivityCompat.shouldShowRequestPermissionRationale
 import androidx.core.content.pm.PackageInfoCompat
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
@@ -61,6 +68,11 @@ import com.perkedel.htlauncher.func.createDataStore
 import com.perkedel.htlauncher.ui.dialog.HomeMoreMenu
 import com.perkedel.htlauncher.ui.navigation.HomeScreen
 import com.perkedel.htlauncher.ui.bars.HTAppBar
+import com.perkedel.htlauncher.ui.dialog.CameraPermissionTextProvider
+import com.perkedel.htlauncher.ui.dialog.HTAlertDialog
+import com.perkedel.htlauncher.ui.dialog.PermissionDialog
+import com.perkedel.htlauncher.ui.dialog.PhoneCallPermissionTextProvider
+import com.perkedel.htlauncher.ui.dialog.RecordAudioPermissionTextProvider
 import com.perkedel.htlauncher.ui.navigation.AllAppsScreen
 import com.perkedel.htlauncher.ui.navigation.Configurationing
 import com.perkedel.htlauncher.ui.theme.rememberColorScheme
@@ -86,8 +98,39 @@ fun Navigation(
     snackbarHostState:SnackbarHostState = remember {SnackbarHostState()},
     darkTheme: Boolean = isSystemInDarkTheme(),
     dynamicColor: Boolean = true,
-    colorScheme: ColorScheme = rememberColorScheme()
+    colorScheme: ColorScheme = rememberColorScheme(),
+    permissionRequests: Array<String> = arrayOf(""),
+//    permissionStates = rememberMultiplePermissionsState(permissionRequests),
+    activityHandOver: ComponentActivity = ComponentActivity()
 ){
+    //permission
+    //
+//    val permissions:Array<String> = if(Build.VERSION.SDK_INT >= 33){
+//        arrayOf(
+//            Manifest.permission.READ_MEDIA_AUDIO,
+//            Manifest.permission.READ_MEDIA_VIDEO,
+//            Manifest.permission.READ_MEDIA_IMAGES,
+//        )
+//    } else {
+//        arrayOf(
+//            Manifest.permission.READ_EXTERNAL_STORAGE,
+//            Manifest.permission.WRITE_EXTERNAL_STORAGE,
+//        )
+//    }
+    var multiplePermissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestMultiplePermissions(),
+        onResult = { perms ->
+            // https://github.com/philipplackner/PermissionsGuideCompose/blob/master/app/src/main/java/com/plcoding/permissionsguidecompose/MainActivity.kt
+            // https://youtu.be/D3JCtaK8LSU
+            permissionRequests.forEach { aPermission ->
+                anViewModel.onPermissionResult(
+                    permission = aPermission,
+                    isGranted = perms[aPermission] == true,
+                )
+            }
+        }
+    )
+
     // https://youtu.be/4gUeyNkGE3g
     // https://github.com/philipplackner/NavigationMultiModule
     // https://youtube.com/shorts/SAD8flVdILY
@@ -111,7 +154,7 @@ fun Navigation(
         } else {
             pm.getPackageInfo(packageName, 0)
         }
-        val versionName: String = packageInfo.versionName
+        val versionName: String = packageInfo.versionName!!
         val versionNumber: Long = PackageInfoCompat.getLongVersionCode(packageInfo)
 //    } catch (e : Exception) {
 //        val packageName: String = ""
@@ -155,6 +198,7 @@ fun Navigation(
     // https://www.linkedin.com/pulse/displaying-files-from-local-storage-jetpack-compose-wajahat-jawaid
     // https://www.linkedin.com/pulse/displaying-files-from-local-storage-jetpack-compose-wajahat-jawaid
             // https://fvilarino.medium.com/using-activity-result-contracts-in-jetpack-compose-14b179fb87de
+    // https://github.com/DrVipinKumar/Android-Jetpack-Compose/tree/main/FileRWInternalStorageJetpackCompose
 //    val saveDirResult = remember { mutableStateOf<Uri?>(null) }
     val takeFlags: Int = Intent.FLAG_GRANT_READ_URI_PERMISSION or
             Intent.FLAG_GRANT_WRITE_URI_PERMISSION
@@ -174,8 +218,8 @@ fun Navigation(
                 }
             }
             println("Let's try test.json!")
+            println("Parse URI! ${Uri.parse("${htuiState.selectedSaveDir}%2Ftest.json")}")
             try {
-                println("Pare URI! ${Uri.parse("${htuiState.selectedSaveDir}%2Ftest.json")}")
                 val jsonTestRaw = openATextFile(
 //                    Uri.withAppendedPath(htuiState.selectedSaveDir, "test.json"),
 //                    htuiState.selectedSaveDir!!.path,
@@ -184,6 +228,7 @@ fun Navigation(
                     saveDirResolver
                 )
                 println("JSON Test:\n${jsonTestRaw}")
+                anViewModel.changeTestResult(jsonTestRaw)
             } catch (e:Exception){
                 println("WERROR EXCEPTION")
                 e.printStackTrace()
@@ -211,7 +256,7 @@ fun Navigation(
                 e.printStackTrace()
             }
         } else {
-
+            println("No Test File Selected")
         }
     }
 
@@ -345,6 +390,7 @@ fun Navigation(
                     route = Screen.ConfigurationScreen.name,
                 ) {
                     val attemptChangeSaveDir = remember { mutableStateOf(false) }
+                    val attemptPermission = remember { mutableStateOf(false) }
                     val areYouSureChangeSaveDir = remember { mutableStateOf(false) }
                     Configurationing(
                         navController = navController,
@@ -362,8 +408,12 @@ fun Navigation(
                             uri, contentResolver -> openATextFile(uri = uri, contentResolver =  contentResolver)
                         },
                         onChooseTextFile = {
-                            testFileLauncher.launch(null)
+                            testFileLauncher.launch(arrayOf<String>("",""))
                         },
+                        onCheckPermission = {
+                            attemptPermission.value = true
+                        },
+                        testTextResult = htuiState.testResult,
                         haptic = haptic,
                         versionName = versionName,
                         versionNumber = versionNumber,
@@ -377,59 +427,96 @@ fun Navigation(
                         }
                     }
                     if (areYouSureChangeSaveDir.value) {
-                        BasicAlertDialog(
+                        HTAlertDialog(
                             onDismissRequest = {
                                 areYouSureChangeSaveDir.value = false
                                 attemptChangeSaveDir.value = false
                             },
-                            content = {
-                                Card(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(16.dp),
-                                ) {
-                                    Column(
-                                        modifier = Modifier.padding(16.dp)
-                                    ) {
-                                        Text("Configuration Directory")
-                                        Spacer(
-                                            Modifier
-                                                .fillMaxWidth()
-                                                .size(16.dp)
-                                        )
-                                        Text("Your Config Folder is currently at:\n${htuiState.selectedSaveDir}")
-                                        Spacer(
-                                            Modifier
-                                                .fillMaxWidth()
-                                                .size(16.dp)
-                                        )
-                                        Row(
-                                            modifier = Modifier
-                                                .align(Alignment.End)
-                                            ,
-                                        ) {
-                                            TextButton(
-                                                onClick = {
-                                                    saveDirLauncher.launch(null)
-                                                    areYouSureChangeSaveDir.value = false
-                                                    attemptChangeSaveDir.value = false
-                                                }
-                                            ) { Text("Change") }
-                                            TextButton(
-                                                onClick = {
-                                                    areYouSureChangeSaveDir.value = false
-                                                    attemptChangeSaveDir.value = false
-                                                }
-                                            ) { Text("Dismiss") }
-                                        }
-                                    }
-                                }
-                            }
-                        )
+                            swapButton = true,
+                            icon = { Icon(Icons.Default.Folder, contentDescription = "Folder Icon")},
+                            title = "Configuration Directory",
+                            text = "Your Config Folder is currently at:\n${htuiState.selectedSaveDir}",
+                            confirmText = "Change",
+                            dismissText = "Dismiss",
+                            onConfirm = {
+                                saveDirLauncher.launch(null)
+                                areYouSureChangeSaveDir.value = false
+                                attemptChangeSaveDir.value = false
+                            },
+                        ){
+
+                        }
                     } else {
                         // Close dialog cancel
                         attemptChangeSaveDir.value = false
                     }
+
+                    if(attemptPermission.value){
+                        HTAlertDialog(
+                            title = "Permissions",
+                            text = "Make sure you have granted permission for this app to ensure working experience\nClick `Grant` to proceed, or `Details` to manually grant permissions.",
+                            thirdButton = true,
+                            confirmText = "Grant",
+                            thirdText = "Details",
+                            onConfirm = {
+                                multiplePermissionLauncher.launch(permissionRequests)
+                                attemptPermission.value = false
+                            },
+                            onThirdButton = {
+                                startIntent(
+                                    context, Intent(
+                                        Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+                                        Uri.fromParts("package", packageName, null)
+                                    )
+                                )
+                                attemptPermission.value = false
+                            },
+                            onDismissRequest = {
+                                attemptPermission.value = false
+                            }
+                        )
+                    } else {
+//                        attemptPermission.value = false
+                    }
+
+                    anViewModel.visiblePermissionDialogQueue
+                        .reversed()
+                        .forEach{ permission ->
+                            PermissionDialog(
+                                permissionsTextProvider = when(permission){
+                                    Manifest.permission.CAMERA -> {
+                                        CameraPermissionTextProvider()
+                                    }
+                                    Manifest.permission.RECORD_AUDIO -> {
+                                        RecordAudioPermissionTextProvider()
+                                    }
+                                    Manifest.permission.CALL_PHONE -> {
+                                        PhoneCallPermissionTextProvider()
+                                    }
+                                    else -> return@forEach
+                                },
+                                isPermanentlyDeclined = !shouldShowRequestPermissionRationale(
+                                    activityHandOver,
+                                    permission,
+                                ),
+                                onDismiss = anViewModel::dissmissPermissionDialog,
+                                onOkClick = {
+                                    anViewModel.dissmissPermissionDialog()
+                                    multiplePermissionLauncher.launch(
+                                        arrayOf(permission)
+                                    )
+                                },
+                                onGoToAppSettingClick = {
+
+                                    startIntent(
+                                        context, Intent(
+                                            Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+                                            Uri.fromParts("package", packageName, null)
+                                        )
+                                    )
+                                }
+                            )
+                        }
                 }
             }
         }
@@ -460,6 +547,7 @@ public fun startIntent(context: Context, what: Intent){
 //    what.launch(args)
 //}
 
+@Throws(Exception::class)
 public fun startApplication(context: Context, what: String, pm: PackageManager = context.packageManager){
     // https://developer.android.com/reference/android/content/pm/PackageManager.html#getLaunchIntentForPackage(java.lang.String)
     // https://stackoverflow.com/questions/3422758/start-application-knowing-package-name
