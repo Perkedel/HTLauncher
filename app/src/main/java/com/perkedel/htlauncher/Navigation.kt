@@ -49,9 +49,14 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.unit.dp
 import androidx.core.content.pm.PackageInfoCompat
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.documentfile.provider.DocumentFile.fromTreeUri
 
 import androidx.lifecycle.ViewModel
+import com.perkedel.htlauncher.func.createDataStore
 //import androidx.wear.compose.material3.ScaffoldState
 import com.perkedel.htlauncher.ui.dialog.HomeMoreMenu
 import com.perkedel.htlauncher.ui.navigation.HomeScreen
@@ -60,6 +65,8 @@ import com.perkedel.htlauncher.ui.navigation.AllAppsScreen
 import com.perkedel.htlauncher.ui.navigation.Configurationing
 import com.perkedel.htlauncher.ui.theme.rememberColorScheme
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 import java.io.BufferedReader
 import java.io.IOException
 import java.io.InputStreamReader
@@ -71,6 +78,7 @@ fun Navigation(
     context: Context = LocalContext.current,
     pm: PackageManager = context.packageManager,
     haptic: HapticFeedback = LocalHapticFeedback.current,
+    prefs: DataStore<Preferences> = remember { createDataStore(context) },
     anViewModel: HTViewModel = viewModel(),
     homePagerState: PagerState = rememberPagerState(pageCount = {10}),
 //    scaffoldState: ScaffoldState = rememberScaffoldState(),
@@ -113,6 +121,21 @@ fun Navigation(
 //    }
 //    val colorScheme = if (isSystemInDarkTheme()) darkColorScheme() else lightColorScheme()
 
+    // LOAD SETTING
+    val selectedSaveDir by prefs
+        .data
+        .map {
+            val saveDir = stringPreferencesKey("saveDir")
+            it[saveDir] ?: "HTLauncher"
+        }
+        .collectAsState("HTLauncher")
+    try{
+    anViewModel.selectSaveDirUri(Uri.parse(selectedSaveDir))
+    } catch (e:Exception){
+        e.printStackTrace()
+    } catch (e:IOException){
+        e.printStackTrace()
+    }
     // https://medium.com/@yogesh_shinde/implementing-image-video-documents-picker-in-jetpack-compose-73ef846cfffb
     // https://composables.com/jetpack-compose-tutorials/activityresultcontract
     // https://developer.android.com/reference/androidx/activity/result/contract/ActivityResultContracts.OpenDocumentTree
@@ -128,6 +151,9 @@ fun Navigation(
     // https://www.geeksforgeeks.org/android-jetpack-compose-external-storage/
     // https://github.com/android/storage-samples
     // https://developer.android.com/reference/kotlin/androidx/activity/result/contract/ActivityResultContracts.OpenDocumentTree
+    // https://youtu.be/_k4tUuG47TU
+    // https://www.linkedin.com/pulse/displaying-files-from-local-storage-jetpack-compose-wajahat-jawaid
+    // https://www.linkedin.com/pulse/displaying-files-from-local-storage-jetpack-compose-wajahat-jawaid
             // https://fvilarino.medium.com/using-activity-result-contracts-in-jetpack-compose-14b179fb87de
 //    val saveDirResult = remember { mutableStateOf<Uri?>(null) }
     val takeFlags: Int = Intent.FLAG_GRANT_READ_URI_PERMISSION or
@@ -141,14 +167,20 @@ fun Navigation(
 //            onSelectedSaveDir(dirUri)
             anViewModel.selectSaveDirUri(dirUri)
             saveDirResolver.takePersistableUriPermission(dirUri,takeFlags)
+            coroutineScope.launch {
+                prefs.edit { dataStore ->
+                    val saveDir = stringPreferencesKey("saveDir")
+                    dataStore[saveDir] = dirUri.toString()
+                }
+            }
             println("Let's try test.json!")
             try {
+                println("Pare URI! ${Uri.parse("${htuiState.selectedSaveDir}%2Ftest.json")}")
                 val jsonTestRaw = openATextFile(
 //                    Uri.withAppendedPath(htuiState.selectedSaveDir, "test.json"),
 //                    htuiState.selectedSaveDir!!.path,
 //                    fromTreeUri(context, Uri.withAppendedPath(htuiState.selectedSaveDir, "test.json"))!!.uri,
-//                    Uri.parse("${htuiState.selectedSaveDir!!}%2Ftest.json"), // FUCK YOU WHY CAN'T YOU GIVE ME FUCKING EXAMPLE!??!?!
-
+                    Uri.parse("${htuiState.selectedSaveDir!!}%2Ftest.json"), // FUCK YOU WHY CAN'T YOU GIVE ME FUCKING EXAMPLE!??!?!
                     saveDirResolver
                 )
                 println("JSON Test:\n${jsonTestRaw}")

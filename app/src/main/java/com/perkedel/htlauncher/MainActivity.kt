@@ -20,11 +20,15 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBarDefaults.topAppBarColors
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
+import com.perkedel.htlauncher.func.createDataStore
 import com.perkedel.htlauncher.ui.theme.HTLauncherTheme
 
 class MainActivity : ComponentActivity() {
@@ -33,7 +37,9 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            HomeGreeting()
+            HomeGreeting(
+//                prefs = remember { createDataStore(applicationContext) }
+            )
         }
 
     }
@@ -41,9 +47,13 @@ class MainActivity : ComponentActivity() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeGreeting(){
+fun HomeGreeting(
+//    prefs:DataStore<Preferences>
+){
     HTLauncherTheme {
-        Navigation()
+        Navigation(
+//            prefs = prefs
+        )
     }
 }
 
@@ -62,5 +72,7 @@ fun GreetingPreview() {
 ////        Greeting("Android")
 //
 //    }
-    HomeGreeting()
+    HomeGreeting(
+//        prefs = remember { createDataStore(applicationContext) }
+    )
 }
