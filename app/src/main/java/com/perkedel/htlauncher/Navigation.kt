@@ -19,6 +19,7 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import android.provider.Settings
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -45,6 +46,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.hapticfeedback.HapticFeedback
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.res.stringResource
 import androidx.core.app.ActivityCompat.shouldShowRequestPermissionRationale
 import androidx.core.content.pm.PackageInfoCompat
 import androidx.datastore.core.DataStore
@@ -54,6 +56,7 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.documentfile.provider.DocumentFile
 
 import androidx.lifecycle.ViewModel
+import com.perkedel.htlauncher.data.HomepagesWeHave
 import com.perkedel.htlauncher.enumerations.Screen
 import com.perkedel.htlauncher.func.createDataStore
 //import androidx.wear.compose.material3.ScaffoldState
@@ -73,10 +76,13 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.decodeFromJsonElement
+import kotlinx.serialization.json.encodeToJsonElement
 import kotlinx.serialization.json.jsonObject
 import java.io.BufferedReader
 import java.io.IOException
 import java.io.InputStreamReader
+import kotlin.math.log
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -87,7 +93,7 @@ fun Navigation(
     haptic: HapticFeedback = LocalHapticFeedback.current,
     prefs: DataStore<Preferences> = remember { createDataStore(context) },
     anViewModel: HTViewModel = viewModel(),
-    homePagerState: PagerState = rememberPagerState(pageCount = {10}),
+//    homePagerState: PagerState = rememberPagerState(pageCount = {10}),
 //    scaffoldState: ScaffoldState = rememberScaffoldState(),
     coroutineScope: CoroutineScope = rememberCoroutineScope(),
     snackbarHostState:SnackbarHostState = remember {SnackbarHostState()},
@@ -98,6 +104,16 @@ fun Navigation(
 //    permissionStates = rememberMultiplePermissionsState(permissionRequests),
     activityHandOver: ComponentActivity = ComponentActivity()
 ){
+    var homePagerState: PagerState = rememberPagerState(pageCount = {10})
+
+    // Dummies
+    val dummyHomeScreen:HomepagesWeHave = HomepagesWeHave(
+        pagesPath = listOf(
+            "Home",
+            "Second",
+        )
+    )
+
     //permission
     //
 //    val permissions:Array<String> = if(Build.VERSION.SDK_INT >= 33){
@@ -164,9 +180,9 @@ fun Navigation(
         .data
         .map {
             val saveDir = stringPreferencesKey("saveDir")
-            it[saveDir] ?: "HTLauncher"
+            it[saveDir] ?: ""
         }
-        .collectAsState("HTLauncher")
+        .collectAsState("")
     try{
     anViewModel.selectSaveDirUri(Uri.parse(selectedSaveDir))
     } catch (e:Exception){
@@ -280,6 +296,12 @@ fun Navigation(
     }
 
 
+
+
+    LaunchedEffect(true) {
+
+    }
+
     Surface(
         modifier = Modifier,
         color = when (currentScreen){
@@ -333,6 +355,52 @@ fun Navigation(
                 modifier = Modifier.padding(innerPadding),
             ) {
                 composable(route = Screen.HomeScreen.name) {
+                    LaunchedEffect(true) {
+
+                    }
+                    if(htuiState.selectedSaveDir != null && htuiState.selectedSaveDir.toString().isNotEmpty()) {
+                        // https://dev.to/vtsen/how-to-debug-jetpack-compose-recomposition-with-logging-k7g
+                        // https://developer.android.com/reference/android/util/Log
+                        Log.d("DebugHomescreen", "Will check ${htuiState.selectedSaveDir}")
+                        val urei = getATextFile(htuiState.selectedSaveDir!!,context,"${stringResource(R.string.home_screen_file)}.json")
+                        Log.d("DebugHomescreen", "So, there is ${urei}")
+                        anViewModel.setHomeScreenJson(urei)
+                        Log.d("DebugHomescreen", "Which contains ${openATextFile(htuiState.coreConfig!!, contentResolver = saveDirResolver)}")
+//                        anViewModel.loadHomeScreenJsonElements(Json.decodeFromString<HomepagesWeHave>(openATextFile(htuiState.coreConfig!!, contentResolver = saveDirResolver)))
+                        if(htuiState.coreConfigJson != null && htuiState.coreConfigJson.toString().isNotEmpty()){
+                            if(htuiState.coreConfigJson!!.pagesPath.isNotEmpty()){
+
+                            } else {
+                                anViewModel.loadHomeScreenJsonElements(
+                                    dummyHomeScreen
+                                )
+                            }
+                        } else {
+                            anViewModel.loadHomeScreenJsonElements(
+                                dummyHomeScreen
+                            )
+                        }
+                    } else {
+                        // TODO: when not select, add dummy demo page
+
+//                        homePagerState
+                        anViewModel.loadHomeScreenJsonElements(
+                            dummyHomeScreen
+                        )
+                    }
+                    Log.d("DebugHomescreen","pls check jsona ${htuiState.coreConfigJson}")
+//                    try {
+                        homePagerState =
+//                            rememberPagerState(pageCount = { htuiState.coreConfigJson!!.pagesPath.size })
+                            rememberPagerState(pageCount = {
+                                var counte:Int = 2
+                                counte = if(htuiState.coreConfigJson != null) htuiState.coreConfigJson!!.pagesPath.size else 2
+                                counte
+                            })
+//                    } catch (e:Exception){
+//                        e.printStackTrace()
+//                    }
+
                     HomeScreen(
                         //                    navController = navController,
                         onAllAppButtonClicked = {
@@ -347,7 +415,15 @@ fun Navigation(
                         colorScheme = colorScheme,
                         haptic = haptic,
                         // TODO: handover the homescreen file json
+                        configFile = htuiState.coreConfigJson,
                     )
+
+                    LaunchedEffect(true) {
+
+                    }
+
+
+
                     if (htuiState.openMoreMenu) {
                         HomeMoreMenu(
                             modifier = Modifier,
@@ -609,7 +685,7 @@ public fun writeATextFile(uri:Uri, contentResolver: ContentResolver){
 
 }
 
-public fun getATextFile(dirUri:Uri, context: Context, fileName:String = "text.txt", mimeType:String = "text/plain"):Uri{
+public fun getATextFile(dirUri:Uri, context: Context, fileName:String = "text.txt", mimeType:String = "text/plain"): Uri{
     // https://github.com/abdallahmehiz/mpvKt/blob/74d407106e1fb0bae4b7bc66e3b0f83e77a6cbc2/app/src/main/java/live/mehiz/mpvkt/ui/preferences/AdvancedPreferencesScreen.kt#L189
     val thingieTree:DocumentFile = DocumentFile.fromTreeUri(context,dirUri)!!
     // check exist
@@ -619,6 +695,19 @@ public fun getATextFile(dirUri:Uri, context: Context, fileName:String = "text.tx
         thingieFile.uri
     } else{
         thingieTree.findFile(fileName)!!.uri
+    }
+}
+
+public fun getADirectory(dirUri:Uri, context: Context, dirName:String = "Folder"): Uri{
+    // https://github.com/abdallahmehiz/mpvKt/blob/74d407106e1fb0bae4b7bc66e3b0f83e77a6cbc2/app/src/main/java/live/mehiz/mpvkt/ui/preferences/AdvancedPreferencesScreen.kt#L189
+    val thingieTree:DocumentFile = DocumentFile.fromTreeUri(context,dirUri)!!
+//    var thingieDir = thingieTree.createDirectory(dirName)!!
+    return if(thingieTree.findFile(dirName) == null || !thingieTree.findFile(dirName)!!.isDirectory){
+        val thingieDir = thingieTree.createDirectory(dirName)!!
+        thingieDir.renameTo(dirName)
+        thingieDir.uri
+    } else {
+        thingieTree.findFile(dirName)!!.uri
     }
 }
 

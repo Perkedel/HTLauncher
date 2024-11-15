@@ -84,6 +84,12 @@ fun AboutTerms(
                 ) {
                     Box(
                         modifier = Modifier.fillMaxSize().padding(16.dp)
+                            .combinedClickable(
+                                onClick = {},
+                                onLongClick = {
+
+                                }
+                            )
                     ) {
                         Column(
                             modifier = Modifier.fillMaxSize()

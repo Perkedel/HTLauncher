@@ -44,11 +44,12 @@ import com.perkedel.htlauncher.widgets.ItemCell
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun BasePage(
+    fileName:String = "Home",
     isOnNumberWhat: Int = 0,
     isFirstPage: Boolean = false,
     howManyItemsHere: Int = 0,
     onMoreMenuButtonClicked: () -> Unit,
-    modifier: Modifier.Companion,
+    modifier: Modifier,
     context: Context = LocalContext.current,
     colorScheme: ColorScheme = rememberColorScheme(),
     haptic: HapticFeedback = LocalHapticFeedback.current,

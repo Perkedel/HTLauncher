@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import com.perkedel.htlauncher.data.HomepagesWeHave
 import kotlinx.coroutines.flow.update
 import kotlinx.serialization.json.JsonElement
 
@@ -73,6 +74,22 @@ class HTViewModel : ViewModel() {
                 currentState -> currentState.copy(
             openMoreMenu = !_uiState.value.openMoreMenu
         )
+        }
+    }
+
+    fun setHomeScreenJson(file:Uri){
+        _uiState.update {
+            currentState -> currentState.copy(
+                coreConfig = file,
+            )
+        }
+    }
+
+    fun loadHomeScreenJsonElements(contains:HomepagesWeHave){
+        _uiState.update {
+            currentState ->currentState.copy(
+                coreConfigJson = contains,
+            )
         }
     }
 }

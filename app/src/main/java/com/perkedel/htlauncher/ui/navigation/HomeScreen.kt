@@ -29,9 +29,11 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.perkedel.htlauncher.data.HomepagesWeHave
 import com.perkedel.htlauncher.ui.page.BasePage
 import com.perkedel.htlauncher.ui.theme.HTLauncherTheme
 import com.perkedel.htlauncher.ui.theme.rememberColorScheme
+import kotlinx.serialization.json.JsonElement
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
@@ -46,8 +48,9 @@ fun HomeScreen(
     context: Context = LocalContext.current,
     colorScheme: ColorScheme = rememberColorScheme(),
     haptic: HapticFeedback = LocalHapticFeedback.current,
-    // TODO: Home screen json file handover
+    configFile:HomepagesWeHave? = null,
 ){
+
     // https://developer.android.com/develop/ui/compose/layouts/pager
     Box(
         modifier = Modifier
