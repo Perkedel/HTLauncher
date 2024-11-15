@@ -34,6 +34,7 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.compose.runtime.collectAsState
@@ -339,11 +340,13 @@ fun Navigation(
                         },
                         onMoreMenuButtonClicked = {
                             anViewModel.openTheMoreMenu(true)
+
                         },
                         handoverPagerState = homePagerState,
                         context = context,
                         colorScheme = colorScheme,
                         haptic = haptic,
+                        // TODO: handover the homescreen file json
                     )
                     if (htuiState.openMoreMenu) {
                         HomeMoreMenu(
@@ -604,6 +607,19 @@ public fun openATextFile(uri:Uri, contentResolver: ContentResolver,newLine:Boole
 
 public fun writeATextFile(uri:Uri, contentResolver: ContentResolver){
 
+}
+
+public fun getATextFile(dirUri:Uri, context: Context, fileName:String = "text.txt", mimeType:String = "text/plain"):Uri{
+    // https://github.com/abdallahmehiz/mpvKt/blob/74d407106e1fb0bae4b7bc66e3b0f83e77a6cbc2/app/src/main/java/live/mehiz/mpvkt/ui/preferences/AdvancedPreferencesScreen.kt#L189
+    val thingieTree:DocumentFile = DocumentFile.fromTreeUri(context,dirUri)!!
+    // check exist
+    return if (thingieTree.findFile(fileName) == null){
+        val thingieFile = thingieTree.createFile(mimeType,fileName)!!
+        thingieFile.renameTo(fileName)
+        thingieFile.uri
+    } else{
+        thingieTree.findFile(fileName)!!.uri
+    }
 }
 
 //private fun setNewSaveDir(intoUri: Uri){

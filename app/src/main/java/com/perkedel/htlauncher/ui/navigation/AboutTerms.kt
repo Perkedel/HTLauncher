@@ -5,7 +5,9 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.Resources
 import android.net.Uri
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -54,6 +56,7 @@ import kotlinx.coroutines.CoroutineScope
 import me.zhanghai.compose.preference.ProvidePreferenceLocals
 import me.zhanghai.compose.preference.preference
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun AboutTerms(
     navController: NavController? = rememberNavController(),
@@ -164,6 +167,14 @@ fun AboutTerms(
                 // Disclaimer Card! Expandable
                 Box(
                     modifier = Modifier.fillMaxWidth().padding(16.dp)
+                        .combinedClickable(
+                            onClick = {
+
+                            },
+                            onLongClick = {
+
+                            }
+                        )
                 ) {
                     Text(text = stringResource(R.string.disclaimer_full))
                 }

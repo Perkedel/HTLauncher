@@ -46,6 +46,7 @@ fun HomeScreen(
     context: Context = LocalContext.current,
     colorScheme: ColorScheme = rememberColorScheme(),
     haptic: HapticFeedback = LocalHapticFeedback.current,
+    // TODO: Home screen json file handover
 ){
     // https://developer.android.com/develop/ui/compose/layouts/pager
     Box(
