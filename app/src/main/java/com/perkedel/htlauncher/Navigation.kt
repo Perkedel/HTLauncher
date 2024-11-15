@@ -365,7 +365,7 @@ fun Navigation(
                         val urei = getATextFile(htuiState.selectedSaveDir!!,context,"${stringResource(R.string.home_screen_file)}.json")
                         Log.d("DebugHomescreen", "So, there is ${urei}")
                         anViewModel.setHomeScreenJson(urei)
-                        Log.d("DebugHomescreen", "Which contains ${openATextFile(htuiState.coreConfig!!, contentResolver = saveDirResolver)}")
+//                        Log.d("DebugHomescreen", "Which contains ${openATextFile(htuiState.coreConfig!!, contentResolver = saveDirResolver)}")
 //                        anViewModel.loadHomeScreenJsonElements(Json.decodeFromString<HomepagesWeHave>(openATextFile(htuiState.coreConfig!!, contentResolver = saveDirResolver)))
                         if(htuiState.coreConfigJson != null && htuiState.coreConfigJson.toString().isNotEmpty()){
                             if(htuiState.coreConfigJson!!.pagesPath.isNotEmpty()){
