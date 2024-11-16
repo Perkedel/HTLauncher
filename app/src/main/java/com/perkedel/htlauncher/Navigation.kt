@@ -57,6 +57,7 @@ import androidx.documentfile.provider.DocumentFile
 
 import androidx.lifecycle.ViewModel
 import com.perkedel.htlauncher.data.HomepagesWeHave
+import com.perkedel.htlauncher.data.ItemData
 import com.perkedel.htlauncher.enumerations.Screen
 import com.perkedel.htlauncher.func.createDataStore
 //import androidx.wear.compose.material3.ScaffoldState
@@ -111,8 +112,10 @@ fun Navigation(
         pagesPath = listOf(
             "Home",
             "Second",
+            "Third",
         )
     )
+    val dummyItems:ItemData = ItemData()
 
     //permission
     //
@@ -298,8 +301,16 @@ fun Navigation(
 
 
 
-    LaunchedEffect(true) {
+    LaunchedEffect(true, htuiState.selectedSaveDir, context) {
+        // You must Folders!!
+        if(htuiState.selectedSaveDir != null && htuiState.selectedSaveDir.toString().isNotEmpty()){
+            getADirectory(htuiState.selectedSaveDir!!, context, "Pages")
+            getADirectory(htuiState.selectedSaveDir!!, context, "Items")
+            getADirectory(htuiState.selectedSaveDir!!, context, "Themes")
+            getADirectory(htuiState.selectedSaveDir!!, context, "Medias")
+        } else {
 
+        }
     }
 
     Surface(
@@ -369,19 +380,23 @@ fun Navigation(
 //                        anViewModel.loadHomeScreenJsonElements(Json.decodeFromString<HomepagesWeHave>(openATextFile(htuiState.coreConfig!!, contentResolver = saveDirResolver)))
                         if(htuiState.coreConfigJson != null && htuiState.coreConfigJson.toString().isNotEmpty()){
                             if(htuiState.coreConfigJson!!.pagesPath.isNotEmpty()){
-
+                                Log.d("DebugHomescreen", "There is something!")
                             } else {
+                                Log.d("DebugHomescreen", "Still nothing!")
                                 anViewModel.loadHomeScreenJsonElements(
                                     dummyHomeScreen
                                 )
                             }
+
                         } else {
+                            Log.d("DebugHomescreen", "There is nothing!")
                             anViewModel.loadHomeScreenJsonElements(
                                 dummyHomeScreen
                             )
                         }
                     } else {
                         // TODO: when not select, add dummy demo page
+                        Log.d("DebugHomescreen", "Literally nothing!")
 
 //                        homePagerState
                         anViewModel.loadHomeScreenJsonElements(
@@ -414,8 +429,10 @@ fun Navigation(
                         context = context,
                         colorScheme = colorScheme,
                         haptic = haptic,
-                        // TODO: handover the homescreen file json
+                        // DONE: handover the homescreen file json
                         configFile = htuiState.coreConfigJson,
+                        viewModel = anViewModel,
+                        contentResolver = saveDirResolver,
                     )
 
                     LaunchedEffect(true) {
@@ -685,15 +702,18 @@ public fun writeATextFile(uri:Uri, contentResolver: ContentResolver){
 
 }
 
-public fun getATextFile(dirUri:Uri, context: Context, fileName:String = "text.txt", mimeType:String = "text/plain"): Uri{
+public fun getATextFile(dirUri:Uri, context: Context, fileName:String = "text.txt", mimeType:String = "text/plain", initData:String = ""): Uri{
     // https://github.com/abdallahmehiz/mpvKt/blob/74d407106e1fb0bae4b7bc66e3b0f83e77a6cbc2/app/src/main/java/live/mehiz/mpvkt/ui/preferences/AdvancedPreferencesScreen.kt#L189
     val thingieTree:DocumentFile = DocumentFile.fromTreeUri(context,dirUri)!!
     // check exist
     return if (thingieTree.findFile(fileName) == null){
         val thingieFile = thingieTree.createFile(mimeType,fileName)!!
         thingieFile.renameTo(fileName)
+        Log.d("GetTextFile","Create Text File of URI: ${thingieFile.uri}")
+        //TODO: write dummy file
         thingieFile.uri
     } else{
+        Log.d("GetTextFile","Found Text File of URI: ${thingieTree.findFile(fileName)!!.uri}")
         thingieTree.findFile(fileName)!!.uri
     }
 }
@@ -704,9 +724,11 @@ public fun getADirectory(dirUri:Uri, context: Context, dirName:String = "Folder"
 //    var thingieDir = thingieTree.createDirectory(dirName)!!
     return if(thingieTree.findFile(dirName) == null || !thingieTree.findFile(dirName)!!.isDirectory){
         val thingieDir = thingieTree.createDirectory(dirName)!!
-        thingieDir.renameTo(dirName)
+//        thingieDir.renameTo(dirName)
+        Log.d("GetDirectory","Create Directory of URI: ${thingieDir.uri}")
         thingieDir.uri
     } else {
+        Log.d("GetDirectory","Found Directory of URI: ${thingieTree.findFile(dirName)!!.uri}")
         thingieTree.findFile(dirName)!!.uri
     }
 }

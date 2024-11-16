@@ -3,7 +3,10 @@ package com.perkedel.htlauncher.data
 data class ActionData(// Items will do something out of these:
     val name:String = "Launch", // Name of this action
     val action:String = "", // Package name? exe name?
-    val args:List<String>, // Arguments of it this
+    val args:List<String> = listOf(
+        "",
+        "",
+    ), // Arguments of it this
     val type:String = "", //Type of this action.
 
     /*

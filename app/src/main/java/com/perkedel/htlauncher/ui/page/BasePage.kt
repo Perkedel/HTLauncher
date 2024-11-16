@@ -1,6 +1,8 @@
 package com.perkedel.htlauncher.ui.page
 
+import android.content.ContentResolver
 import android.content.Context
+import android.net.Uri
 import android.widget.Toast
 import androidx.compose.foundation.CombinedClickableNode
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -23,6 +25,7 @@ import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -34,26 +37,49 @@ import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.perkedel.htlauncher.HTUIState
+import com.perkedel.htlauncher.HTViewModel
+import com.perkedel.htlauncher.data.HomepagesWeHave
+import com.perkedel.htlauncher.data.PageData
 import com.perkedel.htlauncher.func.WindowInfo
 import com.perkedel.htlauncher.func.rememberWindowInfo
+import com.perkedel.htlauncher.getATextFile
+import com.perkedel.htlauncher.openATextFile
 import com.perkedel.htlauncher.ui.theme.HTLauncherTheme
 import com.perkedel.htlauncher.ui.theme.rememberColorScheme
 import com.perkedel.htlauncher.widgets.FirstPageCard
 import com.perkedel.htlauncher.widgets.ItemCell
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun BasePage(
-    fileName:String = "Home",
+    fileName:String = "",
     isOnNumberWhat: Int = 0,
     isFirstPage: Boolean = false,
     howManyItemsHere: Int = 0,
     onMoreMenuButtonClicked: () -> Unit,
     modifier: Modifier,
     context: Context = LocalContext.current,
+    viewModel: HTViewModel = HTViewModel(),
+    contentResolver: ContentResolver = context.contentResolver,
+    uiState: HTUIState = HTUIState(),
     colorScheme: ColorScheme = rememberColorScheme(),
     haptic: HapticFeedback = LocalHapticFeedback.current,
 ){
+    // Load this file!
+    var pageUri:Uri = Uri.parse("")
+    var pageOfIt:PageData = PageData()
+    LaunchedEffect(
+        true
+    ) {
+        if(fileName.isNotEmpty() && uiState.selectedSaveDir != null && uiState.selectedSaveDir.toString().isNotEmpty()){
+            pageUri = getATextFile(uiState.selectedSaveDir,context,"${fileName}.json", Json.encodeToString<PageData>(PageData()))
+            pageOfIt = Json.decodeFromString<PageData>(openATextFile(pageUri,contentResolver))
+        }
+    }
+
     // https://youtu.be/UhnTTk3cwc4?si=5BoNxc4uZdM6y5nG
     // https://youtu.be/qP-ieASbqMY?si=JFoxgnsQyDf3iJob
     // https://youtu.be/NPmgnGFzopA?si=yOJydgvsQrLfsHKk
@@ -71,7 +97,7 @@ fun BasePage(
                 state = lazyListState,
                 content = {
                     // Permanent Card on first page
-                    if (isFirstPage){
+                    if (isFirstPage || pageOfIt.isHome){
                         item(
                             span = { GridItemSpan(this.maxLineSpan) }
                         ){
@@ -97,6 +123,7 @@ fun BasePage(
 //                            Text(text = "item $i")
 //                        }
                         ItemCell(
+//                            readTheItemFile = pageOfIt.items[i],
                             handoverText = "Item ${i}",
                         )
                     }
@@ -107,7 +134,7 @@ fun BasePage(
             // anything else
             Row {
                 // Permanent Card on first page
-                if(isFirstPage){
+                if(isFirstPage || pageOfIt.isHome){
                     FirstPageCard(
                         isCompact = isCompact,
                         isOnNumberWhat = isOnNumberWhat,

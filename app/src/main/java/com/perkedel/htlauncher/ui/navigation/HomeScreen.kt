@@ -1,5 +1,6 @@
 package com.perkedel.htlauncher.ui.navigation
 
+import android.content.ContentResolver
 import android.content.Context
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
@@ -29,6 +30,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.perkedel.htlauncher.HTUIState
+import com.perkedel.htlauncher.HTViewModel
 import com.perkedel.htlauncher.data.HomepagesWeHave
 import com.perkedel.htlauncher.ui.page.BasePage
 import com.perkedel.htlauncher.ui.theme.HTLauncherTheme
@@ -46,11 +49,13 @@ fun HomeScreen(
     modifier: Modifier = Modifier.fillMaxSize(),
     hideTopBar: Boolean = true,
     context: Context = LocalContext.current,
+    viewModel:HTViewModel = HTViewModel(),
+    uiState: HTUIState = HTUIState(),
+    contentResolver: ContentResolver = context.contentResolver,
     colorScheme: ColorScheme = rememberColorScheme(),
     haptic: HapticFeedback = LocalHapticFeedback.current,
     configFile:HomepagesWeHave? = null,
 ){
-
     // https://developer.android.com/develop/ui/compose/layouts/pager
     Box(
         modifier = Modifier
@@ -75,6 +80,7 @@ fun HomeScreen(
 
                 ) { page ->
                 BasePage(
+//                    fileName = configFile!!.pagesPath[page],
                     isOnNumberWhat = page,
                     isFirstPage = page == 0,
                     // TODO: read JSON file `anPage.json` in folder `Pages`, if the `isFirstPage` declaration in itself is set to true.
@@ -85,6 +91,8 @@ fun HomeScreen(
                     context = context,
                     colorScheme = colorScheme,
                     haptic = haptic,
+                    viewModel = viewModel,
+                    contentResolver = contentResolver,
                 )
             }
 

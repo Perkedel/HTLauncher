@@ -4,10 +4,12 @@ import android.graphics.Color
 import com.perkedel.htlauncher.ui.theme.rememberColorScheme
 
 data class ItemData(
-    val name:String, // Name of this item. Not showing
-    val label:String, // Label that shows above the icon. If empty, showLabel shows name above.
-    val aria:String, // Aria says to be read by A11y narrator system
-    val action:List<ActionData>, // What should this item do?
+    val name:String = "anItem", // Name of this item. Not showing
+    val label:String = "Item Data", // Label that shows above the icon. If empty, showLabel shows name above.
+    val aria:String = "Item Data", // Aria says to be read by A11y narrator system.
+    val action:List<ActionData> = listOf(
+        ActionData(),
+    ), // What should this item do?
 
     // Customize
     val showLabel:Boolean = true, // Show the label

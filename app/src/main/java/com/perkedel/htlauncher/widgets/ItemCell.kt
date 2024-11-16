@@ -58,6 +58,11 @@ fun ItemCell(
     pm : PackageManager = context.packageManager,
     haptic: HapticFeedback = LocalHapticFeedback.current,
 ){
+    // Load file
+    if(readTheItemFile.isNotEmpty()){
+
+    }
+
     Surface(
         modifier = modifier
             .combinedClickable(

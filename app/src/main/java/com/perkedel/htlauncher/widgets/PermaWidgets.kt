@@ -60,7 +60,9 @@ fun FirstPageCard(
             Column(
                 verticalArrangement = Arrangement.spacedBy(16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = if(isCompact)Modifier.weight(1f) else Modifier
+                modifier = if(isCompact) Modifier
+                    .weight(1f)
+                else Modifier
                     .fillMaxHeight()
                     .size(200.dp)
 
@@ -84,6 +86,8 @@ fun FirstPageCard(
 //                    },
 //                    modifier = Modifier.padding(5.dp),
 //                )
+
+                // bottom the more menu?
             }
             IconButton(
                 onClick = onMoreMenuButton,
