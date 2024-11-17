@@ -247,6 +247,9 @@ fun Navigation(
             println("Let's try test.json!")
             println("Parse URI! ${Uri.parse(totalUriTest)}")
             try {
+                // https://stackoverflow.com/a/24869904/9079640
+                // Java.nio is only available since API 26. Min was 21, crash!
+
                 val tempFile = kotlin.io.path.createTempFile()
 //                println(runCatching {
 //                val urei = DocumentFile.fromTreeUri(context,Uri.parse("${htuiState.selectedSaveDir}")!!)!!.findFile("test.json")!!.uri

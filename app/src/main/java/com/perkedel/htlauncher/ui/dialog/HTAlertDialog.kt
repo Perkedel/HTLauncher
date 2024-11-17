@@ -1,14 +1,22 @@
-@file:OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3Api::class)
+@file:OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3Api::class,
+    ExperimentalMaterial3Api::class
+)
 
 package com.perkedel.htlauncher.ui.dialog
 
 import android.graphics.drawable.Icon
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Error
 import androidx.compose.material3.BasicAlertDialog
@@ -23,6 +31,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewDynamicColors
+import androidx.compose.ui.tooling.preview.PreviewFontScale
+import androidx.compose.ui.tooling.preview.PreviewLightDark
+import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -32,7 +44,15 @@ import com.perkedel.htlauncher.ui.theme.HTLauncherTheme
 @Composable
 fun HTAlertDialog(
     modifier: Modifier = Modifier,
-    icon: @Composable () -> Unit = { Icon(imageVector = Icons.Default.Error, contentDescription = "") },
+    icon: @Composable () -> Unit = {
+        Icon(
+            modifier = Modifier
+
+            ,
+            imageVector = Icons.Default.Error,
+            contentDescription = ""
+        )
+    },
     title:String = "Alert",
     text:String = "This is alert",
 
@@ -63,11 +83,17 @@ fun HTAlertDialog(
             ) {
                 Column(
                     modifier = Modifier
+                        // https://stackoverflow.com/a/68166668/9079640
+                        .verticalScroll(rememberScrollState())
                         .padding(16.dp)
                         .align(Alignment.CenterHorizontally),
                 ) {
-                    icon()
-
+                    Row(
+                        modifier = Modifier
+                            .align(Alignment.CenterHorizontally)
+                    ){
+                        icon()
+                    }
                     Spacer(
                         Modifier
                             .fillMaxWidth()
@@ -76,6 +102,7 @@ fun HTAlertDialog(
 
                     Text(
                         title,
+                        modifier = Modifier.align(Alignment.CenterHorizontally),
                         fontSize = 32.sp,
                         textAlign = TextAlign.Center
                     )
@@ -84,7 +111,9 @@ fun HTAlertDialog(
                             .fillMaxWidth()
                             .size(16.dp)
                     )
+
                     Text(
+                        modifier = Modifier.align(Alignment.CenterHorizontally),
                         text = text,
                         textAlign = TextAlign.Center
                     )
@@ -95,15 +124,16 @@ fun HTAlertDialog(
                     )
 
                     content()
-
                     Spacer(
                         Modifier
                             .fillMaxWidth()
                             .size(16.dp)
                     )
+
                     Row(
                         modifier = Modifier
                             .align(Alignment.End)
+                            .horizontalScroll(rememberScrollState())
                         ,
                     ) {
                         if(thirdButton && thirdButtonPosition == ThirdButtonPosition.Left){
@@ -153,6 +183,10 @@ fun HTAlertDialog(
     )
 }
 
+@PreviewFontScale
+@PreviewLightDark
+@PreviewScreenSizes
+@PreviewDynamicColors
 @Preview(showBackground = true)
 @Composable
 fun HTAlertDialogPreview(){
