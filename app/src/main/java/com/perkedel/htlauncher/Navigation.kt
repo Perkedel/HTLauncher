@@ -16,6 +16,7 @@ import android.content.Context;
 import android.content.Intent
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
+import android.content.res.Configuration
 import android.net.Uri
 import android.os.Build
 import android.provider.Settings
@@ -44,6 +45,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.hapticfeedback.HapticFeedback
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
@@ -56,6 +58,8 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.documentfile.provider.DocumentFile
 
 import androidx.lifecycle.ViewModel
+import com.google.accompanist.systemuicontroller.SystemUiController
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.perkedel.htlauncher.data.HomepagesWeHave
 import com.perkedel.htlauncher.data.ItemData
 import com.perkedel.htlauncher.enumerations.Screen
@@ -90,6 +94,7 @@ import kotlin.math.log
 fun Navigation(
     navController: NavHostController = rememberNavController(),
     context: Context = LocalContext.current,
+    configuration: Configuration = LocalConfiguration.current,
     pm: PackageManager = context.packageManager,
     haptic: HapticFeedback = LocalHapticFeedback.current,
     prefs: DataStore<Preferences> = remember { createDataStore(context) },
@@ -103,7 +108,8 @@ fun Navigation(
     colorScheme: ColorScheme = rememberColorScheme(),
     permissionRequests: Array<String> = arrayOf(""),
 //    permissionStates = rememberMultiplePermissionsState(permissionRequests),
-    activityHandOver: ComponentActivity = ComponentActivity()
+    activityHandOver: ComponentActivity = ComponentActivity(),
+    systemUiController: SystemUiController = rememberSystemUiController(),
 ){
     var homePagerState: PagerState = rememberPagerState(pageCount = {10})
 
@@ -243,7 +249,8 @@ fun Navigation(
             try {
                 val tempFile = kotlin.io.path.createTempFile()
 //                println(runCatching {
-                    val urei = DocumentFile.fromTreeUri(context,Uri.parse("${htuiState.selectedSaveDir}")!!)!!.findFile("test.json")!!.uri
+//                val urei = DocumentFile.fromTreeUri(context,Uri.parse("${htuiState.selectedSaveDir}")!!)!!.findFile("test.json")!!.uri
+                val urei = getATextFile(dirUri = dirUri, context = context, fileName = "test.json")
                 println("Urei! ${urei}")
                     jsonTestRaw.value = openATextFile(
 //                    Uri.withAppendedPath(htuiState.selectedSaveDir, "test.json"),
@@ -302,6 +309,10 @@ fun Navigation(
 
 
     LaunchedEffect(true, htuiState.selectedSaveDir, context) {
+        // Full screen
+        // https://stackoverflow.com/a/69689196/9079640
+//        systemUiController.isStatusBarVisible = false
+
         // You must Folders!!
         if(htuiState.selectedSaveDir != null && htuiState.selectedSaveDir.toString().isNotEmpty()){
             getADirectory(htuiState.selectedSaveDir!!, context, "Pages")
@@ -312,6 +323,7 @@ fun Navigation(
 
         }
     }
+
 
     Surface(
         modifier = Modifier,
@@ -340,7 +352,7 @@ fun Navigation(
                             }
 
                             else -> {
-                                Text(text = "")
+                                Text(text = currentScreen.name)
                             }
                         }
                     },
@@ -369,6 +381,7 @@ fun Navigation(
                     LaunchedEffect(true) {
 
                     }
+//                    setStatusBarVisibility(false,systemUiController)
                     if(htuiState.selectedSaveDir != null && htuiState.selectedSaveDir.toString().isNotEmpty()) {
                         // https://dev.to/vtsen/how-to-debug-jetpack-compose-recomposition-with-logging-k7g
                         // https://developer.android.com/reference/android/util/Log
@@ -427,12 +440,14 @@ fun Navigation(
                         },
                         handoverPagerState = homePagerState,
                         context = context,
+                        configuration = configuration,
                         colorScheme = colorScheme,
                         haptic = haptic,
                         // DONE: handover the homescreen file json
                         configFile = htuiState.coreConfigJson,
                         viewModel = anViewModel,
                         contentResolver = saveDirResolver,
+                        systemUiController = systemUiController,
                     )
 
                     LaunchedEffect(true) {
@@ -477,7 +492,10 @@ fun Navigation(
                                 }
                                 anViewModel.openTheMoreMenu(false)
                             },
-                            onDismissRequest = { anViewModel.openTheMoreMenu(false) }
+                            onDismissRequest = {
+                                anViewModel.openTheMoreMenu(false)
+//                                setStatusBarVisibility(false,systemUiController)
+                            }
                         )
                     }
                 }
@@ -497,7 +515,8 @@ fun Navigation(
                             {
 
                             }
-                        }
+                        },
+                        systemUiController = systemUiController,
                     )
                 }
                 composable(
@@ -534,6 +553,7 @@ fun Navigation(
                         haptic = haptic,
                         versionName = versionName,
                         versionNumber = versionNumber,
+                        systemUiController = systemUiController,
                     )
                     if(attemptChangeSaveDir.value) {
                         if (htuiState.selectedSaveDir != null) {
@@ -643,6 +663,7 @@ fun Navigation(
                         haptic = haptic,
                         versionName = versionName,
                         versionNumber = versionNumber,
+                        systemUiController = systemUiController,
                     )
                 }
             }
@@ -736,6 +757,10 @@ public fun getADirectory(dirUri:Uri, context: Context, dirName:String = "Folder"
 //private fun setNewSaveDir(intoUri: Uri){
 //
 //}
+
+public fun setStatusBarVisibility(into:Boolean, systemUiController: SystemUiController){
+    systemUiController.isStatusBarVisible = into
+}
 
 //@Composable
 //public fun changeSaveDir(): Uri? {

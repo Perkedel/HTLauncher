@@ -1,8 +1,10 @@
 package com.perkedel.htlauncher.widgets
 
+import android.content.ContentResolver
 import android.content.Context
 import android.content.pm.PackageManager
 import android.graphics.drawable.Drawable
+import android.net.Uri
 import android.widget.Toast
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
@@ -39,12 +41,24 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewDynamicColors
+import androidx.compose.ui.tooling.preview.PreviewFontScale
+import androidx.compose.ui.tooling.preview.PreviewLightDark
+import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.bumptech.glide.load.resource.drawable.DrawableResource
+import com.perkedel.htlauncher.HTUIState
+import com.perkedel.htlauncher.HTViewModel
 import com.perkedel.htlauncher.R
+import com.perkedel.htlauncher.data.ItemData
+import com.perkedel.htlauncher.data.PageData
+import com.perkedel.htlauncher.getATextFile
+import com.perkedel.htlauncher.openATextFile
 import com.perkedel.htlauncher.ui.theme.HTLauncherTheme
 import com.perkedel.htlauncher.ui.theme.rememberColorScheme
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 
 @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class,
     ExperimentalComposeUiApi::class
@@ -57,10 +71,25 @@ fun ItemCell(
     context: Context = LocalContext.current,
     pm : PackageManager = context.packageManager,
     haptic: HapticFeedback = LocalHapticFeedback.current,
+    uiState: HTUIState = HTUIState(),
+    viewModel: HTViewModel = HTViewModel(),
+    contentResolver: ContentResolver = context.contentResolver,
 ){
     // Load file
-    if(readTheItemFile.isNotEmpty()){
-
+    var itemUri:Uri = Uri.parse("")
+    var itemOfIt:ItemData = ItemData(
+        name = readTheItemFile
+    )
+    if(readTheItemFile.isNotEmpty() && uiState.selectedSaveDir != null && uiState.selectedSaveDir.toString().isNotEmpty()){
+        itemUri = getATextFile(
+            uiState.selectedSaveDir,
+            context,
+            "${readTheItemFile}.json",
+            Json.encodeToString<ItemData>(
+                ItemData()
+            )
+        )
+        itemOfIt = Json.decodeFromString<ItemData>(openATextFile(itemUri, contentResolver))
     }
 
     Surface(
@@ -96,7 +125,9 @@ fun ItemCell(
         color = Color.Transparent,
     ) {
         Box(
-
+            modifier = Modifier
+                .combinedClickable {  }
+            ,
         ){
             Image(
                 // https://developer.android.com/develop/ui/compose/graphics/images/loading
@@ -111,7 +142,7 @@ fun ItemCell(
 
                     .align(Alignment.BottomCenter)
                 ,
-                text = "${handoverText}",
+                text = "${if(itemOfIt.label.isNotEmpty()) itemOfIt.label else handoverText}",
                 textAlign = TextAlign.Center,
 //                color = rememberColorScheme().primary,
 //                style = TextStyle.Default.copy(
@@ -139,6 +170,10 @@ fun ItemCell(
     }
 }
 
+@PreviewFontScale
+@PreviewLightDark
+@PreviewScreenSizes
+@PreviewDynamicColors
 @Preview(showBackground = true)
 @Composable
 fun ItemCellPreview(){

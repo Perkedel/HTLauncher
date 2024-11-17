@@ -2,6 +2,8 @@ package com.perkedel.htlauncher.ui.page
 
 import android.content.ContentResolver
 import android.content.Context
+import android.content.pm.PackageManager
+import android.content.res.Configuration
 import android.net.Uri
 import android.widget.Toast
 import androidx.compose.foundation.CombinedClickableNode
@@ -32,10 +34,15 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.hapticfeedback.HapticFeedback
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewDynamicColors
+import androidx.compose.ui.tooling.preview.PreviewFontScale
+import androidx.compose.ui.tooling.preview.PreviewLightDark
+import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.compose.ui.unit.dp
 import com.perkedel.htlauncher.HTUIState
 import com.perkedel.htlauncher.HTViewModel
@@ -62,6 +69,8 @@ fun BasePage(
     onMoreMenuButtonClicked: () -> Unit,
     modifier: Modifier,
     context: Context = LocalContext.current,
+    configuration: Configuration = LocalConfiguration.current,
+    pm: PackageManager = context.packageManager,
     viewModel: HTViewModel = HTViewModel(),
     contentResolver: ContentResolver = context.contentResolver,
     uiState: HTUIState = HTUIState(),
@@ -75,8 +84,13 @@ fun BasePage(
         true
     ) {
         if(fileName.isNotEmpty() && uiState.selectedSaveDir != null && uiState.selectedSaveDir.toString().isNotEmpty()){
-            pageUri = getATextFile(uiState.selectedSaveDir,context,"${fileName}.json", Json.encodeToString<PageData>(PageData()))
-            pageOfIt = Json.decodeFromString<PageData>(openATextFile(pageUri,contentResolver))
+            pageUri = getATextFile(
+                uiState.selectedSaveDir,
+                context,
+                "${fileName}.json",
+                Json.encodeToString<PageData>(PageData())
+            )
+            pageOfIt = Json.decodeFromString<PageData>(openATextFile(pageUri, contentResolver))
         }
     }
 
@@ -90,6 +104,8 @@ fun BasePage(
     ) {
         val windowInfo = rememberWindowInfo()
         val isCompact = windowInfo.screenWidthInfo is WindowInfo.WindowType.Compact
+        // https://stackoverflow.com/a/64755245/9079640
+        val isOrientation:Int = configuration.orientation // This doesn't seems to work
         if(isCompact){
             // if screen is compact
             LazyVerticalGrid(
@@ -110,21 +126,14 @@ fun BasePage(
                         }
                     }
                     // Rest of the items
-                    items(howManyItemsHere){i->
-//                        TextButton(
-//                            modifier = Modifier
-//                                .padding(8.dp)
-//                                .aspectRatio(1f)
-////                                .background(Color.Blue)
-//                                .clip(RoundedCornerShape(5.dp)),
-//                            onClick = {}
-//
-//                        ) {
-//                            Text(text = "item $i")
-//                        }
+                    items(pageOfIt.items.size){i->
                         ItemCell(
-//                            readTheItemFile = pageOfIt.items[i],
+                            readTheItemFile = pageOfIt.items[i],
                             handoverText = "Item ${i}",
+                            context = context,
+                            pm = pm,
+                            uiState = uiState,
+                            viewModel = viewModel,
                         )
                     }
 
@@ -147,9 +156,13 @@ fun BasePage(
                     state = lazyListState,
                     content = {
                         // Rest of the items
-                        items(howManyItemsHere){i->
+                        items(pageOfIt.items.size){i->
                             ItemCell(
                                 handoverText = "Item ${i}",
+                                context = context,
+                                pm = pm,
+                                uiState = uiState,
+                                viewModel = viewModel,
                             )
                         }
                     }
@@ -160,6 +173,10 @@ fun BasePage(
     }
 }
 
+@PreviewFontScale
+@PreviewLightDark
+@PreviewScreenSizes
+@PreviewDynamicColors
 @Preview(showBackground = true)
 @Composable
 fun BasePagePreview(){

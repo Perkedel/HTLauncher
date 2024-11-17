@@ -120,6 +120,7 @@ dependencies {
 //    implementation("com.google.accompanist:accompanist-drawablepainter")
 //    implementation("com.google.accompanist:accompanist-permissions")
 //    implementation("com.google.accompanist:accompanist-adaptive")
+    implementation(libs.accompanist.systemuicontroller)
 
     // https://github.com/coil-kt/coil
     implementation(libs.coil.compose)
@@ -134,6 +135,7 @@ dependencies {
 
     api(libs.androidx.datastore)
     api(libs.androidx.datastore.preferences)
+    api(libs.ui.tooling.preview) // https://developer.android.com/develop/ui/compose/tooling/previews#multipreview-templates
 }
 
 //composeCompiler {

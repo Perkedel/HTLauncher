@@ -28,6 +28,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewDynamicColors
+import androidx.compose.ui.tooling.preview.PreviewFontScale
+import androidx.compose.ui.tooling.preview.PreviewLightDark
+import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import com.perkedel.htlauncher.R
@@ -103,6 +107,10 @@ fun FirstPageCard(
     }
 }
 
+@PreviewFontScale
+@PreviewLightDark
+@PreviewScreenSizes
+@PreviewDynamicColors
 @Preview(showBackground = true)
 @Composable
 fun FirstPageCardPreview(){

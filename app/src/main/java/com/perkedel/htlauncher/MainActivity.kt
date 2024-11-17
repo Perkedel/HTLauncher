@@ -7,7 +7,9 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.graphics.Color
 import android.os.Build
+import androidx.activity.SystemBarStyle
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -25,6 +27,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewDynamicColors
+import androidx.compose.ui.tooling.preview.PreviewFontScale
+import androidx.compose.ui.tooling.preview.PreviewLightDark
+import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.compose.ui.unit.dp
 import androidx.core.app.ActivityCompat
 import androidx.datastore.core.DataStore
@@ -51,8 +57,11 @@ class MainActivity : ComponentActivity() {
 
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
+        enableEdgeToEdge(
+            SystemBarStyle.auto(Color.TRANSPARENT,Color.TRANSPARENT),
+            SystemBarStyle.auto(Color.TRANSPARENT,Color.TRANSPARENT)
+        )
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
 //        val permissionDialogQueue = htui.visiblePermissionDialogQueue
         // Permissioners
         // https://youtu.be/ji6Z32oPUpQ
@@ -98,6 +107,10 @@ fun Greeting(name: String, modifier: Modifier = Modifier) {
     )
 }
 
+@PreviewFontScale
+@PreviewLightDark
+@PreviewScreenSizes
+@PreviewDynamicColors
 @Preview(showBackground = true)
 @Composable
 fun GreetingPreview() {

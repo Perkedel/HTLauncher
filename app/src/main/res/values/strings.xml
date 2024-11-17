@@ -33,12 +33,16 @@
 
     <!--  Configurations  -->
     <string name="version_option">Version</string>
+    <string name="android_version_option">Android Version</string>
+    <string name="android_sdk_version_option">Android SDK</string>
     <string name="source_code_option">Source Code</string>
+    <string name="web_site_option">Website</string>
     <string name="version_code_option">Version Code</string>
     <string name="terms_option">Terms of Use</string>
     <string name="terms_option_desc">Read Terms of Use</string>
     <string name="disclaimer_option">Disclaimer</string>
     <string name="disclaimer_option_desc">Something to keep in mind</string>
+    <string name="click_here_to_check_update_snippet">Click here to check update</string>
 
     <!--  Filename & Directory name  -->
     <string name="home_screen_file" translatable="false">HomeScreen</string>

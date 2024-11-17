@@ -2,6 +2,8 @@ package com.perkedel.htlauncher.ui.navigation
 
 import android.content.ContentResolver
 import android.content.Context
+import android.content.pm.PackageManager
+import android.content.res.Configuration
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
@@ -26,10 +28,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.hapticfeedback.HapticFeedback
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewDynamicColors
+import androidx.compose.ui.tooling.preview.PreviewFontScale
+import androidx.compose.ui.tooling.preview.PreviewLightDark
+import androidx.compose.ui.tooling.preview.PreviewParameter
+import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.compose.ui.unit.dp
+import com.google.accompanist.systemuicontroller.SystemUiController
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.perkedel.htlauncher.HTUIState
 import com.perkedel.htlauncher.HTViewModel
 import com.perkedel.htlauncher.data.HomepagesWeHave
@@ -49,12 +59,15 @@ fun HomeScreen(
     modifier: Modifier = Modifier.fillMaxSize(),
     hideTopBar: Boolean = true,
     context: Context = LocalContext.current,
+    configuration: Configuration = LocalConfiguration.current,
+    pm: PackageManager = context.packageManager,
     viewModel:HTViewModel = HTViewModel(),
     uiState: HTUIState = HTUIState(),
     contentResolver: ContentResolver = context.contentResolver,
     colorScheme: ColorScheme = rememberColorScheme(),
     haptic: HapticFeedback = LocalHapticFeedback.current,
     configFile:HomepagesWeHave? = null,
+    systemUiController: SystemUiController = rememberSystemUiController(),
 ){
     // https://developer.android.com/develop/ui/compose/layouts/pager
     Box(
@@ -89,6 +102,7 @@ fun HomeScreen(
                     howManyItemsHere = 25,
                     modifier = Modifier,
                     context = context,
+                    configuration = configuration,
                     colorScheme = colorScheme,
                     haptic = haptic,
                     viewModel = viewModel,
@@ -131,6 +145,10 @@ fun HomeScreen(
 
 }
 
+@PreviewFontScale
+@PreviewLightDark
+@PreviewScreenSizes
+@PreviewDynamicColors
 @Preview(showBackground = true)
 @Composable
 fun HomeScreenPreview(){

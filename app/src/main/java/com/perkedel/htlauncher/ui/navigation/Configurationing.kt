@@ -1,4 +1,4 @@
-@file:OptIn(ExperimentalFoundationApi::class)
+@file:OptIn(ExperimentalFoundationApi::class, ExperimentalFoundationApi::class)
 
 package com.perkedel.htlauncher.ui.navigation
 
@@ -7,6 +7,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
+import android.os.Build
 import android.provider.DocumentsContract
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -42,23 +43,32 @@ import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.Translate
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.hapticfeedback.HapticFeedback
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewDynamicColors
+import androidx.compose.ui.tooling.preview.PreviewFontScale
+import androidx.compose.ui.tooling.preview.PreviewLightDark
+import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.compose.ui.unit.dp
 import androidx.core.app.ActivityCompat.startActivityForResult
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.google.accompanist.systemuicontroller.SystemUiController
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.perkedel.htlauncher.HTViewModel
 import com.perkedel.htlauncher.ui.theme.HTLauncherTheme
+import com.perkedel.htlauncher.ui.theme.rememberColorScheme
 import me.zhanghai.compose.preference.ProvidePreferenceLocals
 import me.zhanghai.compose.preference.footerPreference
 import me.zhanghai.compose.preference.listPreference
@@ -84,6 +94,7 @@ fun Configurationing(
     onOpenTextFile: ((uri:Uri,contentResolver:ContentResolver)->Unit)? = {uri,contentResolver -> {}},
     versionName:String = "XXXX.XX.XX",
     versionNumber:Long = 0,
+    systemUiController: SystemUiController = rememberSystemUiController(),
 ){
     // https://www.geeksforgeeks.org/how-to-get-the-build-version-number-of-an-android-application-using-jetpack-compose/
     // https://composeexamples.com/components/application-ui/screens/settings
@@ -351,14 +362,23 @@ fun SettingCategoryBar(
     }
 }
 
+@PreviewFontScale
+@PreviewLightDark
+@PreviewScreenSizes
+@PreviewDynamicColors
 @Preview(showBackground = true)
 @Composable
 fun ConfigurationingPreview(){
     HTLauncherTheme {
-        Configurationing(
-            navController = rememberNavController(),
-            context = LocalContext.current
-        )
+        Surface(
+            color = rememberColorScheme().background
+        ) {
+            Configurationing(
+                navController = rememberNavController(),
+                context = LocalContext.current
+            )
+        }
+
     }
 }
 

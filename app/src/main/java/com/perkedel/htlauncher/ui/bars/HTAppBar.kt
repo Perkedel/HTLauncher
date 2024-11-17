@@ -1,6 +1,9 @@
+@file:OptIn(ExperimentalMaterial3Api::class)
+
 package com.perkedel.htlauncher.ui.bars
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -12,11 +15,19 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarColors
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBarDefaults.topAppBarColors
+import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewDynamicColors
+import androidx.compose.ui.tooling.preview.PreviewFontScale
+import androidx.compose.ui.tooling.preview.PreviewLightDark
+import androidx.compose.ui.tooling.preview.PreviewScreenSizes
+import androidx.compose.ui.unit.Dp
 import com.perkedel.htlauncher.R
 import com.perkedel.htlauncher.enumerations.Screen
 import com.perkedel.htlauncher.ui.theme.HTLauncherTheme
@@ -29,7 +40,21 @@ fun HTAppBar(
     canNavigateBack: Boolean = false,
     navigateUp: () -> Unit = {},
     hideIt: Boolean = false,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onMoreMenu: (() -> Unit)? = null,
+    moreMenuIcon: @Composable () -> Unit = {
+        Icon(
+            imageVector = Icons.Filled.MoreVert,
+            contentDescription = "Menu"
+        )
+    },
+    windowInsets: WindowInsets = TopAppBarDefaults.windowInsets,
+    scrollBehavior: TopAppBarScrollBehavior? = null,
+    colors:TopAppBarColors = topAppBarColors(
+        containerColor = MaterialTheme.colorScheme.primaryContainer,
+        titleContentColor = MaterialTheme.colorScheme.primary,
+    ),
+    expandedHeight: Dp = TopAppBarDefaults.TopAppBarExpandedHeight
 ){
     // https://developer.android.com/codelabs/basic-android-kotlin-compose-navigation#8
     if (hideIt) {
@@ -40,10 +65,11 @@ fun HTAppBar(
 //            title = { Text(text = (if (title!!.isNotBlank()) title.toString() else stringResource(currentScreen.title))) },
 //            title = { Text(text = (stringResource(currentScreen.title))) },
             title = title,
-            colors = topAppBarColors(
-                containerColor = MaterialTheme.colorScheme.primaryContainer,
-                titleContentColor = MaterialTheme.colorScheme.primary,
-            ),
+//            colors = topAppBarColors(
+//                containerColor = MaterialTheme.colorScheme.primaryContainer,
+//                titleContentColor = MaterialTheme.colorScheme.primary,
+//            ),
+            colors = colors,
             modifier = modifier,
             navigationIcon = {
                 if (canNavigateBack) {
@@ -56,17 +82,19 @@ fun HTAppBar(
                 }
             },
             actions = {
-                IconButton(
-                    onClick = {
+                if (onMoreMenu != null) {
+                    IconButton(
+                        onClick = {
 
+                        },
+                    ) {
+                        moreMenuIcon()
                     }
-                ) {
-                    Icon(
-                        imageVector = Icons.Filled.MoreVert,
-                        contentDescription = "Menu"
-                    )
                 }
-            }
+            },
+            windowInsets = windowInsets,
+            scrollBehavior = scrollBehavior,
+            expandedHeight = expandedHeight,
         )
     }
 }
@@ -75,6 +103,10 @@ private fun setShowTopBar(into:Boolean = true,handover:()->Boolean){
 
 }
 
+@PreviewFontScale
+@PreviewLightDark
+@PreviewScreenSizes
+@PreviewDynamicColors
 @Preview(showBackground = true)
 @Composable
 fun HTAppBarPreview(){
@@ -83,7 +115,7 @@ fun HTAppBarPreview(){
 
             topBar = { HTAppBar(
                 currentScreen = Screen.HomeScreen,
-
+                onMoreMenu = {},
                 canNavigateBack = true,
                 hideIt = false,
             ) }
