@@ -573,9 +573,18 @@ fun Navigation(
                                 attemptChangeSaveDir.value = false
                             },
                             swapButton = true,
-                            icon = { Icon(Icons.Default.Folder, contentDescription = "Folder Icon")},
+                            icon = {
+                                Icon(
+                                    Icons.Default.Folder,
+                                    contentDescription = "Folder Icon"
+                                )
+                            },
                             title = "Configuration Directory",
-                            text = "Your Config Folder is currently at:\n${htuiState.selectedSaveDir}",
+                            text = "Your Config Folder is currently at:\n${
+                                if (htuiState.selectedSaveDir != null && htuiState.selectedSaveDir.toString()
+                                        .isNotEmpty()
+                                ) htuiState.selectedSaveDir else stringResource(R.string.value_unselected)
+                            }",
                             confirmText = "Change",
                             dismissText = "Dismiss",
                             onConfirm = {
@@ -591,7 +600,7 @@ fun Navigation(
                         attemptChangeSaveDir.value = false
                     }
 
-                    if(attemptPermission.value){
+                    if (attemptPermission.value) {
                         HTAlertDialog(
                             title = "Permissions",
                             text = "Make sure you have granted permission for this app to ensure working experience\nClick `Grant` to proceed, or `Details` to manually grant permissions.",

@@ -13,6 +13,7 @@ data class ItemData(
 
     // Customize
     val showLabel:Boolean = true, // Show the label
+    val showWhichIcon:Int = 0, // 0 = App Icon, 1 = TV Banner
     val textFillColor: String = "Black", // Color say of this label text
     val textOutlineColor: String = "White", // Color say of this label text stroke
 )
