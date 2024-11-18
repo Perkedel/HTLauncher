@@ -138,6 +138,8 @@ dependencies {
     api(libs.ui.tooling.preview) // https://developer.android.com/develop/ui/compose/tooling/previews#multipreview-templates
 
     implementation(libs.gson) // https://stackoverflow.com/a/77173046/9079640
+
+    implementation(libs.jsontree) // https://github.com/snappdevelopment/JsonTree
 }
 
 //composeCompiler {

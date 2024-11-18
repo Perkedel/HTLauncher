@@ -32,15 +32,26 @@
     <string name="Home_more_all_apps">All Apps</string>
 
     <!--  Configurations  -->
+    <string name="dismiss_button">Dismiss</string>
     <string name="version_option">Version</string>
     <string name="android_version_option">Android Version</string>
     <string name="android_sdk_version_option">Android SDK</string>
     <string name="source_code_option">Source Code</string>
     <string name="web_site_option">Website</string>
+    <string name="directory_option">Directory</string>
+    <string name="change_savedir_option">Change Configuration Folder Location</string>
+    <string name="change_savedir_dialog">Config Directory</string>
+    <string name="change_savedir_description">Your Config Folder is currently at</string>
+    <string name="change_savedir_change">Change</string>
     <string name="version_code_option">Version Code</string>
     <string name="terms_option">Terms of Use</string>
     <string name="terms_option_desc">Read Terms of Use</string>
     <string name="disclaimer_option">Disclaimer</string>
+    <string name="permission_option">Check Permissions</string>
+    <string name="permission_dialog">Permissions</string>
+    <string name="permission_grant">Grant</string>
+    <string name="permission_dismiss">Dismiss</string>
+    <string name="permission_details">Details</string>
     <string name="disclaimer_option_desc">Something to keep in mind</string>
     <string name="click_here_to_check_update_snippet">Click here to check update</string>
 
@@ -169,4 +180,14 @@
         "any disparagement, insult, nor callouts whatsoever (even some strings may found to have"
         "said so).\n\n"
     </string>
+    <string name="permission_description">
+        "Make sure you have granted permission for this app to ensure working experience\n"
+        "Click `Grant` to proceed, or `Details` to manually grant permissions."
+    </string>
+
+    <!--  Extras  -->
+    <string name="unit_packages_installed">installed packages</string>
+    <string name="unit_version_name">version</string>
+    <string name="unit_version_number">iteration</string>
+    <string name="iteration">iteration</string>
 </resources>

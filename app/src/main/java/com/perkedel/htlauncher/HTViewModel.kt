@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import com.perkedel.htlauncher.data.HomepagesWeHave
+import com.perkedel.htlauncher.data.TestJsonData
 import kotlinx.coroutines.flow.update
 import kotlinx.serialization.json.JsonElement
 
@@ -61,7 +62,7 @@ class HTViewModel : ViewModel() {
         }
     }
 
-    fun injectTestJsonResult(into:JsonElement){
+    fun injectTestJsonResult(into:TestJsonData){
         _uiState.update {
             currentState -> currentState.copy(
                 testJsonElement = into,

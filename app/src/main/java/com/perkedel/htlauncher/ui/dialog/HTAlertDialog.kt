@@ -66,11 +66,11 @@ fun HTAlertDialog(
     confirmButton:Boolean = true, // false will hide it
     confirmButtonDismiss:Boolean = false,
 
-    content: @Composable () -> Unit = {},
-
     onDismissRequest: () -> Unit = {},
     onConfirm: () -> Unit = {},
     onThirdButton: () -> Unit = {}, // onSecondThought
+
+    content: @Composable () -> Unit = {},
 ){
     BasicAlertDialog(
         onDismissRequest = onDismissRequest,
@@ -117,11 +117,11 @@ fun HTAlertDialog(
                         text = text,
                         textAlign = TextAlign.Center
                     )
-                    Spacer(
-                        Modifier
-                            .fillMaxWidth()
-                            .size(16.dp)
-                    )
+//                    Spacer(
+//                        Modifier
+//                            .fillMaxWidth()
+//                            .size(16.dp)
+//                    )
 
                     content()
                     Spacer(

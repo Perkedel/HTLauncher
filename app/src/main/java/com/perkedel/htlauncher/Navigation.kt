@@ -25,13 +25,16 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Folder
+import androidx.compose.material.icons.filled.Security
 import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
@@ -49,6 +52,7 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.sp
 import androidx.core.app.ActivityCompat.shouldShowRequestPermissionRationale
 import androidx.core.content.pm.PackageInfoCompat
 import androidx.datastore.core.DataStore
@@ -115,6 +119,11 @@ fun Navigation(
 //    permissionStates = rememberMultiplePermissionsState(permissionRequests),
     activityHandOver: ComponentActivity = ComponentActivity(),
     systemUiController: SystemUiController = rememberSystemUiController(),
+    json: Json = Json {
+        // https://coldfusion-example.blogspot.com/2022/03/jetpack-compose-kotlinx-serialization_79.html
+        prettyPrint = true
+        encodeDefaults = true
+                      },
 ){
     var homePagerState: PagerState = rememberPagerState(pageCount = {10})
 
@@ -244,30 +253,35 @@ fun Navigation(
             anViewModel.selectSaveDirUri(dirUri)
             println("IEAYIE")
             saveDirResolver.takePersistableUriPermission(dirUri,takeFlags)
+
+            println("Saving Setting")
             coroutineScope.launch {
                 prefs.edit { dataStore ->
                     val saveDir = stringPreferencesKey("saveDir")
                     dataStore[saveDir] = dirUri.toString()
                 }
             }
-            println("Let's try test.json!")
-            println("Parse URI! ${Uri.parse(totalUriTest)}")
-            println("Oh yeah!")
-            try {
-                // https://stackoverflow.com/a/24869904/9079640
-                // Java.nio is only available since API 26. Min was 21, crash!
+
+            println("About to launch a test!")
+            coroutineScope.launch {
+                println("Let's try test.json!")
+                println("Parse URI! ${Uri.parse(totalUriTest)}")
+                println("Oh yeah!")
+                try {
+                    // https://stackoverflow.com/a/24869904/9079640
+                    // Java.nio is only available since API 26. Min was 21, crash!
 
 //                val tempFile = kotlin.io.path.createTempFile()
 //                println(runCatching {
 //                val urei = DocumentFile.fromTreeUri(context,Uri.parse("${htuiState.selectedSaveDir}")!!)!!.findFile("test.json")!!.uri
 //                val compatPath =
-                var urei:Uri
+                    var urei:Uri
 //                if(Build.VERSION.SDK_INT >= 26) {
                     urei = getATextFile(
                         dirUri = dirUri,
                         context = context,
                         fileName = "test.json",
-                        initData = Json.encodeToString<TestJsonData>(TestJsonData(
+                        initData = json.encodeToString<TestJsonData>(TestJsonData(
                             test = "This is a file"
                         )),
                         hardOverwrite = true,
@@ -282,33 +296,36 @@ fun Navigation(
                         contentResolver = saveDirResolver,
                         newLine = true,
                     )
-                // https://stackoverflow.com/a/75573771/9079640
-                // https://stackoverflow.com/questions/77073202/getting-unexpected-json-token-at-offset-0-with-kotlin-serialization
+                    // https://stackoverflow.com/a/75573771/9079640
+                    // https://stackoverflow.com/questions/77073202/getting-unexpected-json-token-at-offset-0-with-kotlin-serialization
 //                    Gson().fromJson(jsonTestRaw.value, TypeToken<TestJsonData>(){}.type)
 //                    println("JSON Test:\n${jsonTestRaw.value}")
 //                    println("Find Parser!\n\n${Json.parseToJsonElement(jsonTestRaw.value)}")
-                println("JSON ABRUR \n${jsonTestRaw.value}")
+                    println("JSON ABRUR \n${jsonTestRaw.value}")
                     anViewModel.changeTestResult(jsonTestRaw.value)
 //                })
 //                }
-            } catch (e:Exception){
-                println("WERROR EXCEPTION")
-                e.printStackTrace()
-            } catch (e:IOException){
-                println("WERROR IOEXCEPTION")
-                e.printStackTrace()
+                } catch (e:Exception){
+                    println("WERROR EXCEPTION")
+                    e.printStackTrace()
+                } catch (e:IOException){
+                    println("WERROR IOEXCEPTION")
+                    e.printStackTrace()
+                }
+
+                println("Okay Parser Found, let's interpret!")
+                try{
+//                anViewModel.injectTestJsonResult(Json.parseToJsonElement(jsonTestRaw.value))
+                    anViewModel.injectTestJsonResult(json.decodeFromString<TestJsonData>(jsonTestRaw.value))
+
+                    println("READ THE INJECT JSON ${htuiState.testJsonElement}")
+//                println("& TEST VALUE IS `${htuiState.testJsonElement.jsonObject.getValue("test")}`")
+                } catch (e:Exception){
+                    println("WERROR EXCEPTION JSON")
+                    e.printStackTrace()
+                }
             }
 
-            println("Okay Parser Found, let's interpret!")
-            try{
-                anViewModel.injectTestJsonResult(Json.parseToJsonElement(jsonTestRaw.value))
-
-                println("READ THE INJECT JSON ${htuiState.testJsonElement}")
-                println("& TEST VALUE IS `${htuiState.testJsonElement.jsonObject.getValue("test")}`")
-            } catch (e:Exception){
-                println("WERROR EXCEPTION JSON")
-                e.printStackTrace()
-            }
         } else {
             println("No Save Dir Selected")
         }
@@ -366,16 +383,40 @@ fun Navigation(
                     title = {
                         when (currentScreen) {
                             Screen.HomeScreen -> {
-                                Text(text = "HT Launcher")
+                                Text(text = stringResource(R.string.app_name))
                             }
 
                             Screen.AllAppsScreen -> {
-//                                Text(text = "All Apps | (${pm.getInstalledPackages(0).size})")
-                                Text(text = "All Apps | (${pm.getInstalledApplications(0).size})")
+                                Column {
+                                    //                                Text(text = "All Apps | (${pm.getInstalledPackages(0).size})")
+                                    Text(text = "${stringResource(R.string.all_apps)}")
+                                    Text(
+                                        text = "${pm.getInstalledApplications(0).size} ${stringResource(R.string.unit_packages_installed)}",
+                                        fontSize = 8.sp,
+                                    )
+                                }
                             }
 
                             Screen.ConfigurationScreen -> {
-                                Text(text = "Config | v${versionName}")
+                                Column {
+                                    Text(text = "${stringResource(R.string.configuration_screen)}")
+                                    Text(
+                                        text = "${stringResource(R.string.version_option)} ${stringResource(R.string.iteration)} (${versionNumber})",
+                                        fontSize = 8.sp,
+                                    )
+                                }
+
+                            }
+
+                            Screen.AboutScreen -> {
+                                Column {
+                                    Text(text = "${stringResource(R.string.about_screen)}")
+                                    Text(
+                                        text = "${stringResource(R.string.version_option)} ${versionName}",
+                                        fontSize = 8.sp,
+                                    )
+                                }
+
                             }
 
                             else -> {
@@ -603,21 +644,37 @@ fun Navigation(
                                     contentDescription = "Folder Icon"
                                 )
                             },
-                            title = "Configuration Directory",
-                            text = "Your Config Folder is currently at:\n${
-                                if (htuiState.selectedSaveDir != null && htuiState.selectedSaveDir.toString()
-                                        .isNotEmpty()
-                                ) htuiState.selectedSaveDir else stringResource(R.string.value_unselected)
-                            }",
-                            confirmText = "Change",
-                            dismissText = "Dismiss",
+                            title = stringResource(R.string.change_savedir_dialog),
+                            text = "${stringResource(R.string.change_savedir_description)}:"
+//                            "Your Config Folder is currently at:\n${""
+//                                if (htuiState.selectedSaveDir != null && htuiState.selectedSaveDir.toString()
+//                                        .isNotEmpty()
+//                                ) htuiState.selectedSaveDir else stringResource(R.string.value_unselected)
+//                            +""}"
+                            ,
+                            confirmText = stringResource(R.string.change_savedir_change),
+                            dismissText = stringResource(R.string.dismiss_button),
                             onConfirm = {
                                 saveDirLauncher.launch(null)
                                 areYouSureChangeSaveDir.value = false
                                 attemptChangeSaveDir.value = false
                             },
                         ){
-
+                            val decompose = stringResource(R.string.value_unselected)
+                            val say = remember {  if (htuiState.selectedSaveDir != null && htuiState.selectedSaveDir.toString()
+                                    .isNotEmpty()
+                            ) htuiState.selectedSaveDir.toString() else decompose}
+                            OutlinedTextField(
+                                value = say,
+                                trailingIcon = {
+                                    Icon(Icons.Default.Folder, "")
+                                },
+                                label = { Text(stringResource(R.string.directory_option)) },
+                                onValueChange = {
+//                                    say = it
+                                },
+                                enabled = false,
+                            )
                         }
                     } else {
                         // Close dialog cancel
@@ -626,13 +683,18 @@ fun Navigation(
 
                     if (attemptPermission.value) {
                         HTAlertDialog(
-                            title = "Permissions",
-                            text = "Make sure you have granted permission for this app to ensure working experience\nClick `Grant` to proceed, or `Details` to manually grant permissions.",
+                            title = stringResource(R.string.permission_dialog),
+                            text = stringResource(R.string.permission_description),
                             thirdButton = true,
-                            confirmText = "Grant",
-                            thirdText = "Details",
+                            confirmText = stringResource(R.string.permission_grant),
+                            thirdText = stringResource(R.string.permission_details),
+                            icon = {
+                                Icon(Icons.Default.Security,"")
+                            },
                             onConfirm = {
+                                Log.d("PermissionDialog","Attempt to run permission grant!")
                                 multiplePermissionLauncher.launch(permissionRequests)
+                                Log.d("PermissionDialog","Is it done?")
                                 attemptPermission.value = false
                             },
                             onThirdButton = {
@@ -799,10 +861,20 @@ public fun getATextFile(dirUri:Uri, context: Context, fileName:String = "text.tx
     } else{
         Log.d("GetTextFile","Found Text File of URI: ${thingieTree.findFile(fileName)!!.uri}")
         if(hardOverwrite){
-            Log.d("GetTextFile","Hard Overwrite for empty file: ${thingieTree.findFile(fileName)!!.uri}")
+            Log.d("GetTextFile","Hard Overwrite for empty file: ${thingieTree.findFile(fileName)!!.uri}, contains:\n${initData}")
             val thingieFile = thingieTree.findFile(fileName)!!
-            if(thingieFile.isFile && thingieFile.canWrite()){
-
+            if(thingieFile.exists()){
+                if(openATextFile(thingieFile.uri, contentResolver = context.contentResolver, newLine = false).isEmpty()){
+                    Log.d("GetTextFile","The File is indeed empty! Let's initialize!")
+                    if(thingieFile.isFile && thingieFile.canWrite()){
+                        writeATextFile(uri = thingieFile.uri, contentResolver = context.contentResolver, with = initData)
+                    } else {
+                        if(thingieFile.isDirectory) Log.d("GetTextFile", "Wait a second, this is a Folder!")
+                        if(!thingieFile.canWrite()) Log.d("GetTextFile", "I somehow cannot write to it!")
+                    }
+                } else {
+                    Log.d("GetTextFile","The File is not empty! leave it alone!")
+                }
             }
         }
         thingieTree.findFile(fileName)!!.uri
