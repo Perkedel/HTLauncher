@@ -1,5 +1,8 @@
 package com.perkedel.htlauncher.data
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class PageData( // And inside a page, there are:
     val items:List<String> = listOf(
         "Item",

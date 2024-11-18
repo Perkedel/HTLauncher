@@ -2,7 +2,9 @@ package com.perkedel.htlauncher.data
 
 import android.graphics.Color
 import com.perkedel.htlauncher.ui.theme.rememberColorScheme
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class ItemData(
     val name:String = "anItem", // Name of this item. Not showing
     val label:String = name, // Label that shows above the icon. If empty, showLabel shows name above.

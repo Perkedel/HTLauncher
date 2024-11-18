@@ -1,8 +1,8 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
-//    alias(libs.plugins.kotlin.serialization)
-//    alias(libs.plugins.compose.compiler)
+    alias(libs.plugins.kotlin.serialization)
+    alias(libs.plugins.compose.compiler)
 }
 
 //allprojects{
@@ -136,6 +136,8 @@ dependencies {
     api(libs.androidx.datastore)
     api(libs.androidx.datastore.preferences)
     api(libs.ui.tooling.preview) // https://developer.android.com/develop/ui/compose/tooling/previews#multipreview-templates
+
+    implementation(libs.gson) // https://stackoverflow.com/a/77173046/9079640
 }
 
 //composeCompiler {

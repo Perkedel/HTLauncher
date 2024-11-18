@@ -60,8 +60,11 @@ import androidx.documentfile.provider.DocumentFile
 import androidx.lifecycle.ViewModel
 import com.google.accompanist.systemuicontroller.SystemUiController
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import com.perkedel.htlauncher.data.HomepagesWeHave
 import com.perkedel.htlauncher.data.ItemData
+import com.perkedel.htlauncher.data.TestJsonData
 import com.perkedel.htlauncher.enumerations.Screen
 import com.perkedel.htlauncher.func.createDataStore
 //import androidx.wear.compose.material3.ScaffoldState
@@ -80,6 +83,8 @@ import com.perkedel.htlauncher.ui.theme.rememberColorScheme
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.decodeFromJsonElement
 import kotlinx.serialization.json.encodeToJsonElement
@@ -237,6 +242,7 @@ fun Navigation(
 //            onSelectedSaveDir(dirUri)
             val jsonTestRaw:MutableState<String> = mutableStateOf<String>("")
             anViewModel.selectSaveDirUri(dirUri)
+            println("IEAYIE")
             saveDirResolver.takePersistableUriPermission(dirUri,takeFlags)
             coroutineScope.launch {
                 prefs.edit { dataStore ->
@@ -246,27 +252,45 @@ fun Navigation(
             }
             println("Let's try test.json!")
             println("Parse URI! ${Uri.parse(totalUriTest)}")
+            println("Oh yeah!")
             try {
                 // https://stackoverflow.com/a/24869904/9079640
                 // Java.nio is only available since API 26. Min was 21, crash!
 
-                val tempFile = kotlin.io.path.createTempFile()
+//                val tempFile = kotlin.io.path.createTempFile()
 //                println(runCatching {
 //                val urei = DocumentFile.fromTreeUri(context,Uri.parse("${htuiState.selectedSaveDir}")!!)!!.findFile("test.json")!!.uri
-                val urei = getATextFile(dirUri = dirUri, context = context, fileName = "test.json")
-                println("Urei! ${urei}")
+//                val compatPath =
+                var urei:Uri
+//                if(Build.VERSION.SDK_INT >= 26) {
+                    urei = getATextFile(
+                        dirUri = dirUri,
+                        context = context,
+                        fileName = "test.json",
+                        initData = Json.encodeToString<TestJsonData>(TestJsonData(
+                            test = "This is a file"
+                        )),
+                        hardOverwrite = true,
+                    )
+                    println("Urei! ${urei}")
                     jsonTestRaw.value = openATextFile(
 //                    Uri.withAppendedPath(htuiState.selectedSaveDir, "test.json"),
 //                    htuiState.selectedSaveDir!!.path,
 //                    fromTreeUri(context, Uri.withAppendedPath(htuiState.selectedSaveDir, "test.json"))!!.uri,
 //                    Uri.parse(totalUriTest), // FUCK YOU WHY CAN'T YOU GIVE ME FUCKING EXAMPLE!??!?!
-                        urei, // FRUCKING FRNALLY!!! THANCC MPV KT
-                        saveDirResolver
+                        uri = urei, // FRUCKING FRNALLY!!! THANK YOU MPV KT
+                        contentResolver = saveDirResolver,
+                        newLine = true,
                     )
-                    println("JSON Test:\n${jsonTestRaw.value}")
-                    println("Find Parser!\n\n${Json.parseToJsonElement(jsonTestRaw.value)}")
+                // https://stackoverflow.com/a/75573771/9079640
+                // https://stackoverflow.com/questions/77073202/getting-unexpected-json-token-at-offset-0-with-kotlin-serialization
+//                    Gson().fromJson(jsonTestRaw.value, TypeToken<TestJsonData>(){}.type)
+//                    println("JSON Test:\n${jsonTestRaw.value}")
+//                    println("Find Parser!\n\n${Json.parseToJsonElement(jsonTestRaw.value)}")
+                println("JSON ABRUR \n${jsonTestRaw.value}")
                     anViewModel.changeTestResult(jsonTestRaw.value)
 //                })
+//                }
             } catch (e:Exception){
                 println("WERROR EXCEPTION")
                 e.printStackTrace()
@@ -559,7 +583,7 @@ fun Navigation(
                         systemUiController = systemUiController,
                     )
                     if(attemptChangeSaveDir.value) {
-                        if (htuiState.selectedSaveDir != null) {
+                        if (htuiState.selectedSaveDir != null && htuiState.selectedSaveDir.toString().isNotEmpty()) {
                             areYouSureChangeSaveDir.value = true
                         } else {
                             saveDirLauncher.launch(null)
@@ -731,22 +755,56 @@ public fun openATextFile(uri:Uri, contentResolver: ContentResolver,newLine:Boole
     return stringBuilder.toString()
 }
 
-public fun writeATextFile(uri:Uri, contentResolver: ContentResolver){
+@Throws(IOException::class)
+public fun writeATextFile(uri:Uri, contentResolver: ContentResolver, with:String = ""){
+    // https://blog.stackademic.com/android-kotlin-jetpack-compose-save-file-documents-to-files-app-and-solve-item-cant-be-saved-3ed63c422b85
+    // https://stackoverflow.com/a/42043137/9079640
+    contentResolver.openOutputStream(uri)?.let{ outputStream ->
+        outputStream.write(with.toByteArray())
 
+        outputStream.flush()
+        outputStream.close()
+    }
 }
 
-public fun getATextFile(dirUri:Uri, context: Context, fileName:String = "text.txt", mimeType:String = "text/plain", initData:String = ""): Uri{
+
+public fun getATextFile(dirUri:Uri, context: Context, fileName:String = "text.txt", mimeType:String = "text/plain", initData:String = "", hardOverwrite:Boolean = false): Uri{
+    println("Starting to get file: ${fileName} (mime: ${mimeType}) from ${dirUri}")
+    Log.d("GetTextFile","Starting to get file: ${fileName} (mime: ${mimeType}) from ${dirUri}")
     // https://github.com/abdallahmehiz/mpvKt/blob/74d407106e1fb0bae4b7bc66e3b0f83e77a6cbc2/app/src/main/java/live/mehiz/mpvkt/ui/preferences/AdvancedPreferencesScreen.kt#L189
     val thingieTree:DocumentFile = DocumentFile.fromTreeUri(context,dirUri)!!
     // check exist
     return if (thingieTree.findFile(fileName) == null){
+        Log.d("GetTextFile","404 NOT FOUND, let's make the file now! at: ${dirUri}")
         val thingieFile = thingieTree.createFile(mimeType,fileName)!!
+        if(initData.isNotEmpty() && thingieFile.canWrite()){
+            Log.d("GetTextFile","Initialize empty file: ${thingieFile.uri} with these data:\n${initData}")
+            try{
+                writeATextFile(thingieFile.uri, context.contentResolver, initData)
+            } catch (e:Exception){
+                // I've heard a young girl somewhere in a realm or init and planet somewhere uttered a swear word
+                // `peck neck`. What is that? Is that `fucking hell` / `anjing ngentot` for init realm & init planet?
+                // upd: her name was Puella Prescott from Chronicle planet, whose featured in a Jason's TV show. Thanks your Excellency.
+                Log.d("GetTextFile", "Peck Neck: EXCEPTION when initializing!")
+                e.printStackTrace()
+            } catch (e:IOException){
+                Log.d("GetTextFile", "Peck Neck: IO-EXCEPTION when initializing!")
+                e.printStackTrace()
+            }
+        }
         thingieFile.renameTo(fileName)
         Log.d("GetTextFile","Create Text File of URI: ${thingieFile.uri}")
         //TODO: write dummy file
         thingieFile.uri
     } else{
         Log.d("GetTextFile","Found Text File of URI: ${thingieTree.findFile(fileName)!!.uri}")
+        if(hardOverwrite){
+            Log.d("GetTextFile","Hard Overwrite for empty file: ${thingieTree.findFile(fileName)!!.uri}")
+            val thingieFile = thingieTree.findFile(fileName)!!
+            if(thingieFile.isFile && thingieFile.canWrite()){
+
+            }
+        }
         thingieTree.findFile(fileName)!!.uri
     }
 }

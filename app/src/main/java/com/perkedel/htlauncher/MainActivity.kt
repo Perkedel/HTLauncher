@@ -62,15 +62,17 @@ class MainActivity : ComponentActivity() {
             SystemBarStyle.auto(Color.TRANSPARENT,Color.TRANSPARENT)
         )
         super.onCreate(savedInstanceState)
+        if (Build.VERSION.SDK_INT < 26) {
 //        val permissionDialogQueue = htui.visiblePermissionDialogQueue
-        // Permissioners
-        // https://youtu.be/ji6Z32oPUpQ
-        // https://github.com/philipplackner/ReadExternalMediaFilesAPI35/blob/master/app/src/main/java/com/plcoding/readexternalmediafilesapi35/MainActivity.kt
-//        ActivityCompat.requestPermissions(
-//            this,
-//            permissions,
-//            0
-//        )
+            // Permissioners
+            // https://youtu.be/ji6Z32oPUpQ
+            // https://github.com/philipplackner/ReadExternalMediaFilesAPI35/blob/master/app/src/main/java/com/plcoding/readexternalmediafilesapi35/MainActivity.kt
+            ActivityCompat.requestPermissions(
+                this,
+                permissions,
+                0
+            )
+        }
 
         setContent {
             HomeGreeting(

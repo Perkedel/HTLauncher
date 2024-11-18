@@ -1,5 +1,8 @@
 package com.perkedel.htlauncher.data
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class SettingData(
     val fullscreen:Boolean = false,
     val colorMode:Int = 0,

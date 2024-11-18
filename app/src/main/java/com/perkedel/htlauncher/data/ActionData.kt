@@ -1,5 +1,8 @@
 package com.perkedel.htlauncher.data
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class ActionData(// Items will do something out of these:
     val name:String = "Launch", // Name of this action
     val action:String = "", // Package name? exe name?
