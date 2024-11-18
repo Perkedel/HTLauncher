@@ -28,6 +28,7 @@ import androidx.compose.ui.tooling.preview.PreviewFontScale
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.sp
 import com.perkedel.htlauncher.R
 import com.perkedel.htlauncher.enumerations.Screen
 import com.perkedel.htlauncher.ui.theme.HTLauncherTheme
@@ -36,7 +37,24 @@ import com.perkedel.htlauncher.ui.theme.HTLauncherTheme
 @Composable
 fun HTAppBar(
     currentScreen: Screen,
-    title: @Composable () -> Unit = { Text(text = (stringResource(currentScreen.title))) },
+    textTitle:String = stringResource(currentScreen.title),
+    textDescription:String? = "",
+    title: @Composable () -> Unit = {
+        if(!textDescription.isNullOrEmpty()){
+            Column {
+                Text(
+                    text = textTitle
+                )
+                Text(
+                    text = textDescription,
+                    fontSize = 12.sp,
+                )
+            }
+        } else {
+            Text(text = textTitle)
+        }
+
+    },
     canNavigateBack: Boolean = false,
     navigateUp: () -> Unit = {},
     hideIt: Boolean = false,
@@ -115,6 +133,8 @@ fun HTAppBarPreview(){
 
             topBar = { HTAppBar(
                 currentScreen = Screen.HomeScreen,
+                textTitle = "Hello",
+                textDescription = "World",
                 onMoreMenu = {},
                 canNavigateBack = true,
                 hideIt = false,

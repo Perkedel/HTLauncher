@@ -380,6 +380,9 @@ fun Navigation(
             topBar = {
                 HTAppBar(
                     currentScreen = currentScreen,
+//                    textDescription = when(currentScreen){
+//                        else -> ""
+//                    },
                     title = {
                         when (currentScreen) {
                             Screen.HomeScreen -> {
