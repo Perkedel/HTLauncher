@@ -12,6 +12,7 @@ import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -64,7 +65,11 @@ fun ApplicationEmblemBanner(
                 modifier = Modifier
             ) {
                 Image(
-                    modifier = modifierLogo.size(200.dp).align(Alignment.CenterHorizontally),
+                    modifier = modifierLogo
+                        .size(100.dp)
+//                        .aspectRatio(1f)
+                        .align(Alignment.CenterHorizontally)
+                    ,
                     painter = painterResource(R.drawable.mavrickle),
                     contentDescription = "a",
                 )

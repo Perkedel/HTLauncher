@@ -1,5 +1,4 @@
 <resources>
-    <string name="app_name" translatable="false">HT Launcher</string>
     <string name="title_activity_main2">Leanback MainActivity2</string>
     <string name="browse_title">Videos by Your Company</string>
     <string name="related_movies">Related Videos</string>
@@ -15,67 +14,61 @@
     <string name="movie">Movie</string>
 
     <!--  Site  -->
-    <string name="source_code_site_0" translatable="false">https://github.com/Perkedel/HTLauncher</string>
-    <string name="web_site_0" translatable="false">https://perkedel.netlify.app/ht</string>
 
     <!--  Home Screen  -->
-    <string name="home_screen">Home</string>
-    <string name="all_apps">All Apps</string>
-    <string name="configuration_screen">Configuration</string>
-    <string name="about_screen">About</string>
-    <string name="back_button">Back</string>
+    <string name="home_screen">Rumah</string>
+    <string name="all_apps">Semua Aplikasi</string>
+    <string name="configuration_screen">Konfigurasi</string>
+    <string name="about_screen">Tentang</string>
+    <string name="back_button">Kembali</string>
 
     <!--  Home More Menu  -->
-    <string name="Home_more_edit">Edit Launcher Buttons</string>
-    <string name="Home_more_configuration">Configure Launchers</string>
-    <string name="Home_more_sys_setting">System Settings</string>
-    <string name="Home_more_all_apps">All Apps</string>
+    <string name="Home_more_edit">Ubah Tombol Peluncur</string>
+    <string name="Home_more_configuration">Konfigurasi Peluncur</string>
+    <string name="Home_more_sys_setting">Pengaturan Sistem</string>
+    <string name="Home_more_all_apps">Semua Aplikasi</string>
 
     <!--  Configurations  -->
-    <string name="dismiss_button">Dismiss</string>
-    <string name="confirm_button">Confirm</string>
-    <string name="third_button">Third</string>
-    <string name="Cancel_button">Cancel</string>
-    <string name="version_option">Version</string>
-    <string name="android_version_option">Android Version</string>
-    <string name="android_sdk_version_option">Android SDK</string>
-    <string name="source_code_option">Source Code</string>
-    <string name="web_site_option">Website</string>
-    <string name="directory_option">Directory</string>
-    <string name="change_savedir_option">Change Configuration Folder Location</string>
-    <string name="change_savedir_dialog">Config Directory</string>
-    <string name="change_savedir_description">Your Config Folder is currently at</string>
-    <string name="change_savedir_change">Change</string>
-    <string name="version_code_option">Version Code</string>
-    <string name="terms_option">Terms of Use</string>
-    <string name="terms_option_desc">Read Terms of Use</string>
-    <string name="disclaimer_option">Disclaimer</string>
-    <string name="permission_option">Check Permissions</string>
-    <string name="permission_dialog">Permissions</string>
-    <string name="permission_grant">Grant</string>
-    <string name="permission_dismiss">Dismiss</string>
-    <string name="permission_details">Details</string>
-    <string name="disclaimer_option_desc">Something to keep in mind</string>
-    <string name="click_here_to_check_update_snippet">Click here to check update</string>
+    <string name="dismiss_button">Tutup</string>
+    <string name="confirm_button">Konfirmasi</string>
+    <string name="third_button">Ketiga</string>
+    <string name="Cancel_button">Batal</string>
+    <string name="version_option">Versi</string>
+    <string name="android_version_option">Versi Android</string>
+    <string name="android_sdk_version_option">SDK Android</string>
+    <string name="source_code_option">Kode Sumber</string>
+    <string name="web_site_option">Situs Web</string>
+    <string name="directory_option">Direktori</string>
+    <string name="change_savedir_option">Ubah Lokasi Folder Konfigurasi</string>
+    <string name="change_savedir_dialog">Direktori Konfig</string>
+    <string name="change_savedir_description">Folder Konfig Anda saat ini berada di</string>
+    <string name="change_savedir_change">Ubah</string>
+    <string name="version_code_option">Kode Versi</string>
+    <string name="terms_option">Syarat Ketentuan</string>
+    <string name="terms_option_desc">Baca Syarat Ketentuan</string>
+    <string name="disclaimer_option">Disklaimer</string>
+    <string name="permission_option">Periksa Izin</string>
+    <string name="permission_dialog">Izin</string>
+    <string name="permission_grant">Terima</string>
+    <string name="permission_dismiss">Tutup</string>
+    <string name="permission_details">Detail</string>
+    <string name="disclaimer_option_desc">Sesuatu yg harap diperhatikan</string>
+    <string name="click_here_to_check_update_snippet">Klik disini untuk periksa update</string>
 
     <!--  Filename & Directory name  -->
-    <string name="home_screen_file" translatable="false">HomeScreen</string>
-    <string name="test_file" translatable="false">test</string>
-    <string name="pages_folder" translatable="false">Pages</string>
-    <string name="items_folder" translatable="false">Items</string>
 
     <!-- Error messages -->
-    <string name="error_fragment_message">An error occurred</string>
-    <string name="dismiss_error">Dismiss</string>
+    <string name="error_fragment_message">Sebuah galat terjadi</string>
+    <string name="dismiss_error">Tutup</string>
     <string name="title_activity_nava">Nava</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="nav_header_title">Android Studio</string>
     <string name="nav_header_subtitle">android.studio@android.com</string>
     <string name="nav_header_desc">Navigation header</string>
-    <string name="action_settings">Settings</string>
+    <string name="action_settings">Pengaturan</string>
     <string name="value_null"><i>null</i></string>
-    <string name="value_unselected"><i>unselected</i></string>
+    <string name="value_unselected"><i>tidak terpilih</i></string>
 
     <string name="menu_home">Home</string>
     <string name="menu_gallery">Gallery</string>
@@ -174,23 +167,23 @@
 
     <!--  Long Text  -->
     <string name="disclaimer_full">
-        "Disclaimer\n\n"
+        "Disklaimer\n\n"
 
-        "This piece of software was made for the purpose of parody. Any resemblance of software "
-        "products: real, fake, or defunct; are purely coincidental and made up.\n\n"
+        "Software ini dibuat dengan tujuan parodi. Apapun bentuk produk softwarenya baik itu"
+        ": sungguhan, palsu, atau usang; adalah kebetulan belaka dan dibuat2.\n\n"
 
-        "Creation of this product subjects for the act of satire, hence does not condone nor express "
-        "any disparagement, insult, nor callouts whatsoever (even some strings may found to have "
-        "said so).\n\n"
+        "Pembuatan produk ini tunduk terhadap tindakan satir, jadi tidak membenarkan ataupun menyinggung hal2 berupa"
+        "pencemaran nama baik, ledekan, ataupun ekposisi apapun itu (bahkan apabila terdapat beberapa string"
+        "yang tertulis demikian).\n\n"
     </string>
     <string name="permission_description">
-        "Make sure you have granted permission for this app to ensure working experience\n"
-        "Click `Grant` to proceed, or `Details` to manually grant permissions."
+        "Pastikan Anda telah mengizinkan izin2 pada app ini agar berfungsi dengan baik\n"
+        "Klik `Terima` untuk lanjut, atau `Detail` untuk izinkan secara manual."
     </string>
 
     <!--  Extras  -->
-    <string name="unit_packages_installed">installed packages</string>
-    <string name="unit_version_name">version</string>
-    <string name="unit_version_number">iteration</string>
-    <string name="iteration">iteration</string>
+    <string name="unit_packages_installed">paket terinstall</string>
+    <string name="unit_version_name">versi</string>
+    <string name="unit_version_number">iterasi</string>
+    <string name="iteration">iterasi</string>
 </resources>

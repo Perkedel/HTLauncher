@@ -52,6 +52,11 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewDynamicColors
+import androidx.compose.ui.tooling.preview.PreviewFontScale
+import androidx.compose.ui.tooling.preview.PreviewLightDark
+import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.compose.ui.unit.sp
 import androidx.core.app.ActivityCompat.shouldShowRequestPermissionRationale
 import androidx.core.content.pm.PackageInfoCompat
@@ -83,6 +88,7 @@ import com.perkedel.htlauncher.ui.dialog.RecordAudioPermissionTextProvider
 import com.perkedel.htlauncher.ui.navigation.AboutTerms
 import com.perkedel.htlauncher.ui.navigation.AllAppsScreen
 import com.perkedel.htlauncher.ui.navigation.Configurationing
+import com.perkedel.htlauncher.ui.theme.HTLauncherTheme
 import com.perkedel.htlauncher.ui.theme.rememberColorScheme
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.map
@@ -380,52 +386,19 @@ fun Navigation(
             topBar = {
                 HTAppBar(
                     currentScreen = currentScreen,
-//                    textDescription = when(currentScreen){
-//                        else -> ""
-//                    },
-                    title = {
-                        when (currentScreen) {
-                            Screen.HomeScreen -> {
-                                Text(text = stringResource(R.string.app_name))
-                            }
-
-                            Screen.AllAppsScreen -> {
-                                Column {
-                                    //                                Text(text = "All Apps | (${pm.getInstalledPackages(0).size})")
-                                    Text(text = "${stringResource(R.string.all_apps)}")
-                                    Text(
-                                        text = "${pm.getInstalledApplications(0).size} ${stringResource(R.string.unit_packages_installed)}",
-                                        fontSize = 8.sp,
-                                    )
-                                }
-                            }
-
-                            Screen.ConfigurationScreen -> {
-                                Column {
-                                    Text(text = "${stringResource(R.string.configuration_screen)}")
-                                    Text(
-                                        text = "${stringResource(R.string.version_option)} ${stringResource(R.string.iteration)} (${versionNumber})",
-                                        fontSize = 8.sp,
-                                    )
-                                }
-
-                            }
-
-                            Screen.AboutScreen -> {
-                                Column {
-                                    Text(text = "${stringResource(R.string.about_screen)}")
-                                    Text(
-                                        text = "${stringResource(R.string.version_option)} ${versionName}",
-                                        fontSize = 8.sp,
-                                    )
-                                }
-
-                            }
-
-                            else -> {
-                                Text(text = currentScreen.name)
-                            }
-                        }
+                    textTitle= when(currentScreen){
+                        Screen.HomeScreen -> stringResource(R.string.app_name)
+                        Screen.AllAppsScreen -> stringResource(R.string.all_apps)
+                        Screen.ConfigurationScreen -> stringResource(R.string.configuration_screen)
+                        Screen.AboutScreen -> stringResource(R.string.about_screen)
+                        else -> currentScreen.name
+                    },
+                    textDescription = when(currentScreen){
+                        Screen.HomeScreen -> null
+                        Screen.AllAppsScreen -> "${pm.getInstalledApplications(0).size} ${stringResource(R.string.unit_packages_installed)}"
+                        Screen.ConfigurationScreen -> "${stringResource(R.string.version_option)} ${versionName} (${stringResource(R.string.iteration)} ${versionNumber})"
+                        Screen.AboutScreen -> "${stringResource(R.string.version_option)} ${versionName} (${stringResource(R.string.iteration)} ${versionNumber})"
+                        else -> null
                     },
                     canNavigateBack = navController.previousBackStackEntry != null,
                     navigateUp = { navController.navigateUp() },
@@ -923,3 +896,15 @@ public fun setStatusBarVisibility(into:Boolean, systemUiController: SystemUiCont
 //    }
 //    return nowUri
 //}
+
+@PreviewFontScale
+@PreviewLightDark
+@PreviewScreenSizes
+@PreviewDynamicColors
+@Preview(showBackground = true)
+@Composable
+fun NavigationPreview(){
+    HTLauncherTheme {
+        Navigation()
+    }
+}

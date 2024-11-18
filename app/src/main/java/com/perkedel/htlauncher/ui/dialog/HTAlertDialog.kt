@@ -4,6 +4,7 @@
 
 package com.perkedel.htlauncher.ui.dialog
 
+import android.content.Context
 import android.graphics.drawable.Icon
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Box
@@ -28,6 +29,8 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -38,12 +41,14 @@ import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.perkedel.htlauncher.R
 import com.perkedel.htlauncher.enumerations.ThirdButtonPosition
 import com.perkedel.htlauncher.ui.theme.HTLauncherTheme
 
 @Composable
 fun HTAlertDialog(
     modifier: Modifier = Modifier,
+    context: Context = LocalContext.current,
     icon: @Composable () -> Unit = {
         Icon(
             modifier = Modifier
@@ -56,9 +61,10 @@ fun HTAlertDialog(
     title:String = "Alert",
     text:String = "This is alert",
 
-    confirmText:String = "Confirm", // YES
-    dismissText:String = "Dismiss", // CANCEL
-    thirdText:String = "Third", // NO
+    confirmText:String = context.resources.getString(R.string.confirm_button), // YES
+    dismissText:String = context.resources.getString(R.string.dismiss_button), // CANCEL
+    thirdText:String = context.resources.getString(R.string.third_button), // NO
+    // https://stackoverflow.com/questions/74044246/how-to-get-stringresource-if-not-in-a-composable-function
 
     swapButton:Boolean = false,
     thirdButton:Boolean = false,
