@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.net.Uri
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.CombinedClickableNode
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -39,6 +40,7 @@ import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewDynamicColors
@@ -48,6 +50,7 @@ import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.compose.ui.unit.dp
 import com.perkedel.htlauncher.HTUIState
 import com.perkedel.htlauncher.HTViewModel
+import com.perkedel.htlauncher.R
 import com.perkedel.htlauncher.data.HomepagesWeHave
 import com.perkedel.htlauncher.data.PageData
 import com.perkedel.htlauncher.func.WindowInfo
@@ -90,11 +93,12 @@ fun BasePage(
             pageUri = getATextFile(
                 dirUri = uiState.selectedSaveDir,
                 context = context,
-                fileName = "${fileName}.json",
+                fileName = "${context.resources.getString(R.string.pages_folder)}/${fileName}.json",
                 initData = Json.encodeToString<PageData>(PageData()),
                 hardOverwrite = true
             )
             pageOfIt = Json.decodeFromString<PageData>(openATextFile(pageUri, contentResolver))
+            Log.d("BasePage", "a Page ${fileName} has:\n${pageOfIt}")
         }
     }
 

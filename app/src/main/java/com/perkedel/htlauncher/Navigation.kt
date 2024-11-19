@@ -73,6 +73,7 @@ import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.perkedel.htlauncher.data.HomepagesWeHave
 import com.perkedel.htlauncher.data.ItemData
+import com.perkedel.htlauncher.data.PageData
 import com.perkedel.htlauncher.data.TestJsonData
 import com.perkedel.htlauncher.enumerations.Screen
 import com.perkedel.htlauncher.func.createDataStore
@@ -369,11 +370,89 @@ fun Navigation(
             getADirectory(htuiState.selectedSaveDir!!, context, "Items")
             getADirectory(htuiState.selectedSaveDir!!, context, "Themes")
             getADirectory(htuiState.selectedSaveDir!!, context, "Medias")
+
+            val homeSaf:String = json.encodeToString<HomepagesWeHave>(HomepagesWeHave())
+            Log.d("InitFileLoader", "Pls Homescreen:\n${homeSaf}")
+            getATextFile(
+                dirUri = htuiState.selectedSaveDir!!,
+                context = context,
+                fileName = "${context.resources.getString(R.string.home_screen_file)}.json",
+                initData = homeSaf,
+                hardOverwrite = true,
+            )
         } else {
 
         }
+
+
     }
 
+    if(htuiState.selectedSaveDir != null && htuiState.selectedSaveDir.toString().isNotEmpty()) {
+        // https://dev.to/vtsen/how-to-debug-jetpack-compose-recomposition-with-logging-k7g
+        // https://developer.android.com/reference/android/util/Log
+        // https://stackoverflow.com/a/74044617/9079640
+        Log.d("DebugHomescreen", "Will check ${htuiState.selectedSaveDir}")
+        val urei = getATextFile(
+            dirUri = htuiState.selectedSaveDir!!,
+            context = context,
+//            fileName = "${context.resources.getString(R.string.home_screen_file)}.json",
+            fileName = "${stringResource(R.string.home_screen_file)}.json",
+            initData = Json.encodeToString<HomepagesWeHave>(HomepagesWeHave()),
+            hardOverwrite = true
+        )
+        var homepageOfIt:HomepagesWeHave
+        Log.d("DebugHomescreen", "So, there is ${urei}")
+        anViewModel.setHomeScreenJson(urei) // coreConfig
+//                        Log.d("DebugHomescreen", "Which contains ${openATextFile(htuiState.coreConfig!!, contentResolver = saveDirResolver)}")
+//                        anViewModel.loadHomeScreenJsonElements(Json.decodeFromString<HomepagesWeHave>(openATextFile(htuiState.coreConfig!!, contentResolver = saveDirResolver)))
+        if (htuiState.coreConfig != null && htuiState.coreConfig.toString().isNotEmpty()) {
+            Log.d("DebugHomescreen", "There is something!")
+            val fileStream:String = openATextFile(
+                uri = htuiState.coreConfig!!,
+                contentResolver = saveDirResolver
+            )
+            Log.d("DebugHomescreen", "It contains:\n${fileStream}")
+            anViewModel.loadHomeScreenJsonElements(
+                json.decodeFromString<HomepagesWeHave>(
+                    fileStream
+                )
+            )
+//                        if(htuiState.coreConfigJson != null && htuiState.coreConfigJson.toString().isNotEmpty()){
+//                            if(htuiState.coreConfigJson!!.pagesPath.isNotEmpty()){
+//                                Log.d("DebugHomescreen", "There is something!")
+//                                anViewModel.loadHomeScreenJsonElements(
+//                                    json.decodeFromString<HomepagesWeHave>(openATextFile(uri = htuiState.coreConfig!!, contentResolver = saveDirResolver))
+//                                )
+//                            } else {
+//                                Log.d("DebugHomescreen", "Still nothing!")
+//                                anViewModel.loadHomeScreenJsonElements(
+//                                    dummyHomeScreen
+//                                )
+//                            }
+//
+//                        } else {
+//                            Log.d("DebugHomescreen", "There is nothing!")
+//                            anViewModel.loadHomeScreenJsonElements(
+//                                dummyHomeScreen
+//                            )
+//                        }
+        } else {
+            Log.d("DebugHomescreen", "There is nothing!")
+
+//                        homePagerState
+            anViewModel.loadHomeScreenJsonElements(
+                HomepagesWeHave()
+            )
+        }
+    } else {
+        // DONE: when not select, add dummy demo page
+        Log.d("DebugHomescreen", "Literally nothing!")
+
+//                        homePagerState
+        anViewModel.loadHomeScreenJsonElements(
+            HomepagesWeHave()
+        )
+    }
 
     Surface(
         modifier = Modifier,
@@ -426,40 +505,7 @@ fun Navigation(
 
                     }
 //                    setStatusBarVisibility(false,systemUiController)
-                    if(htuiState.selectedSaveDir != null && htuiState.selectedSaveDir.toString().isNotEmpty()) {
-                        // https://dev.to/vtsen/how-to-debug-jetpack-compose-recomposition-with-logging-k7g
-                        // https://developer.android.com/reference/android/util/Log
-                        Log.d("DebugHomescreen", "Will check ${htuiState.selectedSaveDir}")
-                        val urei = getATextFile(htuiState.selectedSaveDir!!,context,"${stringResource(R.string.home_screen_file)}.json")
-                        Log.d("DebugHomescreen", "So, there is ${urei}")
-                        anViewModel.setHomeScreenJson(urei)
-//                        Log.d("DebugHomescreen", "Which contains ${openATextFile(htuiState.coreConfig!!, contentResolver = saveDirResolver)}")
-//                        anViewModel.loadHomeScreenJsonElements(Json.decodeFromString<HomepagesWeHave>(openATextFile(htuiState.coreConfig!!, contentResolver = saveDirResolver)))
-                        if(htuiState.coreConfigJson != null && htuiState.coreConfigJson.toString().isNotEmpty()){
-                            if(htuiState.coreConfigJson!!.pagesPath.isNotEmpty()){
-                                Log.d("DebugHomescreen", "There is something!")
-                            } else {
-                                Log.d("DebugHomescreen", "Still nothing!")
-                                anViewModel.loadHomeScreenJsonElements(
-                                    dummyHomeScreen
-                                )
-                            }
 
-                        } else {
-                            Log.d("DebugHomescreen", "There is nothing!")
-                            anViewModel.loadHomeScreenJsonElements(
-                                dummyHomeScreen
-                            )
-                        }
-                    } else {
-                        // TODO: when not select, add dummy demo page
-                        Log.d("DebugHomescreen", "Literally nothing!")
-
-//                        homePagerState
-                        anViewModel.loadHomeScreenJsonElements(
-                            dummyHomeScreen
-                        )
-                    }
                     Log.d("DebugHomescreen","pls check jsona ${htuiState.coreConfigJson}")
 //                    try {
                         homePagerState =
@@ -836,7 +882,7 @@ public fun getATextFile(dirUri:Uri, context: Context, fileName:String = "text.tx
         thingieFile.uri
     } else{
         Log.d("GetTextFile","Found Text File of URI: ${thingieTree.findFile(fileName)!!.uri}")
-        if(hardOverwrite){
+        if(hardOverwrite ){
             Log.d("GetTextFile","Hard Overwrite for empty file: ${thingieTree.findFile(fileName)!!.uri}, contains:\n${initData}")
             val thingieFile = thingieTree.findFile(fileName)!!
             if(thingieFile.exists()){
@@ -851,6 +897,8 @@ public fun getATextFile(dirUri:Uri, context: Context, fileName:String = "text.tx
                 } else {
                     Log.d("GetTextFile","The File is not empty! leave it alone!")
                 }
+            } else {
+
             }
         }
         thingieTree.findFile(fileName)!!.uri

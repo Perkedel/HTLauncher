@@ -70,6 +70,8 @@ fun HomeScreen(
     configFile:HomepagesWeHave? = null,
     systemUiController: SystemUiController = rememberSystemUiController(),
 ){
+
+
     // https://developer.android.com/develop/ui/compose/layouts/pager
     Box(
         modifier = Modifier

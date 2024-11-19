@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.graphics.drawable.Drawable
 import android.net.Uri
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
@@ -85,13 +86,14 @@ fun ItemCell(
         itemUri = getATextFile(
             dirUri = uiState.selectedSaveDir,
             context = context,
-            fileName = "${readTheItemFile}.json",
+            fileName = "${context.resources.getString(R.string.items_folder)}/${readTheItemFile}.json",
             initData = Json.encodeToString<ItemData>(
                 ItemData()
             ),
             hardOverwrite = true,
         )
         itemOfIt = Json.decodeFromString<ItemData>(openATextFile(itemUri, contentResolver))
+        Log.d("ItemCell", "an Item ${readTheItemFile} has:\n${itemOfIt}")
     }
 
     Surface(
