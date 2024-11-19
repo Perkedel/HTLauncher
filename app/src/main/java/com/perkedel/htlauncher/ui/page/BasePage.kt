@@ -14,6 +14,8 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -52,6 +54,7 @@ import com.perkedel.htlauncher.func.WindowInfo
 import com.perkedel.htlauncher.func.rememberWindowInfo
 import com.perkedel.htlauncher.getATextFile
 import com.perkedel.htlauncher.openATextFile
+import com.perkedel.htlauncher.ui.previews.HTPreviewAnnotations
 import com.perkedel.htlauncher.ui.theme.HTLauncherTheme
 import com.perkedel.htlauncher.ui.theme.rememberColorScheme
 import com.perkedel.htlauncher.widgets.FirstPageCard
@@ -85,10 +88,11 @@ fun BasePage(
     ) {
         if(fileName.isNotEmpty() && uiState.selectedSaveDir != null && uiState.selectedSaveDir.toString().isNotEmpty()){
             pageUri = getATextFile(
-                uiState.selectedSaveDir,
-                context,
-                "${fileName}.json",
-                Json.encodeToString<PageData>(PageData())
+                dirUri = uiState.selectedSaveDir,
+                context = context,
+                fileName = "${fileName}.json",
+                initData = Json.encodeToString<PageData>(PageData()),
+                hardOverwrite = true
             )
             pageOfIt = Json.decodeFromString<PageData>(openATextFile(pageUri, contentResolver))
         }
@@ -100,7 +104,7 @@ fun BasePage(
     // https://youtu.be/HmXgVBys7BU?si=u6nsssd2LeP48TED
     val lazyListState = rememberLazyGridState()
     Column(
-        modifier.fillMaxWidth()
+        modifier.fillMaxSize()
     ) {
         val windowInfo = rememberWindowInfo()
         val isCompact = windowInfo.screenWidthInfo is WindowInfo.WindowType.Compact
@@ -109,7 +113,8 @@ fun BasePage(
         if(isCompact){
             // if screen is compact
             LazyVerticalGrid(
-                columns = GridCells.Adaptive(125.dp),
+                modifier = Modifier,
+                columns = GridCells.Adaptive(pageOfIt.cellSize.dp),
                 state = lazyListState,
                 content = {
                     // Permanent Card on first page
@@ -141,7 +146,11 @@ fun BasePage(
             )
         } else {
             // anything else
-            Row {
+            Row(
+                modifier = Modifier
+
+                ,
+            ) {
                 // Permanent Card on first page
                 if(isFirstPage || pageOfIt.isHome){
                     FirstPageCard(
@@ -152,7 +161,7 @@ fun BasePage(
                     )
                 }
                 LazyVerticalGrid(
-                    GridCells.Adaptive(100.dp),
+                    columns = GridCells.Adaptive(pageOfIt.cellSize.dp),
                     state = lazyListState,
                     content = {
                         // Rest of the items
@@ -173,11 +182,7 @@ fun BasePage(
     }
 }
 
-@PreviewFontScale
-@PreviewLightDark
-@PreviewScreenSizes
-@PreviewDynamicColors
-@Preview(showBackground = true)
+@HTPreviewAnnotations
 @Composable
 fun BasePagePreview(){
     HTLauncherTheme {

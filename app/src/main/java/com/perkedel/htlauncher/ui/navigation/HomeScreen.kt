@@ -44,6 +44,7 @@ import com.perkedel.htlauncher.HTUIState
 import com.perkedel.htlauncher.HTViewModel
 import com.perkedel.htlauncher.data.HomepagesWeHave
 import com.perkedel.htlauncher.ui.page.BasePage
+import com.perkedel.htlauncher.ui.previews.HTPreviewAnnotations
 import com.perkedel.htlauncher.ui.theme.HTLauncherTheme
 import com.perkedel.htlauncher.ui.theme.rememberColorScheme
 import kotlinx.serialization.json.JsonElement
@@ -54,8 +55,8 @@ fun HomeScreen(
 //    navController: NavController?,
 //    isFirstPage:Boolean = false,
     handoverPagerState: PagerState = rememberPagerState(pageCount = {10}),
-    onAllAppButtonClicked: () -> Unit,
-    onMoreMenuButtonClicked: () -> Unit,
+    onAllAppButtonClicked: () -> Unit = {},
+    onMoreMenuButtonClicked: () -> Unit = {},
     modifier: Modifier = Modifier.fillMaxSize(),
     hideTopBar: Boolean = true,
     context: Context = LocalContext.current,
@@ -145,18 +146,14 @@ fun HomeScreen(
 
 }
 
-@PreviewFontScale
-@PreviewLightDark
-@PreviewScreenSizes
-@PreviewDynamicColors
-@Preview(showBackground = true)
+@HTPreviewAnnotations
 @Composable
 fun HomeScreenPreview(){
     HTLauncherTheme {
         HomeScreen(
 
-            onAllAppButtonClicked = {},
-            onMoreMenuButtonClicked = {},
+//            onAllAppButtonClicked = {},
+//            onMoreMenuButtonClicked = {},
         )
     }
 }

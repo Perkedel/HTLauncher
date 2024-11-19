@@ -36,7 +36,7 @@ import com.perkedel.htlauncher.ui.theme.HTLauncherTheme
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HTAppBar(
-    currentScreen: Screen,
+    currentScreen: Screen = Screen.HomeScreen,
     textTitle:String = stringResource(currentScreen.title),
     textDescription:String? = "",
     title: @Composable () -> Unit = {

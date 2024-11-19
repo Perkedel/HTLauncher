@@ -140,6 +140,8 @@ dependencies {
     implementation(libs.gson) // https://stackoverflow.com/a/77173046/9079640
 
     implementation(libs.jsontree) // https://github.com/snappdevelopment/JsonTree
+
+    api(libs.guava) //api("com.google.guava:guava:33.3.1-android")
 }
 
 //composeCompiler {

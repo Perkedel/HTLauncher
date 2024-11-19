@@ -67,6 +67,7 @@ import com.perkedel.htlauncher.func.WindowInfo
 import com.perkedel.htlauncher.func.rememberWindowInfo
 import com.perkedel.htlauncher.startIntent
 import com.perkedel.htlauncher.ui.dialog.HTAlertDialog
+import com.perkedel.htlauncher.ui.previews.HTPreviewAnnotations
 import com.perkedel.htlauncher.ui.theme.HTLauncherTheme
 import com.perkedel.htlauncher.ui.theme.rememberColorScheme
 import com.perkedel.htlauncher.widgets.AboutTermsOptions
@@ -159,11 +160,7 @@ fun AboutTerms(
 }
 
 
-@PreviewFontScale
-@PreviewLightDark
-@PreviewScreenSizes
-@PreviewDynamicColors
-@Preview(showBackground = true)
+@HTPreviewAnnotations
 @Composable
 fun AboutTermsPreview(){
     HTLauncherTheme {

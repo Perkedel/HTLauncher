@@ -182,7 +182,7 @@
     </string>
 
     <!--  Extras  -->
-    <string name="unit_packages_installed">paket terinstall</string>
+    <string name="unit_packages_installed">paket terinstal</string>
     <string name="unit_version_name">versi</string>
     <string name="unit_version_number">iterasi</string>
     <string name="iteration">iterasi</string>

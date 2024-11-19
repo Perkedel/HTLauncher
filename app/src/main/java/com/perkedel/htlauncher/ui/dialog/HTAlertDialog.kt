@@ -1,5 +1,5 @@
 @file:OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3Api::class,
-    ExperimentalMaterial3Api::class
+    ExperimentalMaterial3Api::class, ExperimentalMaterial3Api::class
 )
 
 package com.perkedel.htlauncher.ui.dialog
@@ -42,8 +42,11 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.perkedel.htlauncher.R
+import com.perkedel.htlauncher.enumerations.ButtonTypes
 import com.perkedel.htlauncher.enumerations.ThirdButtonPosition
+import com.perkedel.htlauncher.ui.previews.HTPreviewAnnotations
 import com.perkedel.htlauncher.ui.theme.HTLauncherTheme
+import com.perkedel.htlauncher.widgets.HTButton
 
 @Composable
 fun HTAlertDialog(
@@ -143,44 +146,57 @@ fun HTAlertDialog(
                         ,
                     ) {
                         if(thirdButton && thirdButtonPosition == ThirdButtonPosition.Left){
-                            TextButton(
-                                onClick = onThirdButton
-                            ) { Text(thirdText) }
+                            HTButton(
+                                title = thirdText,
+                                onClick = onThirdButton,
+                                buttonType = ButtonTypes.TextButton
+                            )
                         }
                         if(swapButton){
 
                             if(confirmButton) {
-                                TextButton(
-                                    onClick = if(!confirmButtonDismiss) onConfirm else onDismissRequest
-                                ) { Text(confirmText) }
+                                HTButton(
+                                    title = confirmText,
+                                    onClick = if(!confirmButtonDismiss) onConfirm else onDismissRequest,
+                                    buttonType = ButtonTypes.TextButton
+                                )
                             }
                         } else {
-                            TextButton(
-                                onClick = onDismissRequest
-                            ) { Text(dismissText) }
+                            HTButton(
+                                title = dismissText,
+                                onClick = onDismissRequest,
+                                buttonType = ButtonTypes.TextButton
+                            )
                         }
                         if(thirdButton && thirdButtonPosition == ThirdButtonPosition.Middle){
-                            TextButton(
-                                onClick = onThirdButton
-                            ) { Text(thirdText) }
+                            HTButton(
+                                title = thirdText,
+                                onClick = onThirdButton,
+                                buttonType = ButtonTypes.TextButton
+                            )
                         }
                         if(swapButton){
-
-                            TextButton(
-                                onClick = onDismissRequest
-                            ) { Text(dismissText) }
+                            HTButton(
+                                title = dismissText,
+                                onClick = onDismissRequest,
+                                buttonType = ButtonTypes.TextButton
+                            )
                         }
                         else {
                             if(confirmButton) {
-                                TextButton(
-                                    onClick = if(!confirmButtonDismiss) onConfirm else onDismissRequest
-                                ) { Text(confirmText) }
+                                HTButton(
+                                    title = confirmText,
+                                    onClick = if(!confirmButtonDismiss) onConfirm else onDismissRequest,
+                                    buttonType = ButtonTypes.TextButton
+                                )
                             }
                         }
                         if(thirdButton && thirdButtonPosition == ThirdButtonPosition.Right){
-                            TextButton(
-                                onClick = onThirdButton
-                            ) { Text(thirdText) }
+                            HTButton(
+                                title = thirdText,
+                                onClick = onThirdButton,
+                                buttonType = ButtonTypes.TextButton
+                            )
                         }
                     }
                 }
@@ -189,11 +205,7 @@ fun HTAlertDialog(
     )
 }
 
-@PreviewFontScale
-@PreviewLightDark
-@PreviewScreenSizes
-@PreviewDynamicColors
-@Preview(showBackground = true)
+@HTPreviewAnnotations
 @Composable
 fun HTAlertDialogPreview(){
     HTLauncherTheme {

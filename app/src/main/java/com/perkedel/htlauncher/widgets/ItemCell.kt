@@ -55,6 +55,7 @@ import com.perkedel.htlauncher.data.ItemData
 import com.perkedel.htlauncher.data.PageData
 import com.perkedel.htlauncher.getATextFile
 import com.perkedel.htlauncher.openATextFile
+import com.perkedel.htlauncher.ui.previews.HTPreviewAnnotations
 import com.perkedel.htlauncher.ui.theme.HTLauncherTheme
 import com.perkedel.htlauncher.ui.theme.rememberColorScheme
 import kotlinx.serialization.encodeToString
@@ -82,12 +83,13 @@ fun ItemCell(
     )
     if(readTheItemFile.isNotEmpty() && uiState.selectedSaveDir != null && uiState.selectedSaveDir.toString().isNotEmpty()){
         itemUri = getATextFile(
-            uiState.selectedSaveDir,
-            context,
-            "${readTheItemFile}.json",
-            Json.encodeToString<ItemData>(
+            dirUri = uiState.selectedSaveDir,
+            context = context,
+            fileName = "${readTheItemFile}.json",
+            initData = Json.encodeToString<ItemData>(
                 ItemData()
-            )
+            ),
+            hardOverwrite = true,
         )
         itemOfIt = Json.decodeFromString<ItemData>(openATextFile(itemUri, contentResolver))
     }
@@ -170,11 +172,7 @@ fun ItemCell(
     }
 }
 
-@PreviewFontScale
-@PreviewLightDark
-@PreviewScreenSizes
-@PreviewDynamicColors
-@Preview(showBackground = true)
+@HTPreviewAnnotations
 @Composable
 fun ItemCellPreview(){
     HTLauncherTheme {
