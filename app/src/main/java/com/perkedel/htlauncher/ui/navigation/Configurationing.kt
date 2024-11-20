@@ -55,6 +55,7 @@ import androidx.compose.ui.hapticfeedback.HapticFeedback
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewDynamicColors
 import androidx.compose.ui.tooling.preview.PreviewFontScale
@@ -66,7 +67,10 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.google.accompanist.systemuicontroller.SystemUiController
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
+import com.perkedel.htlauncher.HTUIState
 import com.perkedel.htlauncher.HTViewModel
+import com.perkedel.htlauncher.R
+import com.perkedel.htlauncher.enumerations.ConfigSelected
 import com.perkedel.htlauncher.ui.previews.HTPreviewAnnotations
 import com.perkedel.htlauncher.ui.theme.HTLauncherTheme
 import com.perkedel.htlauncher.ui.theme.rememberColorScheme
@@ -85,6 +89,7 @@ fun Configurationing(
     context: Context = LocalContext.current,
     pm: PackageManager = context.packageManager,
     haptic: HapticFeedback = LocalHapticFeedback.current,
+    onSelectedConfigMenu:(ConfigSelected)->Unit = {},
     onSelectedSaveDir: (Uri) -> Unit = {  },
     onChooseSaveDir: () -> Unit = {},
     onChooseTextFile: () -> Unit = {},
@@ -96,9 +101,14 @@ fun Configurationing(
     versionName:String = "XXXX.XX.XX",
     versionNumber:Long = 0,
     systemUiController: SystemUiController = rememberSystemUiController(),
+    viewModel:HTViewModel = HTViewModel(),
+    uiState: HTUIState = HTUIState(),
 ){
     // https://www.geeksforgeeks.org/how-to-get-the-build-version-number-of-an-android-application-using-jetpack-compose/
     // https://composeexamples.com/components/application-ui/screens/settings
+    // https://youtu.be/AIC_OFQ1r3k
+    // https://youtu.be/EqCvUETekjk
+    // https://youtu.be/W3R_ETKMj0E List detail screen Pilipp Lackner
 //    val versionName:String = BuildConfig.VERSION_NAME
 //    val versionName:String
     // https://medium.com/@yogesh_shinde/implementing-image-video-documents-picker-in-jetpack-compose-73ef846cfffb
@@ -118,12 +128,12 @@ fun Configurationing(
 
     ProvidePreferenceLocals {
         LazyColumn(
-            modifier = Modifier
+            modifier = Modifier.fillMaxSize()
         ) {
             // Yoink Big Launcher!!!
             preference(
                 key = "Activation_License",
-                title = { Text(text = "Donate" ) },
+                title = { Text(text = stringResource(R.string.donation_option) ) },
                 icon = { Icon(imageVector = Icons.Default.ShoppingCart, contentDescription = null) },
                 summary = { Text(text = "You are already FULL VERSION.") },
                 onClick = {
@@ -132,7 +142,7 @@ fun Configurationing(
             )
             preference(
                 key = "quick_start",
-                title = { Text(text = "Read Quick Start Guide" ) },
+                title = { Text(text = stringResource(R.string.quick_start_option) ) },
                 icon = { Icon(imageVector = Icons.Default.Info, contentDescription = null) },
                 onClick = {
 
@@ -140,7 +150,7 @@ fun Configurationing(
             )
             listPreference(
                 key = "select_language",
-                title = { Text(text = "Select Language" ) },
+                title = { Text(text = stringResource(R.string.language_option) ) },
                 defaultValue = "English (US)",
                 values = listOf("English (US)", "Indonesian"),
                 icon = { Icon(imageVector = Icons.Default.Translate, contentDescription = null) },
@@ -148,21 +158,21 @@ fun Configurationing(
             )
             preference(
                 key = "display",
-                title = { Text(text = "Display" ) },
+                title = { Text(text = stringResource(R.string.display_option) ) },
                 icon = { Icon(imageVector = Icons.Default.DisplaySettings, contentDescription = null) },
                 onClick = {
                 }
             )
             preference(
                 key = "accessibility",
-                title = { Text(text = "Accessibility" ) },
+                title = { Text(text = stringResource(R.string.a11y_option) ) },
                 icon = { Icon(imageVector = Icons.Default.Accessibility, contentDescription = null) },
                 onClick = {
                 }
             )
             preference(
                 key = "menu_setting",
-                title = { Text(text = "Menu Options" ) },
+                title = { Text(text = stringResource(R.string.menus_option) ) },
                 icon = { Icon(imageVector = Icons.Default.SettingsInputComponent, contentDescription = null) },
                 onClick = {
 
@@ -180,14 +190,15 @@ fun Configurationing(
             }
             preference(
                 key = "edit",
-                title = { Text(text = "Edit Items & Pages" ) },
+                title = { Text(text = stringResource(R.string.level_editor_option) ) },
                 icon = { Icon(imageVector = Icons.Default.Edit, contentDescription = null) },
                 onClick = {
+                    onSelectedConfigMenu(ConfigSelected.LevelEditor)
                 }
             )
             preference(
                 key = "items_setting",
-                title = { Text(text = "Items & Pages Options" ) },
+                title = { Text(text = stringResource(R.string.items_pages_option) ) },
                 icon = { Icon(imageVector = Icons.Default.Pages, contentDescription = null) },
                 onClick = {
                 }
@@ -204,35 +215,35 @@ fun Configurationing(
             }
             preference(
                 key = "contacts_setting",
-                title = { Text(text = "Contacts" ) },
+                title = { Text(text = stringResource(R.string.contacts_option) ) },
                 icon = { Icon(imageVector = Icons.Default.Contacts, contentDescription = null) },
                 onClick = {
                 }
             )
             preference(
                 key = "telephone_setting",
-                title = { Text(text = "Telephone" ) },
+                title = { Text(text = stringResource(R.string.telephone_option) ) },
                 icon = { Icon(imageVector = Icons.Default.Phone, contentDescription = null) },
                 onClick = {
                 }
             )
             preference(
                 key = "sms_setting",
-                title = { Text(text = "Messages" ) },
+                title = { Text(text = stringResource(R.string.messages_option) ) },
                 icon = { Icon(imageVector = Icons.Default.Sms, contentDescription = null) },
                 onClick = {
                 }
             )
             preference(
                 key = "sos_setting",
-                title = { Text(text = "SOS" ) },
+                title = { Text(text = stringResource(R.string.emergency_option) ) },
                 icon = { Icon(imageVector = Icons.Default.Sos, contentDescription = null) },
                 onClick = {
                 }
             )
             preference(
                 key = "apps_setting",
-                title = { Text(text = "Apps" ) },
+                title = { Text(text = stringResource(R.string.apps_option) ) },
                 icon = { Icon(imageVector = Icons.Default.Apps, contentDescription = null) },
                 onClick = {
                 }
@@ -249,7 +260,7 @@ fun Configurationing(
             }
             preference(
                 key = "compatibility_setting",
-                title = { Text(text = "Fix Compatibility" ) },
+                title = { Text(text = stringResource(R.string.compatibility_option) ) },
                 icon = { Icon(imageVector = Icons.Default.Error, contentDescription = null) },
                 onClick = {
                 }
@@ -264,21 +275,21 @@ fun Configurationing(
 //            )
             preference(
                 key = "remove_default",
-                title = { Text(text = "Remove `HT Launcher` as default launcher" ) },
+                title = { Text(text = stringResource(R.string.remove_default_option) ) },
                 icon = { Icon(imageVector = Icons.Default.Restore, contentDescription = null) },
                 onClick = {
                 }
             )
             preference(
                 key = "manual",
-                title = { Text(text = "User Manual" ) },
+                title = { Text(text = stringResource(R.string.manual_option) ) },
                 icon = { Icon(imageVector = Icons.Default.Book, contentDescription = null) },
                 onClick = {
                 }
             )
             preference(
                 key = "check_permission",
-                title = { Text(text = "Check Permission" ) },
+                title = { Text(text = stringResource(R.string.permissions_option) ) },
                 summary = {
 //                    Text(text = "Selected: ${saveDirResult.value}" )
                     Text(text = "Check & grant required permissions" )
@@ -288,7 +299,7 @@ fun Configurationing(
             )
             preference(
                 key = "save_location",
-                title = { Text(text = "Change Configuration Folder Location" ) },
+                title = { Text(text = stringResource(R.string.save_dir_option) ) },
                 summary = {
 //                    Text(text = "Selected: ${saveDirResult.value}" )
                     Text(text = "Selected: ${saveDirResult}" )
@@ -298,7 +309,7 @@ fun Configurationing(
             )
             preference(
                 key = "debug_testJson",
-                title = { Text(text = "[DEBUG] Test Json" ) },
+                title = { Text(text = stringResource(R.string.debug_test_option) ) },
                 summary = {
 //                    Text(text = "Selected: ${saveDirResult.value}" )
                     Text(text = "Selected file content:\n${testTextResult}" )
@@ -310,7 +321,7 @@ fun Configurationing(
             footerPreference(
                 key = "about",
 //                title= {},
-                summary = { Text(text = "${"HT Launcher"} v${versionName} (Itteration No. ${versionNumber})") },
+                summary = { Text(text = "${"HT Launcher"} v${versionName} (${stringResource(R.string.iteration_option)} ${stringResource(R.string.number_prefix_short_alt)} ${versionNumber})") },
                 modifier = Modifier
                     .combinedClickable(
                         onClick = onClickVersion,

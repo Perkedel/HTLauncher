@@ -75,6 +75,7 @@ import com.perkedel.htlauncher.data.HomepagesWeHave
 import com.perkedel.htlauncher.data.ItemData
 import com.perkedel.htlauncher.data.PageData
 import com.perkedel.htlauncher.data.TestJsonData
+import com.perkedel.htlauncher.enumerations.ConfigSelected
 import com.perkedel.htlauncher.enumerations.Screen
 import com.perkedel.htlauncher.func.createDataStore
 //import androidx.wear.compose.material3.ScaffoldState
@@ -89,10 +90,14 @@ import com.perkedel.htlauncher.ui.dialog.RecordAudioPermissionTextProvider
 import com.perkedel.htlauncher.ui.navigation.AboutTerms
 import com.perkedel.htlauncher.ui.navigation.AllAppsScreen
 import com.perkedel.htlauncher.ui.navigation.Configurationing
+import com.perkedel.htlauncher.ui.navigation.ItemsExplorer
+import com.perkedel.htlauncher.ui.navigation.LevelEditor
 import com.perkedel.htlauncher.ui.theme.HTLauncherTheme
 import com.perkedel.htlauncher.ui.theme.rememberColorScheme
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
@@ -352,154 +357,190 @@ fun Navigation(
         context.resources.getString(R.string.items_folder),
         context.resources.getString(R.string.themes_folder),
         context.resources.getString(R.string.medias_folder),
+        context.resources.getString(R.string.shortcuts_folder),
     )
     val folders: MutableMap<String,Uri> = LinkedHashMap<String,Uri>()
 
 
     LaunchedEffect(true, htuiState.selectedSaveDir, context) {
-        coroutineScope.launch {
 
-            // Full screen
-            // https://stackoverflow.com/a/69689196/9079640
-//        systemUiController.isStatusBarVisible = false
-
-            // You must Folders!!
-            val homeSafData:HomepagesWeHave = HomepagesWeHave()
-            if(htuiState.selectedSaveDir != null && htuiState.selectedSaveDir.toString().isNotEmpty()){
-                for(a in listOfFolder){
-                    folders[a] = getADirectory(htuiState.selectedSaveDir!!, context, a)
-                    Log.d("FolderQuery", "Folder ${folders[a]} queried")
-                }
-                for(i in folders){
-                    Log.d("InitFileLoader","Folder ${i.key} we have ${i.value}")
-                }
-//            getADirectory(htuiState.selectedSaveDir!!, context, "Items")
-//            getADirectory(htuiState.selectedSaveDir!!, context, "Themes")
-//            getADirectory(htuiState.selectedSaveDir!!, context, "Medias")
-
-
-                val homeSaf:String = json.encodeToString<HomepagesWeHave>(homeSafData)
-                val homeSafFileUri = getATextFile(
-                    dirUri = htuiState.selectedSaveDir!!,
-                    context = context,
-                    fileName = "${context.resources.getString(R.string.home_screen_file)}.json",
-                    initData = homeSaf,
-                    hardOverwrite = true,
-                )
-                Log.d("InitFileLoader", "Pls Homescreen:\n${homeSaf}")
-                anViewModel.setHomeScreenJson(
-                    homeSafFileUri
-                )
-                Log.d("InitFileLoader", "Pls the file Homescreen ${htuiState.coreConfig}")
-
-
-            } else {
-                Log.d("InitFileLoader", "Save Dir Not Selected")
-            }
-
-
-            if(htuiState.selectedSaveDir != null && htuiState.selectedSaveDir.toString().isNotEmpty()) {
-                // https://dev.to/vtsen/how-to-debug-jetpack-compose-recomposition-with-logging-k7g
-                // https://developer.android.com/reference/android/util/Log
-                // https://stackoverflow.com/a/74044617/9079640
-                Log.d("DebugHomescreen", "Will check ${htuiState.selectedSaveDir}")
-                if (htuiState.coreConfig != null && htuiState.coreConfig.toString().isNotEmpty()) {
-                    Log.d("DebugHomescreen", "There is something!")
-                    val fileStream:String = openATextFile(
-                        uri = htuiState.coreConfig!!,
-                        contentResolver = saveDirResolver
-                    )
-                    Log.d("DebugHomescreen", "It contains:\n${fileStream}")
-                    anViewModel.loadHomeScreenJsonElements(
-                        json.decodeFromString<HomepagesWeHave>(
-                            fileStream
-                        )
-                    )
-                } else {
-                    Log.d("DebugHomescreen", "There is nothing!")
-                    anViewModel.loadHomeScreenJsonElements(
-                        homeSafData
-                    )
-                }
-            } else {
-                // DONE: when not select, add dummy demo page
-                Log.d("DebugHomescreen", "Literally nothing!")
-                anViewModel.loadHomeScreenJsonElements(
-                    homeSafData
-                )
-            }
-
-            // Load Pages & Items
-            if(htuiState.testPreloadAll && htuiState.coreConfigJson != null && folders[context.resources.getString(R.string.pages_folder)] != null){
-                for(i in htuiState.coreConfigJson!!.pagesPath){
-                    Log.d("PageLoader","Checking page ${i}")
-                    Log.d("PageLoader","Eval context ${context}")
-                    Log.d("PageLoader","Eval resource name ${context.resources.getString(R.string.pages_folder)}")
-                    Log.d("PageLoader","Eval dirUri ${folders[context.resources.getString(R.string.pages_folder)]}")
-
-                    var aPage:PageData = PageData()
-
-                    if(htuiState.pageList.contains(i) && htuiState.pageList[i] != null){
-                        Log.d("PageLoader", "Already Exist ${htuiState.itemList[i]}")
-                        aPage = htuiState.pageList[i]!!
-                    } else {
-                        val aPageUri: Uri = getATextFile(
-                            dirUri = folders[context.resources.getString(R.string.pages_folder)]!!,
-                            context = context,
-                            initData = json.encodeToString<PageData>(PageData()),
-                            fileName = "$i.json",
-                            hardOverwrite = false,
-                        )
-                        Log.d("PageLoader", "Page URI in total ${aPageUri}")
-                        aPage = json.decodeFromString<PageData>(
-                            openATextFile(
-                                uri = aPageUri,
-                                contentResolver = saveDirResolver,
-                            )
-                        )
-                        if (htuiState.pageList.contains(i)) {
-                            // https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-map/contains-key.html
-                            Log.d("PageLoader", "Key $i Exist!")
-                        } else {
-                            Log.d("PageLoader", "Key $i 404 NOT FOUND!")
-                        }
-                        htuiState.pageList[i] = aPage
-                    }
-
-                    // item
-                    for (j in aPage.items) {
-                        Log.d("ItemLoader", "Checking item ${j}")
-                        var aItem: ItemData = ItemData()
-                        if (htuiState.itemList.contains(j) && htuiState.itemList[j] != null) {
-                            Log.d("ItemLoader", "Already Exist ${htuiState.itemList[j]}")
-                            aItem = htuiState.itemList[j]!!
-                        } else {
-                            val aItemUri: Uri = getATextFile(
-                                dirUri = folders[context.resources.getString(R.string.items_folder)]!!,
-                                context = context,
-                                initData = json.encodeToString<ItemData>(ItemData()),
-                                fileName = "$j.json",
-                                hardOverwrite = true,
-                            )
-                            aItem = json.decodeFromString<ItemData>(
-                                openATextFile(
-                                    uri = aItemUri,
-                                    contentResolver = saveDirResolver,
-                                )
-                            )
-                            if (htuiState.itemList.contains(j)) {
-                                // https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-map/contains-key.html
-                                Log.d("ItemLoader", "Key $j Exist!")
-                            } else {
-                                Log.d("ItemLoader", "Key $j 404 NOT FOUND!")
-                            }
-                            htuiState.itemList[j] = aItem
-                        }
-                    }
-                }
-            }
-            anViewModel.setIsReady(true)
-        }
+//        val preloadThing = async {
+//            // https://medium.com/@rajputmukesh748/mastering-async-and-await-in-kotlin-coroutines-833e57fa0e8f
+////            delay(5000)
+//            anViewModel.preloadFiles(
+//                context = context,
+//                contentResolver = saveDirResolver,
+//                uiStating = htuiState,
+//                listOfFolder = listOfFolder,
+//                folders = folders,
+//                json = json,
+//            )
+//        }
+//        preloadThing.await()
+//        val preloadThing = anViewModel.preloadFiles(
+//            context = context,
+//            contentResolver = saveDirResolver,
+//            uiStating = htuiState,
+//            listOfFolder = listOfFolder,
+//            folders = folders,
+//            json = json,
+//        )
+//        preloadThing
+        anViewModel.preloadFiles(
+            context = context,
+            contentResolver = saveDirResolver,
+            uiStating = htuiState,
+            listOfFolder = listOfFolder,
+            folders = folders,
+            json = json,
+        )
+//        coroutineScope.launch {
+//
+//            // Full screen
+//            // https://stackoverflow.com/a/69689196/9079640
+////        systemUiController.isStatusBarVisible = false
+//
+//            // You must Folders!!
+//            val homeSafData:HomepagesWeHave = HomepagesWeHave()
+//            if(htuiState.selectedSaveDir != null && htuiState.selectedSaveDir.toString().isNotEmpty()){
+//                for(a in listOfFolder){
+//                    folders[a] = getADirectory(htuiState.selectedSaveDir!!, context, a)
+//                    Log.d("FolderQuery", "Folder ${folders[a]} queried")
+//                }
+//                for(i in folders){
+//                    Log.d("InitFileLoader","Folder ${i.key} we have ${i.value}")
+//                }
+////            getADirectory(htuiState.selectedSaveDir!!, context, "Items")
+////            getADirectory(htuiState.selectedSaveDir!!, context, "Themes")
+////            getADirectory(htuiState.selectedSaveDir!!, context, "Medias")
+//
+//
+//                val homeSaf:String = json.encodeToString<HomepagesWeHave>(homeSafData)
+//                val homeSafFileUri = getATextFile(
+//                    dirUri = htuiState.selectedSaveDir!!,
+//                    context = context,
+//                    fileName = "${context.resources.getString(R.string.home_screen_file)}.json",
+//                    initData = homeSaf,
+//                    hardOverwrite = true,
+//                )
+//                Log.d("InitFileLoader", "Pls Homescreen:\n${homeSaf}")
+//                anViewModel.setHomeScreenJson(
+//                    homeSafFileUri
+//                )
+//                Log.d("InitFileLoader", "Pls the file Homescreen ${htuiState.coreConfig}")
+//
+//
+//            } else {
+//                Log.d("InitFileLoader", "Save Dir Not Selected")
+//            }
+//
+//
+//            if(htuiState.selectedSaveDir != null && htuiState.selectedSaveDir.toString().isNotEmpty()) {
+//                // https://dev.to/vtsen/how-to-debug-jetpack-compose-recomposition-with-logging-k7g
+//                // https://developer.android.com/reference/android/util/Log
+//                // https://stackoverflow.com/a/74044617/9079640
+//                Log.d("DebugHomescreen", "Will check ${htuiState.selectedSaveDir}")
+//                if (htuiState.coreConfig != null && htuiState.coreConfig.toString().isNotEmpty()) {
+//                    Log.d("DebugHomescreen", "There is something!")
+//                    val fileStream:String = openATextFile(
+//                        uri = htuiState.coreConfig!!,
+//                        contentResolver = saveDirResolver
+//                    )
+//                    Log.d("DebugHomescreen", "It contains:\n${fileStream}")
+//                    anViewModel.loadHomeScreenJsonElements(
+//                        json.decodeFromString<HomepagesWeHave>(
+//                            fileStream
+//                        )
+//                    )
+//                } else {
+//                    Log.d("DebugHomescreen", "There is nothing!")
+//                    anViewModel.loadHomeScreenJsonElements(
+//                        homeSafData
+//                    )
+//                }
+//            } else {
+//                // DONE: when not select, add dummy demo page
+//                Log.d("DebugHomescreen", "Literally nothing!")
+//                anViewModel.loadHomeScreenJsonElements(
+//                    homeSafData
+//                )
+//            }
+//
+//            // Load Pages & Items
+//            if(htuiState.testPreloadAll && htuiState.coreConfigJson != null && folders[context.resources.getString(R.string.pages_folder)] != null){
+//                for(i in htuiState.coreConfigJson!!.pagesPath){
+//                    Log.d("PageLoader","Checking page ${i}")
+//                    Log.d("PageLoader","Eval context ${context}")
+//                    Log.d("PageLoader","Eval resource name ${context.resources.getString(R.string.pages_folder)}")
+//                    Log.d("PageLoader","Eval dirUri ${folders[context.resources.getString(R.string.pages_folder)]}")
+//
+//                    var aPage:PageData = PageData()
+//
+//                    if(htuiState.pageList.contains(i) && htuiState.pageList[i] != null &&
+//                        isFileExist(
+//                            dirUri = folders[context.resources.getString(R.string.pages_folder)]!!,
+//                            context = context, fileName = "$i.json")
+//                        ){
+//                        Log.d("PageLoader", "Already Exist ${htuiState.itemList[i]}")
+//                        aPage = htuiState.pageList[i]!!
+//                    } else {
+//                        val aPageUri: Uri = getATextFile(
+//                            dirUri = folders[context.resources.getString(R.string.pages_folder)]!!,
+//                            context = context,
+//                            initData = json.encodeToString<PageData>(PageData()),
+//                            fileName = "$i.json",
+//                            hardOverwrite = false,
+//                        )
+//                        Log.d("PageLoader", "Page URI in total ${aPageUri}")
+//                        aPage = json.decodeFromString<PageData>(
+//                            openATextFile(
+//                                uri = aPageUri,
+//                                contentResolver = saveDirResolver,
+//                            )
+//                        )
+//                        if (htuiState.pageList.contains(i)) {
+//                            // https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-map/contains-key.html
+//                            Log.d("PageLoader", "Key $i Exist!")
+//                        } else {
+//                            Log.d("PageLoader", "Key $i 404 NOT FOUND!")
+//                        }
+//                        htuiState.pageList[i] = aPage
+//                    }
+//
+//                    // item
+//                    for (j in aPage.items) {
+//                        Log.d("ItemLoader", "Checking item ${j}")
+//                        var aItem: ItemData = ItemData()
+//                        if (htuiState.itemList.contains(j) && htuiState.itemList[j] != null) {
+//                            Log.d("ItemLoader", "Already Exist ${htuiState.itemList[j]}")
+//                            aItem = htuiState.itemList[j]!!
+//                        } else {
+//                            val aItemUri: Uri = getATextFile(
+//                                dirUri = folders[context.resources.getString(R.string.items_folder)]!!,
+//                                context = context,
+//                                initData = json.encodeToString<ItemData>(ItemData()),
+//                                fileName = "$j.json",
+//                                hardOverwrite = false,
+//                            )
+//                            aItem = json.decodeFromString<ItemData>(
+//                                openATextFile(
+//                                    uri = aItemUri,
+//                                    contentResolver = saveDirResolver,
+//                                )
+//                            )
+//                            if (htuiState.itemList.contains(j)) {
+//                                // https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-map/contains-key.html
+//                                Log.d("ItemLoader", "Key $j Exist!")
+//                            } else {
+//                                Log.d("ItemLoader", "Key $j 404 NOT FOUND!")
+//                            }
+//                            htuiState.itemList[j] = aItem
+//                        }
+//                    }
+//                }
+//            }
+//            anViewModel.setIsReady(true)
+//        }
     }
 
 
@@ -520,6 +561,8 @@ fun Navigation(
                         Screen.AllAppsScreen -> stringResource(R.string.all_apps)
                         Screen.ConfigurationScreen -> stringResource(R.string.configuration_screen)
                         Screen.AboutScreen -> stringResource(R.string.about_screen)
+                        Screen.LevelEditor -> stringResource(R.string.editor_screen)
+                        Screen.ItemsExplorer -> "${stringResource(R.string.items_explorer_screen)} ${stringResource(htuiState.toEditWhatFile.label)}"
                         else -> currentScreen.name
                     },
                     textDescription = when(currentScreen){
@@ -672,6 +715,16 @@ fun Navigation(
                         context = context,
                         pm = pm,
                         saveDirResult = htuiState.selectedSaveDir,
+                        onSelectedConfigMenu = { configSelect ->
+                            when(configSelect){
+                                ConfigSelected.Donation -> TODO()
+                                ConfigSelected.LevelEditor -> {
+                                    navController.navigate(Screen.LevelEditor.name)
+                                }
+                                ConfigSelected.ItemsExplorer -> {}
+                                else -> {}
+                            }
+                        },
                         onSelectedSaveDir = {
 //                            anViewModel.selectSaveDirUri(it)
                         },
@@ -696,6 +749,8 @@ fun Navigation(
                         versionName = versionName,
                         versionNumber = versionNumber,
                         systemUiController = systemUiController,
+                        uiState = htuiState,
+                        viewModel = anViewModel,
                     )
                     if(attemptChangeSaveDir.value) {
                         if (htuiState.selectedSaveDir != null && htuiState.selectedSaveDir.toString().isNotEmpty()) {
@@ -838,6 +893,79 @@ fun Navigation(
                         systemUiController = systemUiController,
                     )
                 }
+                composable(Screen.LevelEditor.name) {
+                    LevelEditor(
+                        navController = navController,
+                        context = context,
+                        pm = pm,
+                        saveDirResult = htuiState.selectedSaveDir,
+                        onSelectedSaveDir = {
+//                            anViewModel.selectSaveDirUri(it)
+                        },
+                        onChooseSaveDir = {
+
+                        },
+                        onOpenTextFile = {
+                                uri, contentResolver -> openATextFile(uri = uri, contentResolver =  contentResolver)
+                        },
+                        onChooseTextFile = {
+                            testFileLauncher.launch(arrayOf<String>("",""))
+                        },
+                        onCheckPermission = {
+                        },
+                        onClickVersion = {
+                            navController.navigate(Screen.AboutScreen.name)
+                        },
+                        testTextResult = htuiState.testResult,
+                        haptic = haptic,
+                        versionName = versionName,
+                        versionNumber = versionNumber,
+                        systemUiController = systemUiController,
+                        uiState = htuiState,
+                        viewModel = anViewModel,
+                        onEditWhat = { selection ->
+                            Log.d("LevelEditor", "Trying to edit ${selection}")
+                            anViewModel.setEditWhich(selection)
+                            navController.navigate(Screen.ItemsExplorer.name)
+                        }
+                    )
+                }
+                composable(Screen.ItemsExplorer.name) {
+                    ItemsExplorer(
+                        navController = navController,
+                        context = context,
+                        pm = pm,
+                        saveDirResult = htuiState.selectedSaveDir,
+                        onSelectedSaveDir = {
+//                            anViewModel.selectSaveDirUri(it)
+                        },
+                        onChooseSaveDir = {
+
+                        },
+                        onOpenTextFile = {
+                                uri, contentResolver -> openATextFile(uri = uri, contentResolver =  contentResolver)
+                        },
+                        onChooseTextFile = {
+                            testFileLauncher.launch(arrayOf<String>("",""))
+                        },
+                        onCheckPermission = {
+                        },
+                        onClickVersion = {
+                            navController.navigate(Screen.AboutScreen.name)
+                        },
+                        testTextResult = htuiState.testResult,
+                        haptic = haptic,
+                        versionName = versionName,
+                        versionNumber = versionNumber,
+                        systemUiController = systemUiController,
+                        uiState = htuiState,
+                        viewModel = anViewModel,
+                        onEditWhat = {
+
+                        },
+                        exploreType = htuiState.toEditWhatFile
+                    )
+                }
             }
         }
     }
@@ -903,6 +1031,12 @@ public fun writeATextFile(uri:Uri, contentResolver: ContentResolver, with:String
     }
 }
 
+public fun isFileExist(dirUri:Uri, context: Context, fileName:String = "text.txt"): Boolean{
+    Log.d("IsFileExist","Starting to check file: ${fileName} from ${dirUri}")
+    val thingieTree:DocumentFile = DocumentFile.fromTreeUri(context,dirUri)!!
+    Log.d("IsFileExist","File ${fileName} ${if(thingieTree.findFile(fileName) != null) "Exist" else "404 NOT FOUND"}")
+    return thingieTree.findFile(fileName) != null
+}
 
 public fun getATextFile(dirUri:Uri, context: Context, fileName:String = "text.txt", mimeType:String = "text/plain", initData:String = "", hardOverwrite:Boolean = false): Uri{
 //    println("Starting to get file: ${fileName} (mime: ${mimeType}) from ${dirUri}")

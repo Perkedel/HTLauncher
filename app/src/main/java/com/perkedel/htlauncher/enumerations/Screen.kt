@@ -23,4 +23,6 @@ enum class Screen (@StringRes val title: Int){
     AllAppsScreen(title = R.string.all_apps),
     ConfigurationScreen(title = R.string.configuration_screen),
     AboutScreen(title = R.string.about_screen),
+    LevelEditor(title = R.string.about_screen),
+    ItemsExplorer(title = R.string.about_screen),
 }

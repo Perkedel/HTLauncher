@@ -83,6 +83,8 @@ fun ItemCell(
         prettyPrint = true
         encodeDefaults = true
     },
+    onClick: (()->Unit)? = {},
+    onLongClick: (()->Unit)? = {},
 ){
     // Load file
     var itemFolder = Uri.parse("")
@@ -122,6 +124,9 @@ fun ItemCell(
 //            uiState.itemList[readTheItemFile] = itemOfIt
         }
     }
+    if(uiState.itemList.contains(readTheItemFile) && uiState.itemList[readTheItemFile] != null) {
+        itemOfIt = uiState.itemList[readTheItemFile]!!
+    }
 
 
     Surface(
@@ -137,6 +142,10 @@ fun ItemCell(
                     Toast
                         .makeText(context, "Click ${handoverText}", Toast.LENGTH_SHORT)
                         .show()
+                    Log.d("ItemCell","Click ${handoverText}\n${uiState.itemList[readTheItemFile]}")
+                    if (onClick != null) {
+                        onClick()
+                    }
                 },
                 onLongClick = {
                     haptic.performHapticFeedback(HapticFeedbackType.LongPress)
@@ -147,6 +156,9 @@ fun ItemCell(
                             Toast.LENGTH_SHORT
                         )
                         .show()
+                    if (onLongClick != null) {
+                        onLongClick()
+                    }
                 }
             )
             .padding(8.dp)
@@ -158,7 +170,7 @@ fun ItemCell(
     ) {
         Box(
             modifier = Modifier
-                .combinedClickable {  }
+
             ,
         ){
             Image(
@@ -174,7 +186,8 @@ fun ItemCell(
 
                     .align(Alignment.BottomCenter)
                 ,
-                text = "${if(itemOfIt.label.isNotEmpty()) itemOfIt.label else handoverText}",
+                text = if(itemOfIt.label.isNotEmpty()) itemOfIt.label else handoverText,
+//                text = if(uiState.itemList[readTheItemFile] != null && uiState.itemList[readTheItemFile]!!.label.isNotEmpty()) uiState.itemList[readTheItemFile]!!.label else handoverText,
                 textAlign = TextAlign.Center,
 //                color = rememberColorScheme().primary,
 //                style = TextStyle.Default.copy(

@@ -1,5 +1,6 @@
 package com.perkedel.htlauncher
 
+import android.content.ContentResolver
 import android.content.Context
 import android.net.Uri
 import android.os.Build
@@ -17,9 +18,11 @@ import com.perkedel.htlauncher.data.HomepagesWeHave
 import com.perkedel.htlauncher.data.ItemData
 import com.perkedel.htlauncher.data.PageData
 import com.perkedel.htlauncher.data.TestJsonData
+import com.perkedel.htlauncher.enumerations.EditWhich
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
 
 class HTViewModel : ViewModel() {
@@ -29,11 +32,11 @@ class HTViewModel : ViewModel() {
 
     val visiblePermissionDialogQueue = mutableStateListOf<String>()
 
-    fun preloadFiles(context: Context){
+    suspend fun preloadFiles(context: Context, contentResolver: ContentResolver, uiStating:HTUIState, listOfFolder:List<String>, folders: MutableMap<String,Uri>, json: Json){
         // https://programmingheadache.com/2024/02/13/effortless-loading-screen-with-state-flows-and-jetpack-compose-just-4-easy-steps/
         setIsReady(into = false)
 
-        val launch = viewModelScope.launch {
+//        val launch = viewModelScope.launch {
 
             // Full screen
             // https://stackoverflow.com/a/69689196/9079640
@@ -41,9 +44,9 @@ class HTViewModel : ViewModel() {
 
             // You must Folders!!
             val homeSafData:HomepagesWeHave = HomepagesWeHave()
-            if(htuiState.selectedSaveDir != null && htuiState.selectedSaveDir.toString().isNotEmpty()){
+            if(uiStating.selectedSaveDir != null && uiStating.selectedSaveDir.toString().isNotEmpty()){
                 for(a in listOfFolder){
-                    folders[a] = getADirectory(htuiState.selectedSaveDir!!, context, a)
+                    folders[a] = getADirectory(uiStating.selectedSaveDir!!, context, a)
                     Log.d("FolderQuery", "Folder ${folders[a]} queried")
                 }
                 for(i in folders){
@@ -56,17 +59,17 @@ class HTViewModel : ViewModel() {
 
                 val homeSaf:String = json.encodeToString<HomepagesWeHave>(homeSafData)
                 val homeSafFileUri = getATextFile(
-                    dirUri = htuiState.selectedSaveDir!!,
+                    dirUri = uiStating.selectedSaveDir!!,
                     context = context,
                     fileName = "${context.resources.getString(R.string.home_screen_file)}.json",
                     initData = homeSaf,
                     hardOverwrite = true,
                 )
                 Log.d("InitFileLoader", "Pls Homescreen:\n${homeSaf}")
-                anViewModel.setHomeScreenJson(
+                setHomeScreenJson(
                     homeSafFileUri
                 )
-                Log.d("InitFileLoader", "Pls the file Homescreen ${htuiState.coreConfig}")
+                Log.d("InitFileLoader", "Pls the file Homescreen ${uiStating.coreConfig}")
 
 
             } else {
@@ -74,40 +77,40 @@ class HTViewModel : ViewModel() {
             }
 
 
-            if(htuiState.selectedSaveDir != null && htuiState.selectedSaveDir.toString().isNotEmpty()) {
+            if(uiStating.selectedSaveDir != null &&uiStating.selectedSaveDir.toString().isNotEmpty()) {
                 // https://dev.to/vtsen/how-to-debug-jetpack-compose-recomposition-with-logging-k7g
                 // https://developer.android.com/reference/android/util/Log
                 // https://stackoverflow.com/a/74044617/9079640
-                Log.d("DebugHomescreen", "Will check ${htuiState.selectedSaveDir}")
-                if (htuiState.coreConfig != null && htuiState.coreConfig.toString().isNotEmpty()) {
+                Log.d("DebugHomescreen", "Will check ${uiStating.selectedSaveDir}")
+                if (uiStating.coreConfig != null && uiStating.coreConfig.toString().isNotEmpty()) {
                     Log.d("DebugHomescreen", "There is something!")
                     val fileStream:String = openATextFile(
-                        uri = htuiState.coreConfig!!,
-                        contentResolver = saveDirResolver
+                        uri = uiStating.coreConfig!!,
+                        contentResolver = contentResolver
                     )
                     Log.d("DebugHomescreen", "It contains:\n${fileStream}")
-                    anViewModel.loadHomeScreenJsonElements(
+                    loadHomeScreenJsonElements(
                         json.decodeFromString<HomepagesWeHave>(
                             fileStream
                         )
                     )
                 } else {
                     Log.d("DebugHomescreen", "There is nothing!")
-                    anViewModel.loadHomeScreenJsonElements(
+                    loadHomeScreenJsonElements(
                         homeSafData
                     )
                 }
             } else {
                 // DONE: when not select, add dummy demo page
                 Log.d("DebugHomescreen", "Literally nothing!")
-                anViewModel.loadHomeScreenJsonElements(
+                loadHomeScreenJsonElements(
                     homeSafData
                 )
             }
 
             // Load Pages & Items
-            if(htuiState.testPreloadAll && htuiState.coreConfigJson != null && folders[context.resources.getString(R.string.pages_folder)] != null){
-                for(i in htuiState.coreConfigJson!!.pagesPath){
+            if(uiStating.testPreloadAll && uiStating.coreConfigJson != null && folders[context.resources.getString(R.string.pages_folder)] != null){
+                for(i in uiStating.coreConfigJson!!.pagesPath){
                     Log.d("PageLoader","Checking page ${i}")
                     Log.d("PageLoader","Eval context ${context}")
                     Log.d("PageLoader","Eval resource name ${context.resources.getString(R.string.pages_folder)}")
@@ -115,9 +118,9 @@ class HTViewModel : ViewModel() {
 
                     var aPage: PageData = PageData()
 
-                    if(htuiState.pageList.contains(i) && htuiState.pageList[i] != null){
-                        Log.d("PageLoader", "Already Exist ${htuiState.itemList[i]}")
-                        aPage = htuiState.pageList[i]!!
+                    if(uiStating.pageList.contains(i) && uiStating.pageList[i] != null){
+                        Log.d("PageLoader", "Already Exist ${uiStating.itemList[i]}")
+                        aPage = uiStating.pageList[i]!!
                     } else {
                         val aPageUri: Uri = getATextFile(
                             dirUri = folders[context.resources.getString(R.string.pages_folder)]!!,
@@ -130,25 +133,25 @@ class HTViewModel : ViewModel() {
                         aPage = json.decodeFromString<PageData>(
                             openATextFile(
                                 uri = aPageUri,
-                                contentResolver = saveDirResolver,
+                                contentResolver = contentResolver,
                             )
                         )
-                        if (htuiState.pageList.contains(i)) {
+                        if (uiStating.pageList.contains(i)) {
                             // https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-map/contains-key.html
                             Log.d("PageLoader", "Key $i Exist!")
                         } else {
                             Log.d("PageLoader", "Key $i 404 NOT FOUND!")
                         }
-                        htuiState.pageList[i] = aPage
+                        uiStating.pageList[i] = aPage
                     }
 
                     // item
                     for (j in aPage.items) {
                         Log.d("ItemLoader", "Checking item ${j}")
                         var aItem: ItemData = ItemData()
-                        if (htuiState.itemList.contains(j) && htuiState.itemList[j] != null) {
-                            Log.d("ItemLoader", "Already Exist ${htuiState.itemList[j]}")
-                            aItem = htuiState.itemList[j]!!
+                        if (uiStating.itemList.contains(j) && uiStating.itemList[j] != null) {
+                            Log.d("ItemLoader", "Already Exist ${uiStating.itemList[j]}")
+                            aItem = uiStating.itemList[j]!!
                         } else {
                             val aItemUri: Uri = getATextFile(
                                 dirUri = folders[context.resources.getString(R.string.items_folder)]!!,
@@ -160,24 +163,22 @@ class HTViewModel : ViewModel() {
                             aItem = json.decodeFromString<ItemData>(
                                 openATextFile(
                                     uri = aItemUri,
-                                    contentResolver = saveDirResolver,
+                                    contentResolver = contentResolver,
                                 )
                             )
-                            if (htuiState.itemList.contains(j)) {
+                            if (uiStating.itemList.contains(j)) {
                                 // https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-map/contains-key.html
                                 Log.d("ItemLoader", "Key $j Exist!")
                             } else {
                                 Log.d("ItemLoader", "Key $j 404 NOT FOUND!")
                             }
-                            htuiState.itemList[j] = aItem
+                            uiStating.itemList[j] = aItem
                         }
                     }
                 }
             }
             setIsReady(into = true)
-        }
-
-        setIsReady(into = true)
+//        }
     }
 
     fun dissmissPermissionDialog(){
@@ -257,6 +258,14 @@ class HTViewModel : ViewModel() {
         _uiState.update {
             currentState -> currentState.copy(
                 isReady = into
+            )
+        }
+    }
+
+    fun setEditWhich(into:EditWhich){
+        _uiState.update {
+            currentState -> currentState.copy(
+                toEditWhatFile = into
             )
         }
     }

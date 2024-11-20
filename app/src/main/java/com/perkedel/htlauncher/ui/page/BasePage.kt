@@ -97,34 +97,37 @@ fun BasePage(
     LaunchedEffect(
         true
     ) {
-        Log.d("BasePage", "Eval filename = ${fileName}")
-        Log.d("BasePage", "Eval selected save = ${uiState.selectedSaveDir}")
+//        Log.d("BasePage", "Eval filename = ${fileName}")
+//        Log.d("BasePage", "Eval selected save = ${uiState.selectedSaveDir}")
 
         if(uiState.pageList.contains(fileName) && uiState.pageList[fileName] != null){
             pageOfIt = uiState.pageList[fileName]!!
         } else {
-            if (fileName.isNotEmpty() && uiState.selectedSaveDir != null && uiState.selectedSaveDir.toString()
-                    .isNotEmpty()
-            ) {
-                pageFolder = getADirectory(
-                    dirUri = uiState.selectedSaveDir,
-                    context = context,
-                    dirName = context.resources.getString(R.string.pages_folder)
-                )
-                pageUri = getATextFile(
-                    dirUri = pageFolder,
-                    context = context,
-                    fileName = "${fileName}.json",
-                    initData = json.encodeToString<PageData>(PageData()),
-                    hardOverwrite = false
-                )
-                pageOfIt = json.decodeFromString<PageData>(openATextFile(pageUri, contentResolver))
-                Log.d("BasePage", "a Page ${fileName} has:\n${pageOfIt}")
-            } else {
-                Log.d("BasePage", "(EMPTY) a Page ${fileName} has:\n${pageOfIt}")
-            }
-            uiState.pageList[fileName] = pageOfIt
+//            if (fileName.isNotEmpty() && uiState.selectedSaveDir != null && uiState.selectedSaveDir.toString()
+//                    .isNotEmpty()
+//            ) {
+//                pageFolder = getADirectory(
+//                    dirUri = uiState.selectedSaveDir,
+//                    context = context,
+//                    dirName = context.resources.getString(R.string.pages_folder)
+//                )
+//                pageUri = getATextFile(
+//                    dirUri = pageFolder,
+//                    context = context,
+//                    fileName = "${fileName}.json",
+//                    initData = json.encodeToString<PageData>(PageData()),
+//                    hardOverwrite = false
+//                )
+//                pageOfIt = json.decodeFromString<PageData>(openATextFile(pageUri, contentResolver))
+//                Log.d("BasePage", "a Page ${fileName} has:\n${pageOfIt}")
+//            } else {
+//                Log.d("BasePage", "(EMPTY) a Page ${fileName} has:\n${pageOfIt}")
+//            }
+//            uiState.pageList[fileName] = pageOfIt
         }
+    }
+    if(uiState.pageList.contains(fileName) && uiState.pageList[fileName] != null){
+        pageOfIt = uiState.pageList[fileName]!!
     }
 
     // https://youtu.be/UhnTTk3cwc4?si=5BoNxc4uZdM6y5nG

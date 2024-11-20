@@ -20,6 +20,8 @@
     <string name="all_apps">Semua Aplikasi</string>
     <string name="configuration_screen">Konfigurasi</string>
     <string name="about_screen">Tentang</string>
+    <string name="editor_screen">Editor</string>
+    <string name="items_explorer_screen">Mengedit</string>
     <string name="back_button">Kembali</string>
 
     <!--  Home More Menu  -->
@@ -54,8 +56,38 @@
     <string name="permission_details">Detail</string>
     <string name="disclaimer_option_desc">Sesuatu yg harap diperhatikan</string>
     <string name="click_here_to_check_update_snippet">Klik disini untuk periksa update</string>
+    <string name="donation_option">Donasi</string>
+    <string name="quick_start_option">Quick Start Guide</string>
+    <string name="language_option">Bahasa</string>
+    <string name="display_option">Tampilan</string>
+    <string name="a11y_option">Aksesibilitas</string>
+    <string name="menus_option">Menu</string>
+    <string name="level_editor_option">Ubah Item Halaman</string>
+    <string name="items_pages_option">Opsi Item Halaman</string>
+    <string name="contacts_option">Kontak</string>
+    <string name="telephone_option">Telepon</string>
+    <string name="messages_option">Pesan</string>
+    <string name="apps_option">Aplikasi</string>
+    <string name="compatibility_option">Kompatibilitas</string>
+    <string name="remove_default_option">Hapus `HT Launcher` sebagai Peluncur Default</string>
+    <string name="manual_option">Petunjuk Penggunaan</string>
+    <string name="save_dir_option">Ubah Lokasi Folder Konfigurasi</string>
+    <string name="debug_test_option">[DEBUG] Tes Json</string>
+    <string name="About_option">Tentang</string>
+    <string name="iteration_option">Iterasi</string>
+    <string name="emergency_option">SOS</string>
+    <string name="permissions_option">Periksa Izin-izin</string>
 
     <!--  Filename & Directory name  -->
+
+    <!--  Filename & Directory label  -->
+    <string name="home_screen_file_label" >Rumah</string>
+    <string name="test_file_label" >tes</string>
+    <string name="pages_folder_label">Halaman</string>
+    <string name="items_folder_label" >Item</string>
+    <string name="themes_folder_label" >Tema</string>
+    <string name="medias_folder_label" >Media</string>
+    <string name="shortcuts_folder_label" >Pintasan</string>
 
     <!-- Error messages -->
     <string name="error_fragment_message">Sebuah galat terjadi</string>
@@ -180,6 +212,13 @@
         "Pastikan Anda telah mengizinkan izin2 pada app ini agar berfungsi dengan baik\n"
         "Klik `Terima` untuk lanjut, atau `Detail` untuk izinkan secara manual."
     </string>
+
+    <!--  Humane Units  -->
+    <string name="pieces_unit">Butir</string>
+
+    <!--  Humane Prefixes  -->
+    <string name="number_prefix_short">No.</string>
+    <string name="number_prefix_short_alt">Ke</string>
 
     <!--  Extras  -->
     <string name="unit_packages_installed">paket terinstal</string>
