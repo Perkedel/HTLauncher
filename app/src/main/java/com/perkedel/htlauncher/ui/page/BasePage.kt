@@ -39,6 +39,7 @@ import androidx.compose.ui.hapticfeedback.HapticFeedback
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -55,6 +56,7 @@ import com.perkedel.htlauncher.data.HomepagesWeHave
 import com.perkedel.htlauncher.data.PageData
 import com.perkedel.htlauncher.func.WindowInfo
 import com.perkedel.htlauncher.func.rememberWindowInfo
+import com.perkedel.htlauncher.getADirectory
 import com.perkedel.htlauncher.getATextFile
 import com.perkedel.htlauncher.openATextFile
 import com.perkedel.htlauncher.ui.previews.HTPreviewAnnotations
@@ -82,23 +84,46 @@ fun BasePage(
     uiState: HTUIState = HTUIState(),
     colorScheme: ColorScheme = rememberColorScheme(),
     haptic: HapticFeedback = LocalHapticFeedback.current,
+    json: Json = Json {
+        // https://coldfusion-example.blogspot.com/2022/03/jetpack-compose-kotlinx-serialization_79.html
+        prettyPrint = true
+        encodeDefaults = true
+    },
 ){
     // Load this file!
     var pageUri:Uri = Uri.parse("")
+    var pageFolder:Uri = Uri.parse("")
     var pageOfIt:PageData = PageData()
     LaunchedEffect(
         true
     ) {
-        if(fileName.isNotEmpty() && uiState.selectedSaveDir != null && uiState.selectedSaveDir.toString().isNotEmpty()){
-            pageUri = getATextFile(
-                dirUri = uiState.selectedSaveDir,
-                context = context,
-                fileName = "${context.resources.getString(R.string.pages_folder)}/${fileName}.json",
-                initData = Json.encodeToString<PageData>(PageData()),
-                hardOverwrite = true
-            )
-            pageOfIt = Json.decodeFromString<PageData>(openATextFile(pageUri, contentResolver))
-            Log.d("BasePage", "a Page ${fileName} has:\n${pageOfIt}")
+        Log.d("BasePage", "Eval filename = ${fileName}")
+        Log.d("BasePage", "Eval selected save = ${uiState.selectedSaveDir}")
+
+        if(uiState.pageList.contains(fileName) && uiState.pageList[fileName] != null){
+            pageOfIt = uiState.pageList[fileName]!!
+        } else {
+            if (fileName.isNotEmpty() && uiState.selectedSaveDir != null && uiState.selectedSaveDir.toString()
+                    .isNotEmpty()
+            ) {
+                pageFolder = getADirectory(
+                    dirUri = uiState.selectedSaveDir,
+                    context = context,
+                    dirName = context.resources.getString(R.string.pages_folder)
+                )
+                pageUri = getATextFile(
+                    dirUri = pageFolder,
+                    context = context,
+                    fileName = "${fileName}.json",
+                    initData = json.encodeToString<PageData>(PageData()),
+                    hardOverwrite = false
+                )
+                pageOfIt = json.decodeFromString<PageData>(openATextFile(pageUri, contentResolver))
+                Log.d("BasePage", "a Page ${fileName} has:\n${pageOfIt}")
+            } else {
+                Log.d("BasePage", "(EMPTY) a Page ${fileName} has:\n${pageOfIt}")
+            }
+            uiState.pageList[fileName] = pageOfIt
         }
     }
 
@@ -127,6 +152,7 @@ fun BasePage(
                             span = { GridItemSpan(this.maxLineSpan) }
                         ){
                             FirstPageCard(
+                                handoverText = fileName,
                                 isCompact = isCompact,
                                 isOnNumberWhat = isOnNumberWhat,
                                 modifier = Modifier.weight(1f),
@@ -158,6 +184,7 @@ fun BasePage(
                 // Permanent Card on first page
                 if(isFirstPage || pageOfIt.isHome){
                     FirstPageCard(
+                        handoverText = fileName,
                         isCompact = isCompact,
                         isOnNumberWhat = isOnNumberWhat,
                         modifier = Modifier,

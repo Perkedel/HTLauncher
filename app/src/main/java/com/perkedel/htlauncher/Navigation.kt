@@ -12,7 +12,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import android.content.Context;
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
@@ -92,6 +92,7 @@ import com.perkedel.htlauncher.ui.navigation.Configurationing
 import com.perkedel.htlauncher.ui.theme.HTLauncherTheme
 import com.perkedel.htlauncher.ui.theme.rememberColorScheme
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
@@ -130,19 +131,9 @@ fun Navigation(
         // https://coldfusion-example.blogspot.com/2022/03/jetpack-compose-kotlinx-serialization_79.html
         prettyPrint = true
         encodeDefaults = true
-                      },
+    },
 ){
     var homePagerState: PagerState = rememberPagerState(pageCount = {10})
-
-    // Dummies
-    val dummyHomeScreen:HomepagesWeHave = HomepagesWeHave(
-        pagesPath = listOf(
-            "Home",
-            "Second",
-            "Third",
-        )
-    )
-    val dummyItems:ItemData = ItemData()
 
     //permission
     //
@@ -356,103 +347,162 @@ fun Navigation(
         }
     }
 
-
+    val listOfFolder = listOf(
+        context.resources.getString(R.string.pages_folder),
+        context.resources.getString(R.string.items_folder),
+        context.resources.getString(R.string.themes_folder),
+        context.resources.getString(R.string.medias_folder),
+    )
+    val folders: MutableMap<String,Uri> = LinkedHashMap<String,Uri>()
 
 
     LaunchedEffect(true, htuiState.selectedSaveDir, context) {
-        // Full screen
-        // https://stackoverflow.com/a/69689196/9079640
+        coroutineScope.launch {
+
+            // Full screen
+            // https://stackoverflow.com/a/69689196/9079640
 //        systemUiController.isStatusBarVisible = false
 
-        // You must Folders!!
-        if(htuiState.selectedSaveDir != null && htuiState.selectedSaveDir.toString().isNotEmpty()){
-            getADirectory(htuiState.selectedSaveDir!!, context, "Pages")
-            getADirectory(htuiState.selectedSaveDir!!, context, "Items")
-            getADirectory(htuiState.selectedSaveDir!!, context, "Themes")
-            getADirectory(htuiState.selectedSaveDir!!, context, "Medias")
-
-            val homeSaf:String = json.encodeToString<HomepagesWeHave>(HomepagesWeHave())
-            Log.d("InitFileLoader", "Pls Homescreen:\n${homeSaf}")
-            getATextFile(
-                dirUri = htuiState.selectedSaveDir!!,
-                context = context,
-                fileName = "${context.resources.getString(R.string.home_screen_file)}.json",
-                initData = homeSaf,
-                hardOverwrite = true,
-            )
-        } else {
-
-        }
+            // You must Folders!!
+            val homeSafData:HomepagesWeHave = HomepagesWeHave()
+            if(htuiState.selectedSaveDir != null && htuiState.selectedSaveDir.toString().isNotEmpty()){
+                for(a in listOfFolder){
+                    folders[a] = getADirectory(htuiState.selectedSaveDir!!, context, a)
+                    Log.d("FolderQuery", "Folder ${folders[a]} queried")
+                }
+                for(i in folders){
+                    Log.d("InitFileLoader","Folder ${i.key} we have ${i.value}")
+                }
+//            getADirectory(htuiState.selectedSaveDir!!, context, "Items")
+//            getADirectory(htuiState.selectedSaveDir!!, context, "Themes")
+//            getADirectory(htuiState.selectedSaveDir!!, context, "Medias")
 
 
-    }
-
-    if(htuiState.selectedSaveDir != null && htuiState.selectedSaveDir.toString().isNotEmpty()) {
-        // https://dev.to/vtsen/how-to-debug-jetpack-compose-recomposition-with-logging-k7g
-        // https://developer.android.com/reference/android/util/Log
-        // https://stackoverflow.com/a/74044617/9079640
-        Log.d("DebugHomescreen", "Will check ${htuiState.selectedSaveDir}")
-        val urei = getATextFile(
-            dirUri = htuiState.selectedSaveDir!!,
-            context = context,
-//            fileName = "${context.resources.getString(R.string.home_screen_file)}.json",
-            fileName = "${stringResource(R.string.home_screen_file)}.json",
-            initData = Json.encodeToString<HomepagesWeHave>(HomepagesWeHave()),
-            hardOverwrite = true
-        )
-        var homepageOfIt:HomepagesWeHave
-        Log.d("DebugHomescreen", "So, there is ${urei}")
-        anViewModel.setHomeScreenJson(urei) // coreConfig
-//                        Log.d("DebugHomescreen", "Which contains ${openATextFile(htuiState.coreConfig!!, contentResolver = saveDirResolver)}")
-//                        anViewModel.loadHomeScreenJsonElements(Json.decodeFromString<HomepagesWeHave>(openATextFile(htuiState.coreConfig!!, contentResolver = saveDirResolver)))
-        if (htuiState.coreConfig != null && htuiState.coreConfig.toString().isNotEmpty()) {
-            Log.d("DebugHomescreen", "There is something!")
-            val fileStream:String = openATextFile(
-                uri = htuiState.coreConfig!!,
-                contentResolver = saveDirResolver
-            )
-            Log.d("DebugHomescreen", "It contains:\n${fileStream}")
-            anViewModel.loadHomeScreenJsonElements(
-                json.decodeFromString<HomepagesWeHave>(
-                    fileStream
+                val homeSaf:String = json.encodeToString<HomepagesWeHave>(homeSafData)
+                val homeSafFileUri = getATextFile(
+                    dirUri = htuiState.selectedSaveDir!!,
+                    context = context,
+                    fileName = "${context.resources.getString(R.string.home_screen_file)}.json",
+                    initData = homeSaf,
+                    hardOverwrite = true,
                 )
-            )
-//                        if(htuiState.coreConfigJson != null && htuiState.coreConfigJson.toString().isNotEmpty()){
-//                            if(htuiState.coreConfigJson!!.pagesPath.isNotEmpty()){
-//                                Log.d("DebugHomescreen", "There is something!")
-//                                anViewModel.loadHomeScreenJsonElements(
-//                                    json.decodeFromString<HomepagesWeHave>(openATextFile(uri = htuiState.coreConfig!!, contentResolver = saveDirResolver))
-//                                )
-//                            } else {
-//                                Log.d("DebugHomescreen", "Still nothing!")
-//                                anViewModel.loadHomeScreenJsonElements(
-//                                    dummyHomeScreen
-//                                )
-//                            }
-//
-//                        } else {
-//                            Log.d("DebugHomescreen", "There is nothing!")
-//                            anViewModel.loadHomeScreenJsonElements(
-//                                dummyHomeScreen
-//                            )
-//                        }
-        } else {
-            Log.d("DebugHomescreen", "There is nothing!")
+                Log.d("InitFileLoader", "Pls Homescreen:\n${homeSaf}")
+                anViewModel.setHomeScreenJson(
+                    homeSafFileUri
+                )
+                Log.d("InitFileLoader", "Pls the file Homescreen ${htuiState.coreConfig}")
 
-//                        homePagerState
-            anViewModel.loadHomeScreenJsonElements(
-                HomepagesWeHave()
-            )
+
+            } else {
+                Log.d("InitFileLoader", "Save Dir Not Selected")
+            }
+
+
+            if(htuiState.selectedSaveDir != null && htuiState.selectedSaveDir.toString().isNotEmpty()) {
+                // https://dev.to/vtsen/how-to-debug-jetpack-compose-recomposition-with-logging-k7g
+                // https://developer.android.com/reference/android/util/Log
+                // https://stackoverflow.com/a/74044617/9079640
+                Log.d("DebugHomescreen", "Will check ${htuiState.selectedSaveDir}")
+                if (htuiState.coreConfig != null && htuiState.coreConfig.toString().isNotEmpty()) {
+                    Log.d("DebugHomescreen", "There is something!")
+                    val fileStream:String = openATextFile(
+                        uri = htuiState.coreConfig!!,
+                        contentResolver = saveDirResolver
+                    )
+                    Log.d("DebugHomescreen", "It contains:\n${fileStream}")
+                    anViewModel.loadHomeScreenJsonElements(
+                        json.decodeFromString<HomepagesWeHave>(
+                            fileStream
+                        )
+                    )
+                } else {
+                    Log.d("DebugHomescreen", "There is nothing!")
+                    anViewModel.loadHomeScreenJsonElements(
+                        homeSafData
+                    )
+                }
+            } else {
+                // DONE: when not select, add dummy demo page
+                Log.d("DebugHomescreen", "Literally nothing!")
+                anViewModel.loadHomeScreenJsonElements(
+                    homeSafData
+                )
+            }
+
+            // Load Pages & Items
+            if(htuiState.testPreloadAll && htuiState.coreConfigJson != null && folders[context.resources.getString(R.string.pages_folder)] != null){
+                for(i in htuiState.coreConfigJson!!.pagesPath){
+                    Log.d("PageLoader","Checking page ${i}")
+                    Log.d("PageLoader","Eval context ${context}")
+                    Log.d("PageLoader","Eval resource name ${context.resources.getString(R.string.pages_folder)}")
+                    Log.d("PageLoader","Eval dirUri ${folders[context.resources.getString(R.string.pages_folder)]}")
+
+                    var aPage:PageData = PageData()
+
+                    if(htuiState.pageList.contains(i) && htuiState.pageList[i] != null){
+                        Log.d("PageLoader", "Already Exist ${htuiState.itemList[i]}")
+                        aPage = htuiState.pageList[i]!!
+                    } else {
+                        val aPageUri: Uri = getATextFile(
+                            dirUri = folders[context.resources.getString(R.string.pages_folder)]!!,
+                            context = context,
+                            initData = json.encodeToString<PageData>(PageData()),
+                            fileName = "$i.json",
+                            hardOverwrite = false,
+                        )
+                        Log.d("PageLoader", "Page URI in total ${aPageUri}")
+                        aPage = json.decodeFromString<PageData>(
+                            openATextFile(
+                                uri = aPageUri,
+                                contentResolver = saveDirResolver,
+                            )
+                        )
+                        if (htuiState.pageList.contains(i)) {
+                            // https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-map/contains-key.html
+                            Log.d("PageLoader", "Key $i Exist!")
+                        } else {
+                            Log.d("PageLoader", "Key $i 404 NOT FOUND!")
+                        }
+                        htuiState.pageList[i] = aPage
+                    }
+
+                    // item
+                    for (j in aPage.items) {
+                        Log.d("ItemLoader", "Checking item ${j}")
+                        var aItem: ItemData = ItemData()
+                        if (htuiState.itemList.contains(j) && htuiState.itemList[j] != null) {
+                            Log.d("ItemLoader", "Already Exist ${htuiState.itemList[j]}")
+                            aItem = htuiState.itemList[j]!!
+                        } else {
+                            val aItemUri: Uri = getATextFile(
+                                dirUri = folders[context.resources.getString(R.string.items_folder)]!!,
+                                context = context,
+                                initData = json.encodeToString<ItemData>(ItemData()),
+                                fileName = "$j.json",
+                                hardOverwrite = true,
+                            )
+                            aItem = json.decodeFromString<ItemData>(
+                                openATextFile(
+                                    uri = aItemUri,
+                                    contentResolver = saveDirResolver,
+                                )
+                            )
+                            if (htuiState.itemList.contains(j)) {
+                                // https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-map/contains-key.html
+                                Log.d("ItemLoader", "Key $j Exist!")
+                            } else {
+                                Log.d("ItemLoader", "Key $j 404 NOT FOUND!")
+                            }
+                            htuiState.itemList[j] = aItem
+                        }
+                    }
+                }
+            }
+            anViewModel.setIsReady(true)
         }
-    } else {
-        // DONE: when not select, add dummy demo page
-        Log.d("DebugHomescreen", "Literally nothing!")
-
-//                        homePagerState
-        anViewModel.loadHomeScreenJsonElements(
-            HomepagesWeHave()
-        )
     }
+
+
 
     Surface(
         modifier = Modifier,
@@ -482,7 +532,7 @@ fun Navigation(
                     canNavigateBack = navController.previousBackStackEntry != null,
                     navigateUp = { navController.navigateUp() },
                     //                hideIt = hideTopBar
-                    hideIt = navController.previousBackStackEntry == null
+                    hideIt = navController.previousBackStackEntry == null && htuiState.isReady
                 )
             },
             containerColor = Color.Transparent,
@@ -538,6 +588,8 @@ fun Navigation(
                         viewModel = anViewModel,
                         contentResolver = saveDirResolver,
                         systemUiController = systemUiController,
+                        uiState = htuiState,
+                        isReady = htuiState.isReady
                     )
 
                     LaunchedEffect(true) {
@@ -853,10 +905,11 @@ public fun writeATextFile(uri:Uri, contentResolver: ContentResolver, with:String
 
 
 public fun getATextFile(dirUri:Uri, context: Context, fileName:String = "text.txt", mimeType:String = "text/plain", initData:String = "", hardOverwrite:Boolean = false): Uri{
-    println("Starting to get file: ${fileName} (mime: ${mimeType}) from ${dirUri}")
+//    println("Starting to get file: ${fileName} (mime: ${mimeType}) from ${dirUri}")
     Log.d("GetTextFile","Starting to get file: ${fileName} (mime: ${mimeType}) from ${dirUri}")
     // https://github.com/abdallahmehiz/mpvKt/blob/74d407106e1fb0bae4b7bc66e3b0f83e77a6cbc2/app/src/main/java/live/mehiz/mpvkt/ui/preferences/AdvancedPreferencesScreen.kt#L189
     val thingieTree:DocumentFile = DocumentFile.fromTreeUri(context,dirUri)!!
+    Log.d("GetTextFile","Thingie Tree ${thingieTree.uri}")
     // check exist
     return if (thingieTree.findFile(fileName) == null){
         Log.d("GetTextFile","404 NOT FOUND, let's make the file now! at: ${dirUri}")
@@ -882,7 +935,7 @@ public fun getATextFile(dirUri:Uri, context: Context, fileName:String = "text.tx
         thingieFile.uri
     } else{
         Log.d("GetTextFile","Found Text File of URI: ${thingieTree.findFile(fileName)!!.uri}")
-        if(hardOverwrite ){
+        if(hardOverwrite && initData.isNotEmpty() && initData != "{}"){
             Log.d("GetTextFile","Hard Overwrite for empty file: ${thingieTree.findFile(fileName)!!.uri}, contains:\n${initData}")
             val thingieFile = thingieTree.findFile(fileName)!!
             if(thingieFile.exists()){

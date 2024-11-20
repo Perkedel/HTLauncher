@@ -22,6 +22,7 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -47,6 +48,7 @@ import com.perkedel.htlauncher.ui.page.BasePage
 import com.perkedel.htlauncher.ui.previews.HTPreviewAnnotations
 import com.perkedel.htlauncher.ui.theme.HTLauncherTheme
 import com.perkedel.htlauncher.ui.theme.rememberColorScheme
+import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
@@ -69,6 +71,12 @@ fun HomeScreen(
     haptic: HapticFeedback = LocalHapticFeedback.current,
     configFile:HomepagesWeHave? = null,
     systemUiController: SystemUiController = rememberSystemUiController(),
+    json: Json = Json {
+        // https://coldfusion-example.blogspot.com/2022/03/jetpack-compose-kotlinx-serialization_79.html
+        prettyPrint = true
+        encodeDefaults = true
+    },
+    isReady:Boolean = false,
 ){
 
 
@@ -76,10 +84,11 @@ fun HomeScreen(
     Box(
         modifier = Modifier
     ){
-        Column(
-            modifier = modifier,
-            verticalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
+        if(isReady) {
+            Column(
+                modifier = modifier,
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
 //        Button(
 //            onClick = {
 ////                    navController?.navigate(Screen.AllAppsScreen)
@@ -91,57 +100,65 @@ fun HomeScreen(
 //            Text(text="All Apps")
 //        }
 
-            HorizontalPager(
-                state = handoverPagerState,
+                HorizontalPager(
+                    state = handoverPagerState,
 
-                ) { page ->
-                BasePage(
-//                    fileName = configFile!!.pagesPath[page],
-                    isOnNumberWhat = page,
-                    isFirstPage = page == 0,
-                    // TODO: read JSON file `anPage.json` in folder `Pages`, if the `isFirstPage` declaration in itself is set to true.
-                    // TODO: a JSON file `PageCollection.json` lists the pages included. It includes some JSON files in `Pages` folder. Basically, it's just 1 array for it, making this in order.
-                    onMoreMenuButtonClicked = onMoreMenuButtonClicked,
-                    howManyItemsHere = 25,
-                    modifier = Modifier,
-                    context = context,
-                    configuration = configuration,
-                    colorScheme = colorScheme,
-                    haptic = haptic,
-                    viewModel = viewModel,
-                    contentResolver = contentResolver,
-                )
+                    ) { page ->
+                    BasePage(
+                        fileName = if (configFile != null) configFile.pagesPath[page] else "",
+                        isOnNumberWhat = page,
+                        isFirstPage = page == 0,
+                        // TODO: read JSON file `anPage.json` in folder `Pages`, if the `isFirstPage` declaration in itself is set to true.
+                        // TODO: a JSON file `PageCollection.json` lists the pages included. It includes some JSON files in `Pages` folder. Basically, it's just 1 array for it, making this in order.
+                        onMoreMenuButtonClicked = onMoreMenuButtonClicked,
+                        howManyItemsHere = 25,
+                        modifier = Modifier,
+                        context = context,
+                        configuration = configuration,
+                        colorScheme = colorScheme,
+                        haptic = haptic,
+                        viewModel = viewModel,
+                        contentResolver = contentResolver,
+                        uiState = uiState,
+                    )
+                }
+
             }
+            // Indicator?!
+            Row(
+                Modifier
+                    .wrapContentHeight()
+                    .fillMaxWidth()
+                    .align(Alignment.BottomCenter)
+                    .padding(bottom = 8.dp),
+                horizontalArrangement = Arrangement.Center
+            ) {
+                repeat(handoverPagerState.pageCount) { iteration ->
+                    val color =
+                        if (handoverPagerState.currentPage == iteration) Color.DarkGray else Color.LightGray
+                    Box(
+                        modifier = Modifier
+                            .padding(2.dp)
+                            .clip(CircleShape)
+                            .background(color)
+                            .size(16.dp)
+                            .combinedClickable(
+                                onClick = {
+                                    // Set to what page
+                                },
+                                onLongClick = {
 
-        }
-        // Indicator?!
-        Row(
-            Modifier
-                .wrapContentHeight()
-                .fillMaxWidth()
-                .align(Alignment.BottomCenter)
-                .padding(bottom = 8.dp),
-            horizontalArrangement = Arrangement.Center
-        ) {
-            repeat(handoverPagerState.pageCount) { iteration ->
-                val color = if (handoverPagerState.currentPage == iteration) Color.DarkGray else Color.LightGray
-                Box(
-                    modifier = Modifier
-                        .padding(2.dp)
-                        .clip(CircleShape)
-                        .background(color)
-                        .size(16.dp)
-                        .combinedClickable (
-                            onClick = {
-                                // Set to what page
-                            },
-                            onLongClick = {
+                                }
+                            ),
 
-                            }
                         )
-                    ,
-
-                )
+                }
+            }
+        } else {
+            Column(
+                modifier = modifier,
+            ) {
+                Text(text = "Loading")
             }
         }
     }
@@ -153,7 +170,7 @@ fun HomeScreen(
 fun HomeScreenPreview(){
     HTLauncherTheme {
         HomeScreen(
-
+                isReady = true,
 //            onAllAppButtonClicked = {},
 //            onMoreMenuButtonClicked = {},
         )

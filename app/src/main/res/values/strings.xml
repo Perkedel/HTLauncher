@@ -63,6 +63,8 @@
     <string name="test_file" translatable="false">test</string>
     <string name="pages_folder" translatable="false">Pages</string>
     <string name="items_folder" translatable="false">Items</string>
+    <string name="themes_folder" translatable="false">Themes</string>
+    <string name="medias_folder" translatable="false">Medias</string>
 
     <!-- Error messages -->
     <string name="error_fragment_message">An error occurred</string>

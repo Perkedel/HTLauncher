@@ -42,6 +42,7 @@ import java.util.Date
 //@RequiresApi(Build.VERSION_CODES.S)
 @Composable
 fun FirstPageCard(
+    handoverText:String = "",
     isOnNumberWhat:Int = 0,
     modifier: Modifier,
     isCompact:Boolean = true,
@@ -71,7 +72,7 @@ fun FirstPageCard(
                     .size(200.dp)
 
             ) {
-                Text("HAHAHA ${isOnNumberWhat} | ${currentDateAndTime}")
+                Text("${handoverText} ${isOnNumberWhat} | ${currentDateAndTime}")
 
                 // https://www.geeksforgeeks.org/text-clock-in-android-using-jetpack-compose/
 //                AndroidView(

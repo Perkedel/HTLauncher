@@ -23,6 +23,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -54,6 +55,7 @@ import com.perkedel.htlauncher.HTViewModel
 import com.perkedel.htlauncher.R
 import com.perkedel.htlauncher.data.ItemData
 import com.perkedel.htlauncher.data.PageData
+import com.perkedel.htlauncher.getADirectory
 import com.perkedel.htlauncher.getATextFile
 import com.perkedel.htlauncher.openATextFile
 import com.perkedel.htlauncher.ui.previews.HTPreviewAnnotations
@@ -76,25 +78,51 @@ fun ItemCell(
     uiState: HTUIState = HTUIState(),
     viewModel: HTViewModel = HTViewModel(),
     contentResolver: ContentResolver = context.contentResolver,
+    json: Json = Json {
+        // https://coldfusion-example.blogspot.com/2022/03/jetpack-compose-kotlinx-serialization_79.html
+        prettyPrint = true
+        encodeDefaults = true
+    },
 ){
     // Load file
+    var itemFolder = Uri.parse("")
     var itemUri:Uri = Uri.parse("")
     var itemOfIt:ItemData = ItemData(
         name = readTheItemFile
     )
-    if(readTheItemFile.isNotEmpty() && uiState.selectedSaveDir != null && uiState.selectedSaveDir.toString().isNotEmpty()){
-        itemUri = getATextFile(
-            dirUri = uiState.selectedSaveDir,
-            context = context,
-            fileName = "${context.resources.getString(R.string.items_folder)}/${readTheItemFile}.json",
-            initData = Json.encodeToString<ItemData>(
-                ItemData()
-            ),
-            hardOverwrite = true,
-        )
-        itemOfIt = Json.decodeFromString<ItemData>(openATextFile(itemUri, contentResolver))
-        Log.d("ItemCell", "an Item ${readTheItemFile} has:\n${itemOfIt}")
+    LaunchedEffect(true) {
+//        Log.d("ItemCell", "Eval filename = ${readTheItemFile}")
+//        Log.d("ItemCell", "Eval selected save = ${uiState.selectedSaveDir}")
+
+        if(uiState.itemList.contains(readTheItemFile) && uiState.itemList[readTheItemFile] != null){
+            itemOfIt = uiState.itemList[readTheItemFile]!!
+        } else {
+//            if (readTheItemFile.isNotEmpty() && uiState.selectedSaveDir != null && uiState.selectedSaveDir.toString()
+//                    .isNotEmpty()
+//            ) {
+//                itemFolder = getADirectory(
+//                    dirUri = uiState.selectedSaveDir,
+//                    context = context,
+//                    dirName = context.resources.getString(R.string.items_folder)
+//                )
+//                itemUri = getATextFile(
+//                    dirUri = itemFolder,
+//                    context = context,
+//                    fileName = "${readTheItemFile}.json",
+//                    initData = Json.encodeToString<ItemData>(ItemData()),
+//                    hardOverwrite = false,
+//                )
+//                Log.d("ItemCell", "Eval Item Folder ${itemFolder}")
+//                Log.d("ItemCell", "Eval Item Uri ${itemUri}")
+//                itemOfIt = Json.decodeFromString<ItemData>(openATextFile(itemUri, contentResolver))
+//                Log.d("ItemCell", "an Item ${readTheItemFile} has:\n${itemOfIt}")
+//            } else {
+//                Log.d("ItemCell", "(EMPTY) an Item ${readTheItemFile} has:\n${itemOfIt}")
+//            }
+//            uiState.itemList[readTheItemFile] = itemOfIt
+        }
     }
+
 
     Surface(
         modifier = modifier

@@ -142,6 +142,8 @@ dependencies {
     implementation(libs.jsontree) // https://github.com/snappdevelopment/JsonTree
 
     api(libs.guava) //api("com.google.guava:guava:33.3.1-android")
+
+    implementation(libs.androidx.documentfile) // https://stackoverflow.com/a/67630165/9079640
 }
 
 //composeCompiler {
