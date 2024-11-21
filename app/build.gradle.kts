@@ -41,11 +41,11 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
     }
     kotlinOptions {
-        jvmTarget = "1.8"
+        jvmTarget = "11"
     }
     buildFeatures {
         compose = true
@@ -144,6 +144,11 @@ dependencies {
     api(libs.guava) //api("com.google.guava:guava:33.3.1-android")
 
     implementation(libs.androidx.documentfile) // https://stackoverflow.com/a/67630165/9079640
+
+    // https://github.com/philipplackner/ListPaneScaffoldGuide/blob/master/app/build.gradle.kts
+    // https://youtu.be/W3R_ETKMj0E Philip Lackner List detail
+    implementation(libs.androidx.compose.material3.adaptive.navigation.suite)
+    implementation(libs.androidx.compose.material3.adaptive.navigation)
 }
 
 //composeCompiler {

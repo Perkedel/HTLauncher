@@ -89,16 +89,18 @@
     <string name="items_folder" translatable="false">Items</string>
     <string name="themes_folder" translatable="false">Themes</string>
     <string name="medias_folder" translatable="false">Medias</string>
+    <string name="misc_folder" translatable="false">Miscellaneous</string>
     <string name="shortcuts_folder" translatable="false">Shortcuts</string>
 
     <!--  Filename & Directory label  -->
-    <string name="home_screen_file_label" >Home Screen</string>
-    <string name="test_file_label" >test</string>
+    <string name="home_screen_file_label">Home Screen</string>
+    <string name="test_file_label">test</string>
     <string name="pages_folder_label">Pages</string>
-    <string name="items_folder_label" >Items</string>
-    <string name="themes_folder_label" >Themes</string>
-    <string name="medias_folder_label" >Medias</string>
-    <string name="shortcuts_folder_label" >Medias</string>
+    <string name="items_folder_label">Items</string>
+    <string name="themes_folder_label">Themes</string>
+    <string name="medias_folder_label">Medias</string>
+    <string name="misc_folder_label">Miscellaneous</string>
+    <string name="shortcuts_folder_label">Medias</string>
 
     <!-- Error messages -->
     <string name="error_fragment_message">An error occurred</string>
@@ -236,4 +238,13 @@
     <string name="unit_version_name">version</string>
     <string name="unit_version_number">iteration</string>
     <string name="iteration">iteration</string>
+
+    <!--  filetype  -->
+    <string name="text_plain_type" translatable="false">text/plain</string>
+    <string name="text_all_type" translatable="false">text/*</string>
+    <string name="audio_midi_type" translatable="false">audio/midi</string>
+    <string name="audio_all_type" translatable="false">audio/*</string>
+
+    <!--  Activity  -->
+    <string name="title_activity_item_editor">ItemEditorActivity</string>
 </resources>

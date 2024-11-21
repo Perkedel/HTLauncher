@@ -24,11 +24,13 @@ import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
@@ -37,6 +39,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewDynamicColors
 import androidx.compose.ui.tooling.preview.PreviewFontScale
 import androidx.compose.ui.tooling.preview.PreviewLightDark
+import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
@@ -44,6 +47,9 @@ import androidx.compose.ui.unit.sp
 import com.perkedel.htlauncher.R
 import com.perkedel.htlauncher.enumerations.ButtonTypes
 import com.perkedel.htlauncher.enumerations.ThirdButtonPosition
+import com.perkedel.htlauncher.ui.bars.HTAppBar
+import com.perkedel.htlauncher.ui.previews.DialogPreviewKind
+import com.perkedel.htlauncher.ui.previews.DialogPreviewParameter
 import com.perkedel.htlauncher.ui.previews.HTPreviewAnnotations
 import com.perkedel.htlauncher.ui.theme.HTLauncherTheme
 import com.perkedel.htlauncher.widgets.HTButton
@@ -52,13 +58,15 @@ import com.perkedel.htlauncher.widgets.HTButton
 fun HTAlertDialog(
     modifier: Modifier = Modifier,
     context: Context = LocalContext.current,
+    selectIcon: ImageVector = Icons.Default.Error,
+    selectIconDescriptor:String = "Icon",
     icon: @Composable () -> Unit = {
         Icon(
             modifier = Modifier
 
             ,
-            imageVector = Icons.Default.Error,
-            contentDescription = ""
+            imageVector = selectIcon,
+            contentDescription = selectIconDescriptor
         )
     },
     title:String = "Alert",
@@ -74,6 +82,8 @@ fun HTAlertDialog(
     thirdButtonPosition: ThirdButtonPosition = ThirdButtonPosition.Middle,
     confirmButton:Boolean = true, // false will hide it
     confirmButtonDismiss:Boolean = false,
+    hideIcon:Boolean = false,
+    dismissButton:Boolean = true,
 
     onDismissRequest: () -> Unit = {},
     onConfirm: () -> Unit = {},
@@ -97,21 +107,23 @@ fun HTAlertDialog(
                         .padding(16.dp)
                         .align(Alignment.CenterHorizontally),
                 ) {
-                    Row(
-                        modifier = Modifier
-                            .align(Alignment.CenterHorizontally)
-                    ){
-                        icon()
+                    if(!hideIcon) {
+                        Row(
+                            modifier = Modifier
+                                .align(Alignment.CenterHorizontally)
+                        ) {
+                            icon()
+                        }
+                        Spacer(
+                            Modifier
+                                .fillMaxWidth()
+                                .size(16.dp)
+                        )
                     }
-                    Spacer(
-                        Modifier
-                            .fillMaxWidth()
-                            .size(16.dp)
-                    )
 
                     Text(
                         title,
-                        modifier = Modifier.align(Alignment.CenterHorizontally),
+                        modifier = if(!hideIcon) Modifier.align(Alignment.CenterHorizontally) else Modifier,
                         fontSize = 32.sp,
                         textAlign = TextAlign.Center
                     )
@@ -122,9 +134,10 @@ fun HTAlertDialog(
                     )
 
                     Text(
-                        modifier = Modifier.align(Alignment.CenterHorizontally),
+//                        modifier = Modifier.align(Alignment.CenterHorizontally),
+                        modifier = Modifier,
                         text = text,
-                        textAlign = TextAlign.Center
+//                        textAlign = TextAlign.Center
                     )
 //                    Spacer(
 //                        Modifier
@@ -152,8 +165,8 @@ fun HTAlertDialog(
                                 buttonType = ButtonTypes.TextButton
                             )
                         }
-                        if(swapButton){
 
+                        if(swapButton){
                             if(confirmButton) {
                                 HTButton(
                                     title = confirmText,
@@ -162,12 +175,15 @@ fun HTAlertDialog(
                                 )
                             }
                         } else {
-                            HTButton(
-                                title = dismissText,
-                                onClick = onDismissRequest,
-                                buttonType = ButtonTypes.TextButton
-                            )
+                            if(dismissButton) {
+                                HTButton(
+                                    title = dismissText,
+                                    onClick = onDismissRequest,
+                                    buttonType = ButtonTypes.TextButton
+                                )
+                            }
                         }
+
                         if(thirdButton && thirdButtonPosition == ThirdButtonPosition.Middle){
                             HTButton(
                                 title = thirdText,
@@ -175,12 +191,15 @@ fun HTAlertDialog(
                                 buttonType = ButtonTypes.TextButton
                             )
                         }
+
                         if(swapButton){
-                            HTButton(
-                                title = dismissText,
-                                onClick = onDismissRequest,
-                                buttonType = ButtonTypes.TextButton
-                            )
+                            if(dismissButton) {
+                                HTButton(
+                                    title = dismissText,
+                                    onClick = onDismissRequest,
+                                    buttonType = ButtonTypes.TextButton
+                                )
+                            }
                         }
                         else {
                             if(confirmButton) {
@@ -191,6 +210,7 @@ fun HTAlertDialog(
                                 )
                             }
                         }
+
                         if(thirdButton && thirdButtonPosition == ThirdButtonPosition.Right){
                             HTButton(
                                 title = thirdText,
@@ -207,12 +227,28 @@ fun HTAlertDialog(
 
 @HTPreviewAnnotations
 @Composable
-fun HTAlertDialogPreview(){
+fun HTAlertDialogPreview(
+    @PreviewParameter(DialogPreviewParameter::class) dialogKind:DialogPreviewKind
+){
     HTLauncherTheme {
-        HTAlertDialog(
-            title = "Alert\nOHno",
-            text = "Ho\nHu",
-            thirdButton = true,
-        )
+        Scaffold(
+            modifier = Modifier,
+            topBar = { HTAppBar() },
+        ) { innerPadding ->
+            Box(
+                modifier = Modifier.padding(innerPadding)
+            ) {
+                HTAlertDialog(
+                    title = "Alert\nOHno",
+                    text = "Ho\nHu\nHi\nHe\nHa",
+                    thirdButton = dialogKind.thirdButton,
+                    hideIcon = dialogKind.hideIcon,
+                    thirdButtonPosition = dialogKind.thirdButtonPosition,
+                    confirmButton = dialogKind.confirmButton,
+                    dismissButton = dialogKind.dismissButton,
+                )
+            }
+        }
+
     }
 }

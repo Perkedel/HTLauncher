@@ -1,5 +1,6 @@
 package com.perkedel.htlauncher.ui.navigation
 
+import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.pm.PackageManager
 import androidx.compose.foundation.MarqueeAnimationMode
@@ -151,6 +152,13 @@ fun AllAppsScreen(
                                 startApplication(context, appList[it].packageName)
                             } catch (e: Exception) {
 //                                println(e)
+                                e.printStackTrace()
+                                coroutineScope.launch {
+                                    onSnackbarResult(snackbarHostState.showSnackbar("WERROR 404! Launcher Activity undefined"))
+                                }
+                            } catch (e: ActivityNotFoundException){
+                                // https://youtu.be/2hIY1xuImuQ
+                                // https://youtu.be/2hIY1xuImuQ
                                 e.printStackTrace()
                                 coroutineScope.launch {
                                     onSnackbarResult(snackbarHostState.showSnackbar("WERROR 404! Launcher Activity undefined"))

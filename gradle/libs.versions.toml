@@ -37,6 +37,8 @@ navigationUiKtx = "2.8.4"
 retrofit = "2.11.0"
 xicon_pack_z = "1.1.1"
 composeMaterial3 = "1.0.0-alpha29"
+adaptiveNavigationSuite = "1.0.0-alpha07"
+material3-adaptive = "1.0.0-beta01"
 
 [libraries]
 accompanist-adaptive = { module = "com.google.accompanist:accompanist-adaptive" }
@@ -85,6 +87,8 @@ retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit
 ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview" }
 xicon_pack_z = { module = "br.com.devsrsouza.compose.icons:{ICON_PACK}", version.ref = "xicon_pack_z" }
 androidx-compose-material3 = { group = "androidx.wear.compose", name = "compose-material3", version.ref = "composeMaterial3" }
+androidx-compose-material3-adaptive-navigation = { module = "androidx.compose.material3.adaptive:adaptive-navigation", version.ref = "material3-adaptive" }
+androidx-compose-material3-adaptive-navigation-suite = { module = "androidx.compose.material3:material3-adaptive-navigation-suite", version.ref = "adaptiveNavigationSuite" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

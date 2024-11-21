@@ -87,6 +87,7 @@
     <string name="items_folder_label" >Item</string>
     <string name="themes_folder_label" >Tema</string>
     <string name="medias_folder_label" >Media</string>
+    <string name="misc_folder_label">Lain-lain</string>
     <string name="shortcuts_folder_label" >Pintasan</string>
 
     <!-- Error messages -->
@@ -225,4 +226,5 @@
     <string name="unit_version_name">versi</string>
     <string name="unit_version_number">iterasi</string>
     <string name="iteration">iterasi</string>
+    <string name="title_activity_item_editor">ItemEditorActivity</string>
 </resources>

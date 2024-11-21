@@ -4,6 +4,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class HomepagesWeHave( // In a Home Button, we have:
+    val type:String = "Home",
     val pagesPath: List<String> = listOf(
         "Home",
         "Second",

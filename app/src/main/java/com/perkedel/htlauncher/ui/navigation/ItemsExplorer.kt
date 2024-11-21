@@ -44,7 +44,7 @@ fun ItemsExplorer(
     onChooseSaveDir: () -> Unit = {},
     onChooseTextFile: () -> Unit = {},
     onCheckPermission: () -> Unit = {},
-    onEditWhat:(Int) -> Unit = {},
+    onEditWhat:(EditWhich,String) -> Unit = {edit,filename->{}},
     onClickVersion:() -> Unit = {/* GO TO ABOUT SCREEN*/},
     saveDirResult: Uri? = null,
     testTextResult:String = "",
@@ -84,7 +84,7 @@ fun ItemsExplorer(
                     icon = { Icon(imageVector = Icons.Default.ShoppingCart, contentDescription = null) },
 //                    summary = { Text(text = "You are already FULL VERSION.") },
                     onClick = {
-
+                        onEditWhat(exploreType,editData[it])
                     }
                 )
             }

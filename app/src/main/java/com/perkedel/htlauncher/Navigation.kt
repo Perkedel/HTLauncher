@@ -76,8 +76,10 @@ import com.perkedel.htlauncher.data.ItemData
 import com.perkedel.htlauncher.data.PageData
 import com.perkedel.htlauncher.data.TestJsonData
 import com.perkedel.htlauncher.enumerations.ConfigSelected
+import com.perkedel.htlauncher.enumerations.EditWhich
 import com.perkedel.htlauncher.enumerations.Screen
 import com.perkedel.htlauncher.func.createDataStore
+import com.perkedel.htlauncher.ui.activities.ItemEditorActivity
 //import androidx.wear.compose.material3.ScaffoldState
 import com.perkedel.htlauncher.ui.dialog.HomeMoreMenu
 import com.perkedel.htlauncher.ui.navigation.HomeScreen
@@ -960,8 +962,33 @@ fun Navigation(
                         systemUiController = systemUiController,
                         uiState = htuiState,
                         viewModel = anViewModel,
-                        onEditWhat = {
-
+                        onEditWhat = { editType, filename ->
+                            // https://youtu.be/2hIY1xuImuQ
+                            Log.d("ItemExplorer", "To Edit ${editType.name} ${filename}")
+                            if(htuiState.selectedSaveDir != null) {
+                                startIntent(
+                                    context = context,
+                                    what = Intent(
+                                        context, ItemEditorActivity::class.java
+                                    ).apply {
+                                        type = context.resources.getString(R.string.text_plain_type)
+                                        putExtra(Intent.EXTRA_TEXT, filename)
+                                        putExtra(
+                                            Intent.EXTRA_STREAM, getATextFile(
+                                                dirUri = getADirectory(
+                                                    dirUri = htuiState.selectedSaveDir!!,
+                                                    context = context,
+                                                    dirName = context.resources.getString(editType.select)
+                                                ),
+                                                context = context,
+                                                fileName = "${filename}.json",
+                                                mimeType = context.resources.getString(R.string.text_plain_type),
+                                                hardOverwrite = false,
+                                            )
+                                        )
+                                    }
+                                )
+                            }
                         },
                         exploreType = htuiState.toEditWhatFile
                     )

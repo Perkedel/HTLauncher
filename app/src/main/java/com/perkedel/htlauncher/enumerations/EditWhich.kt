@@ -9,4 +9,5 @@ enum class EditWhich(@StringRes val select:Int, @StringRes val label:Int) {
     Items(select = R.string.items_folder, label = R.string.items_folder_label),
     Themes(select = R.string.themes_folder, label = R.string.themes_folder_label),
     Medias(select = R.string.medias_folder, label = R.string.medias_folder_label),
+    Misc(select = R.string.misc_folder, label = R.string.misc_folder_label),
 }

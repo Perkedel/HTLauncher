@@ -3,24 +3,24 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.INTERNET" /> <!-- <uses-sdk -->
-<!--  https://github.com/Neamar/KISS/blob/master/app/src/main/AndroidManifest.xml  -->
-    <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES"
-        tools:ignore="QueryAllPackagesPermission" />
-    <!-- android:targetSdkVersion="35" -->
+    <!-- https://github.com/Neamar/KISS/blob/master/app/src/main/AndroidManifest.xml -->
+    <uses-permission
+        android:name="android.permission.QUERY_ALL_PACKAGES"
+        tools:ignore="QueryAllPackagesPermission" /> <!-- android:targetSdkVersion="35" -->
     <!-- android:minSdkVersion="21"/> -->
-<!--  https://youtu.be/ji6Z32oPUpQ  -->
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"
+    <!-- https://youtu.be/ji6Z32oPUpQ -->
+    <uses-permission
+        android:name="android.permission.READ_EXTERNAL_STORAGE"
         android:maxSdkVersion="32" />
-    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES"/>
-    <uses-permission android:name="android.permission.READ_MEDIA_AUDIO"/>
-    <uses-permission android:name="android.permission.READ_MEDIA_VIDEO"/>
-    <uses-permission android:name="android.permission.READ_MEDIA_VISUAL_USER_SELECTED"/>
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
+    <uses-permission android:name="android.permission.READ_MEDIA_AUDIO" />
+    <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" />
+    <uses-permission android:name="android.permission.READ_MEDIA_VISUAL_USER_SELECTED" />
+    <uses-permission
+        android:name="android.permission.WRITE_EXTERNAL_STORAGE"
         android:maxSdkVersion="32"
-        tools:ignore="ScopedStorage" />
-<!--    <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE"-->
-<!--        tools:ignore="ScopedStorage" />-->
-
+        tools:ignore="ScopedStorage" /> <!-- <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE" -->
+    <!-- tools:ignore="ScopedStorage" /> -->
     <uses-feature
         android:name="android.hardware.touchscreen"
         android:required="false" />
@@ -48,7 +48,17 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.HTLauncher"
         tools:targetApi="31">
-
+        <activity
+            android:name=".ui.activities.ItemEditorActivity"
+            android:exported="true"
+            android:label="@string/title_activity_item_editor"
+            android:theme="@style/Theme.HTLauncher">
+            <intent-filter>
+                <action android:name="android.intent.action.EDIT"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <data android:mimeType="@string/text_all_type"/>
+            </intent-filter>
+        </activity>
         <activity
             android:name=".MainActivity"
             android:exported="true"
@@ -65,4 +75,13 @@
         </activity>
     </application>
 
+    <queries>
+        <intent>
+            <action android:name="android.intent.action.EDIT"/>
+            <data android:mimeType="text/plain"/>
+        </intent>
+        <intent>
+            <action android:name="android.intent.action.ALL_APPS"/>
+        </intent>
+    </queries>
 </manifest>

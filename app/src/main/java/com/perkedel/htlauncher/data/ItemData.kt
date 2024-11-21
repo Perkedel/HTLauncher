@@ -6,6 +6,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class ItemData(
+    val type:String = "Item",
     val name:String = "anItem", // Name of this item. Not showing
     val label:String = name, // Label that shows above the icon. If empty, showLabel shows name above.
     val aria:String = label, // Aria says to be read by A11y narrator system.
