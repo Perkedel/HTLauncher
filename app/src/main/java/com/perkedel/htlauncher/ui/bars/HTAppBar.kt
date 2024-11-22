@@ -2,6 +2,7 @@
 
 package com.perkedel.htlauncher.ui.bars
 
+import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.padding
@@ -46,6 +47,9 @@ fun HTAppBar(
                     text = textTitle
                 )
                 Text(
+                    modifier = Modifier.basicMarquee(
+
+                    ),
                     text = textDescription,
                     fontSize = 12.sp,
                 )

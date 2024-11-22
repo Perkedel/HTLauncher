@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Code
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
@@ -19,12 +20,14 @@ import androidx.compose.ui.input.pointer.motionEventSpy
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.LocalInspectionMode
+import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.google.accompanist.systemuicontroller.SystemUiController
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.perkedel.htlauncher.HTUIState
 import com.perkedel.htlauncher.HTViewModel
+import com.perkedel.htlauncher.R
 import com.perkedel.htlauncher.data.ItemData
 import com.perkedel.htlauncher.enumerations.EditWhich
 import com.perkedel.htlauncher.ui.previews.HTPreviewAnnotations
@@ -76,12 +79,22 @@ fun ItemsExplorer(
         LazyColumn(
             modifier = Modifier.fillMaxSize()
         ) {
+//            item {
+//                Preference(
+//                    title = { Text(text = stringResource(R.string.home_screen_file_label) ) },
+//                    icon = { Icon(imageVector = Icons.Default.ShoppingCart, contentDescription = null) },
+////                    summary = { Text(text = "You are already FULL VERSION.") },
+//                    onClick = {
+//                        onEditWhat(exploreType,context.resources.getString(R.string.home_screen_file))
+//                    }
+//                )
+//            }
             items(
                 count = editData.size,
             ){
                 Preference(
                     title = { Text(text = editData[it] ) },
-                    icon = { Icon(imageVector = Icons.Default.ShoppingCart, contentDescription = null) },
+                    icon = { Icon(imageVector = Icons.Default.Code, contentDescription = null) },
 //                    summary = { Text(text = "You are already FULL VERSION.") },
                     onClick = {
                         onEditWhat(exploreType,editData[it])

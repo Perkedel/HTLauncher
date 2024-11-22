@@ -150,8 +150,8 @@ fun ExampleHTPreviewAnnotations(){
                 Box(
                     modifier = Modifier.padding(innerPadding),
                 ){
-//                    HomeScreen()
-                    Configurationing()
+                    HomeScreen()
+//                    Configurationing()
                 }
             }
         }

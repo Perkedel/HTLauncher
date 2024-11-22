@@ -159,7 +159,8 @@ fun ItemCell(
                     if (onLongClick != null) {
                         onLongClick()
                     }
-                }
+                },
+                onClickLabel = itemOfIt.aria,
             )
             .padding(8.dp)
             .aspectRatio(1f)

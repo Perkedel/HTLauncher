@@ -13,8 +13,10 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
@@ -83,10 +85,18 @@ fun HomeScreen(
     // https://developer.android.com/develop/ui/compose/layouts/pager
     Box(
         modifier = Modifier
+            .fillMaxSize()
+            // https://youtu.be/pLMw9Vlbfgw Stevdza-San system bar paddings
+//            .statusBarsPadding()
+//            .navigationBarsPadding()
+        ,
     ){
         if(isReady) {
             Column(
-                modifier = modifier,
+                modifier = modifier
+//                    .statusBarsPadding()
+//                    .navigationBarsPadding()
+                ,
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
 //        Button(
@@ -156,7 +166,10 @@ fun HomeScreen(
             }
         } else {
             Column(
-                modifier = modifier,
+                modifier = modifier
+//                    .statusBarsPadding()
+//                    .navigationBarsPadding()
+                ,
             ) {
                 Text(text = "Loading")
             }

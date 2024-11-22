@@ -9,6 +9,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Category
 import androidx.compose.material.icons.filled.FormatPaint
+import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.MusicNote
 import androidx.compose.material.icons.filled.Pages
@@ -65,6 +66,16 @@ fun LevelEditor(
         LazyColumn(
             modifier = Modifier.fillMaxSize()
         ) {
+            preference(
+                key = "home_editor",
+                title = { Text(text = stringResource(R.string.home_screen_file_label) ) },
+                icon = { Icon(imageVector = Icons.Default.Home, contentDescription = null) },
+//                summary = { Text(text = "${uiState.pageList.size} ${stringResource(R.string.pieces_unit)}") },
+                summary = { Text(text = "Reorder pages") },
+                onClick = {
+                    onEditWhat(EditWhich.Home)
+                }
+            )
             preference(
                 key = "pages_editor",
                 title = { Text(text = stringResource(R.string.pages_folder_label) ) },

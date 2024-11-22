@@ -19,11 +19,16 @@ import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.net.Uri
 import android.os.Build
+import android.os.Parcelable
 import android.provider.Settings
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.AnimatedContentTransitionScope
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.pager.PagerState
@@ -589,13 +594,25 @@ fun Navigation(
                 )
             }
             ) { innerPadding ->
+            // https://youtu.be/MhXa-5Arw3Q Land of Coding Animation Transition
+            // https://github.com/mohammednawas8
+            // https://github.com/lofcoding/ComposeNavigationTransitions
             //        val uiState by viewModel.uiState.collectAsState()
             NavHost(
                 navController = navController,
                 startDestination = Screen.HomeScreen.name,
                 modifier = Modifier.padding(innerPadding),
             ) {
-                composable(route = Screen.HomeScreen.name) {
+                composable(route = Screen.HomeScreen.name,
+                    exitTransition = {
+                        scaleOut(
+
+                        )
+                    },
+                    popEnterTransition = {
+                        scaleIn()
+                    }
+                ) {
                     LaunchedEffect(true) {
 
                     }
@@ -686,9 +703,19 @@ fun Navigation(
                         )
                     }
                 }
-                composable(
-                    route = Screen.AllAppsScreen.name,
-
+                composable(route = Screen.AllAppsScreen.name,
+                    enterTransition = {
+                        slideIntoContainer(
+                            towards = AnimatedContentTransitionScope.SlideDirection.Up,
+                            animationSpec = tween(),
+                        )
+                    },
+                    exitTransition = {
+                        slideOutOfContainer(
+                            towards = AnimatedContentTransitionScope.SlideDirection.Down,
+                            animationSpec = tween(),
+                        )
+                    }
                     ) {
                     AllAppsScreen(
                         navController = navController,
@@ -706,9 +733,32 @@ fun Navigation(
                         systemUiController = systemUiController,
                     )
                 }
-                composable(
-                    route = Screen.ConfigurationScreen.name,
-                ) {
+                composable(route = Screen.ConfigurationScreen.name,
+                    enterTransition = {
+                        slideIntoContainer(
+                            towards = AnimatedContentTransitionScope.SlideDirection.Up,
+                            animationSpec = tween(),
+                        )
+                    },
+                    exitTransition = {
+                        slideOutOfContainer(
+                            towards = AnimatedContentTransitionScope.SlideDirection.Left,
+                            animationSpec = tween(),
+                        )
+                    },
+                    popEnterTransition = {
+                        slideIntoContainer(
+                            towards = AnimatedContentTransitionScope.SlideDirection.Right,
+                            animationSpec = tween()
+                        )
+                    },
+                    popExitTransition = {
+                        slideOutOfContainer(
+                            towards = AnimatedContentTransitionScope.SlideDirection.Down,
+                            animationSpec = tween()
+                        )
+                    }
+                    ) {
                     val attemptChangeSaveDir = remember { mutableStateOf(false) }
                     val attemptPermission = remember { mutableStateOf(false) }
                     val areYouSureChangeSaveDir = remember { mutableStateOf(false) }
@@ -884,7 +934,32 @@ fun Navigation(
                             )
                         }
                 }
-                composable(Screen.AboutScreen.name) {
+                composable(route = Screen.AboutScreen.name,
+                    enterTransition = {
+                        slideIntoContainer(
+                            towards = AnimatedContentTransitionScope.SlideDirection.Left,
+                            animationSpec = tween(),
+                        )
+                    },
+                    exitTransition = {
+                        slideOutOfContainer(
+                            towards = AnimatedContentTransitionScope.SlideDirection.Right,
+                            animationSpec = tween(),
+                        )
+                    },
+                    popEnterTransition = {
+                        slideIntoContainer(
+                            towards = AnimatedContentTransitionScope.SlideDirection.Right,
+                            animationSpec = tween()
+                        )
+                    },
+                    popExitTransition = {
+                        slideOutOfContainer(
+                            towards = AnimatedContentTransitionScope.SlideDirection.Right,
+                            animationSpec = tween()
+                        )
+                    }
+                    ) {
                     AboutTerms(
                         navController = navController,
                         context = context,
@@ -895,7 +970,32 @@ fun Navigation(
                         systemUiController = systemUiController,
                     )
                 }
-                composable(Screen.LevelEditor.name) {
+                composable(route = Screen.LevelEditor.name,
+                    enterTransition = {
+                        slideIntoContainer(
+                            towards = AnimatedContentTransitionScope.SlideDirection.Left,
+                            animationSpec = tween(),
+                        )
+                    },
+                    exitTransition = {
+                        slideOutOfContainer(
+                            towards = AnimatedContentTransitionScope.SlideDirection.Left,
+                            animationSpec = tween(),
+                        )
+                    },
+                    popEnterTransition = {
+                        slideIntoContainer(
+                            towards = AnimatedContentTransitionScope.SlideDirection.Right,
+                            animationSpec = tween()
+                        )
+                    },
+                    popExitTransition = {
+                        slideOutOfContainer(
+                            towards = AnimatedContentTransitionScope.SlideDirection.Right,
+                            animationSpec = tween()
+                        )
+                    }
+                    ) {
                     LevelEditor(
                         navController = navController,
                         context = context,
@@ -928,11 +1028,67 @@ fun Navigation(
                         onEditWhat = { selection ->
                             Log.d("LevelEditor", "Trying to edit ${selection}")
                             anViewModel.setEditWhich(selection)
-                            navController.navigate(Screen.ItemsExplorer.name)
+                            if(selection != EditWhich.Home) {
+                                navController.navigate(Screen.ItemsExplorer.name)
+                            } else {
+                                if(htuiState.selectedSaveDir != null) {
+                                    var toIntent = Intent(
+                                        context, ItemEditorActivity::class.java
+                                    )
+                                    val theUri = getATextFile(
+                                        dirUri = htuiState.selectedSaveDir!!,
+                                        context = context,
+                                        fileName = "${context.resources.getString(R.string.home_screen_file)}.json",
+                                        mimeType = context.resources.getString(R.string.text_plain_type),
+                                        hardOverwrite = false,
+                                    )
+                                    toIntent.apply {
+                                        type = context.resources.getString(R.string.text_plain_type)
+                                    }
+                                    toIntent.putExtra(
+                                        "uri", theUri
+                                    )
+                                    toIntent.putExtra(Intent.EXTRA_STREAM, theUri)
+//                                toIntent.putExtra("editType", editType as? Parcelable)
+                                    toIntent.putExtra("editType", context.resources.getString(R.string.home_screen_file))
+                                    toIntent.putExtra("editTypeName",context.resources.getString(R.string.home_screen_file))
+                                    toIntent.putExtra("filename",context.resources.getString(R.string.home_screen_file))
+                                    toIntent.putExtra("fileName",context.resources.getString(R.string.home_screen_file))
+                                    startIntent(
+                                        context = context,
+                                        what = toIntent
+                                    )
+                                }
+                            }
                         }
                     )
                 }
-                composable(Screen.ItemsExplorer.name) {
+                composable(Screen.ItemsExplorer.name,
+                    enterTransition = {
+                        slideIntoContainer(
+                            towards = AnimatedContentTransitionScope.SlideDirection.Left,
+                            animationSpec = tween(),
+                        )
+                    },
+                    exitTransition = {
+                        slideOutOfContainer(
+                            towards = AnimatedContentTransitionScope.SlideDirection.Left,
+                            animationSpec = tween(),
+                        )
+                    },
+                    popEnterTransition = {
+                        slideIntoContainer(
+                            towards = AnimatedContentTransitionScope.SlideDirection.Right,
+                            animationSpec = tween()
+                        )
+                    },
+                    popExitTransition = {
+                        slideOutOfContainer(
+                            towards = AnimatedContentTransitionScope.SlideDirection.Right,
+                            animationSpec = tween()
+                        )
+                    }
+                    ) {
                     ItemsExplorer(
                         navController = navController,
                         context = context,
@@ -966,27 +1122,40 @@ fun Navigation(
                             // https://youtu.be/2hIY1xuImuQ
                             Log.d("ItemExplorer", "To Edit ${editType.name} ${filename}")
                             if(htuiState.selectedSaveDir != null) {
+                                var toIntent = Intent(
+                                    context, ItemEditorActivity::class.java
+                                )
+                                val theUri = getATextFile(
+                                    dirUri = getADirectory(
+                                        dirUri = htuiState.selectedSaveDir!!,
+                                        context = context,
+                                        dirName = context.resources.getString(editType.select)
+                                    ),
+                                    context = context,
+                                    fileName = "${filename}.json",
+                                    mimeType = context.resources.getString(R.string.text_plain_type),
+                                    hardOverwrite = false,
+                                )
+                                toIntent.apply {
+                                    type = context.resources.getString(R.string.text_plain_type)
+                                }
+                                toIntent.putExtra(
+                                    "uri", theUri
+                                )
+//                                    .also {
+//                                    it.putExtra(Intent.EXTRA_STREAM, theUri)
+//                                    it.putExtra("editType",editType)
+//                                    it.putExtra("fileName",filename)
+//                                    }
+                                toIntent.putExtra(Intent.EXTRA_STREAM, theUri)
+//                                toIntent.putExtra("editType", editType as? Parcelable)
+                                toIntent.putExtra("editType", editType.name)
+                                toIntent.putExtra("editTypeName",editType.name)
+                                toIntent.putExtra("filename",filename)
+                                toIntent.putExtra("fileName",filename)
                                 startIntent(
                                     context = context,
-                                    what = Intent(
-                                        context, ItemEditorActivity::class.java
-                                    ).apply {
-                                        type = context.resources.getString(R.string.text_plain_type)
-                                        putExtra(Intent.EXTRA_TEXT, filename)
-                                        putExtra(
-                                            Intent.EXTRA_STREAM, getATextFile(
-                                                dirUri = getADirectory(
-                                                    dirUri = htuiState.selectedSaveDir!!,
-                                                    context = context,
-                                                    dirName = context.resources.getString(editType.select)
-                                                ),
-                                                context = context,
-                                                fileName = "${filename}.json",
-                                                mimeType = context.resources.getString(R.string.text_plain_type),
-                                                hardOverwrite = false,
-                                            )
-                                        )
-                                    }
+                                    what = toIntent
                                 )
                             }
                         },
