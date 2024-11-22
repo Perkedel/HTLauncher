@@ -58,8 +58,10 @@ import com.perkedel.htlauncher.R
 import com.perkedel.htlauncher.data.viewmodels.ItemEditorViewModel
 import com.perkedel.htlauncher.enumerations.EditWhich
 import com.perkedel.htlauncher.openATextFile
+import com.perkedel.htlauncher.ui.navigation.EditItemData
 import kotlinx.serialization.json.Json
 import javax.annotation.meta.When
+import androidx.fragment.app.FragmentActivity
 
 class ItemEditorActivity : ComponentActivity() {
 
@@ -136,6 +138,13 @@ class ItemEditorActivity : ComponentActivity() {
                                 textTitle = "Edito",
                                 textDescription = "(${editorViewModel.editType?.toString()}) ${editorViewModel.uri?.toString()}",
                                 canNavigateBack = true,
+                                navigateUp = {
+                                    // https://developer.android.com/guide/navigation/backstack
+//                                    fragmentManager
+//                                    getFragmentManager()
+//                                    getSupportFragmentManager().
+                                    finish()
+                                }
                             )
                         },
                     ) { innerPadding ->
@@ -161,6 +170,11 @@ class ItemEditorActivity : ComponentActivity() {
         Log.d("ItemEditor", "Obtained New Uri ${uri}")
         editorViewModel.updateUri(uri)
     }
+
+    // https://stackoverflow.com/a/50651129/9079640
+//    override fun onBackPressed() {
+//        super.onBackPressed()
+//    }
 }
 
 @Composable
@@ -204,24 +218,33 @@ fun ItemEditorGreeting(
         modifier = modifier,
         navigator = navigator,
         listPane = {
-
-            Column(
-                modifier = Modifier
-                    .verticalScroll(rememberScrollState())
-                ,
-            ) {
+            when(viewModel.editType){
+                EditWhich.Items -> EditItemData(
+                    modifier = Modifier,
+                    viewModel = viewModel,
+                    data = viewModel.itemData
+                )
+                else -> {
+                    Column(
+                        modifier = Modifier
+                            .verticalScroll(rememberScrollState())
+                        ,
+                    ) {
 //                Text("FILE!! ${viewModel.uri}")
-                Text("FILE!! ${editUri}")
+                        Text("FILE!! ${editUri}")
 //                viewModel.uri?.let {
-                editUri?.let {
+                        editUri?.let {
 //                    viewModel.updateRawContent(openATextFile(
 //                        uri = viewModel.uri!!,
 //                        contentResolver = context.contentResolver
 //                    ))
-                    Text("Contain:\n${viewModel.rawContent}")
+                            Text("Contain:\n${viewModel.rawContent}")
 
+                        }
+                    }
                 }
             }
+
         },
         detailPane = {
             val content = navigator.currentDestination?.content?.toString() ?: "idk"

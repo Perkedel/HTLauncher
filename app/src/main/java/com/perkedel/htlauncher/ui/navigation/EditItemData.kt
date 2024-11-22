@@ -24,6 +24,7 @@ fun EditItemData(
     ) {
         // https://youtu.be/ZERIxmBYP-U Philip Lackner TextField Material 3
         data?.let {
+            Text("AAAAAAAAAAAAA \n${data}")
 //            TextField(
 //
 //            )

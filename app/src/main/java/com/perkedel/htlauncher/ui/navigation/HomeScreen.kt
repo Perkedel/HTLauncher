@@ -165,14 +165,15 @@ fun HomeScreen(
                 }
             }
         } else {
-            Column(
-                modifier = modifier
-//                    .statusBarsPadding()
-//                    .navigationBarsPadding()
-                ,
-            ) {
-                Text(text = "Loading")
-            }
+//            Column(
+//                modifier = modifier
+////                    .statusBarsPadding()
+////                    .navigationBarsPadding()
+//                ,
+//            ) {
+//                Text(text = "Loading")
+//            }
+            HTLoading()
         }
     }
 
