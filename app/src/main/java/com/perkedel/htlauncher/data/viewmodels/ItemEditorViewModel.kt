@@ -1,7 +1,11 @@
+@file:OptIn(ExperimentalMaterial3AdaptiveApi::class)
+
 package com.perkedel.htlauncher.data.viewmodels
 
 import android.content.ClipData.Item
 import android.net.Uri
+import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
+import androidx.compose.material3.adaptive.navigation.ThreePaneScaffoldNavigator
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -29,6 +33,10 @@ class ItemEditorViewModel:ViewModel() {
     var pageData: PageData? by mutableStateOf(null)
     var jsoning: Json? by mutableStateOf(null)
 
+//    var navigator: ThreePaneScaffoldNavigator<Any>? = null
+    var hasGoBack:Boolean = false
+//    var navCallback:Ca
+
     fun updateUri(uri: Uri?){
         this.uri = uri
     }
@@ -45,7 +53,15 @@ class ItemEditorViewModel:ViewModel() {
         this.jsoning = contain
     }
 
-    fun typedEditNow(editType: EditWhich?, rawJson: String){
+//    fun setNavigator(into:ThreePaneScaffoldNavigator<Any>){
+//        this.navigator = into
+//    }
+
+    fun setGoBack(into:Boolean){
+        this.hasGoBack = into
+    }
+
+    fun typedEditNow(editType: EditWhich?, rawJson: String = ""){
         val json = Json {
             // https://coldfusion-example.blogspot.com/2022/03/jetpack-compose-kotlinx-serialization_79.html
             prettyPrint = true

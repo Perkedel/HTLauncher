@@ -50,9 +50,13 @@ import com.perkedel.htlauncher.ui.theme.HTLauncherTheme
 import com.perkedel.htlauncher.ui.theme.rememberColorScheme
 import android.net.Uri
 import android.util.Log
+import androidx.activity.OnBackPressedCallback
+import androidx.activity.compose.BackHandler
 import androidx.activity.viewModels
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.adaptive.layout.ThreePaneScaffoldValue
+import androidx.compose.material3.adaptive.navigation.ThreePaneScaffoldNavigator
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.perkedel.htlauncher.R
 import com.perkedel.htlauncher.data.viewmodels.ItemEditorViewModel
@@ -62,10 +66,14 @@ import com.perkedel.htlauncher.ui.navigation.EditItemData
 import kotlinx.serialization.json.Json
 import javax.annotation.meta.When
 import androidx.fragment.app.FragmentActivity
+import androidx.navigation.findNavController
+import com.perkedel.htlauncher.widgets.HTButton
 
 class ItemEditorActivity : ComponentActivity() {
 
     private val editorViewModel by viewModels<ItemEditorViewModel>()
+//    private val navigator = rememberListDetailPaneScaffoldNavigator<Any>()
+//    private val navigator: ThreePaneScaffoldNavigator<Any>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         // https://stackoverflow.com/questions/10107442/android-how-to-pass-parcelable-object-to-intent-and-use-getparcelable-method-of
@@ -76,6 +84,7 @@ class ItemEditorActivity : ComponentActivity() {
         // https://developer.android.com/games/guides
 
         super.onCreate(savedInstanceState)
+//        onBackPressedDispatcher.addCallback(onBackPressedCallback)
         if(editorViewModel.uri == null) {
             val b:Bundle? = intent.extras
             val uri: Uri? = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -117,6 +126,7 @@ class ItemEditorActivity : ComponentActivity() {
                 applicationContext.resources.getString(R.string.shortcuts_folder) -> EditWhich.Shortcuts
                 else -> EditWhich.Misc
             })
+//            editorViewModel.typedEditNow(editorViewModel.editType)
 //            editorViewModel.updateRawContent(content)
 //            editorViewModel.typedEditNow(editType = editType, rawJson = content)
 //            editorViewModel.updateFilename(fileName)
@@ -126,35 +136,21 @@ class ItemEditorActivity : ComponentActivity() {
         }
         Log.d("ItemEditor", "Welcome to Edit File")
         enableEdgeToEdge()
+
         setContent {
             HTLauncherTheme {
                 Surface(
                     color = rememberColorScheme().background
                 ) {
-                    Scaffold(
+                    ItemEditorGreeting(
                         modifier = Modifier.fillMaxSize(),
-                        topBar = {
-                            HTAppBar(
-                                textTitle = "Edito",
-                                textDescription = "(${editorViewModel.editType?.toString()}) ${editorViewModel.uri?.toString()}",
-                                canNavigateBack = true,
-                                navigateUp = {
-                                    // https://developer.android.com/guide/navigation/backstack
-//                                    fragmentManager
-//                                    getFragmentManager()
-//                                    getSupportFragmentManager().
-                                    finish()
-                                }
-                            )
-                        },
-                    ) { innerPadding ->
-                        ItemEditorGreeting(
-                            modifier = Modifier.padding(innerPadding),
-                            context = applicationContext,
-                            viewModel = editorViewModel,
-                            editUri = editorViewModel.uri,
-                        )
-                    }
+                        context = applicationContext,
+                        viewModel = editorViewModel,
+                        editUri = editorViewModel.uri,
+                        onBack = {
+                            pressBackButton()
+                        }
+                    )
                 }
             }
         }
@@ -172,9 +168,35 @@ class ItemEditorActivity : ComponentActivity() {
     }
 
     // https://stackoverflow.com/a/50651129/9079640
+    // https://youtu.be/2cOeUF2rZnE
 //    override fun onBackPressed() {
 //        super.onBackPressed()
 //    }
+
+    fun pressBackButton(){
+        // TODO: Save file automatically
+//        if(editorViewModel.ha == null && !(editorViewModel.navigator?.navigateBack()!!)){
+        if(!editorViewModel.hasGoBack){
+            finish()
+        } else {
+            Log.d("ItemEditor", "Still has back")
+        }
+    }
+
+    val onBackPressedCallback:OnBackPressedCallback = object :OnBackPressedCallback(true){
+        override fun handleOnBackPressed() {
+            pressBackButton()
+        }
+
+    }
+}
+
+fun soPressBack(nav:ThreePaneScaffoldNavigator<Any>){
+    if(!nav.canNavigateBack()){
+//        finis
+    } else {
+        nav.navigateBack()
+    }
 }
 
 @Composable
@@ -184,6 +206,8 @@ fun ItemEditorGreeting(
     uiState:HTUIState = HTUIState(),
     viewModel: ItemEditorViewModel = ItemEditorViewModel(),
     editUri:Uri? = null,
+    navigator:ThreePaneScaffoldNavigator<Any> = rememberListDetailPaneScaffoldNavigator<Any>(),
+    onBack:()-> Unit = {}
 ) {
     // https://youtu.be/W3R_ETKMj0E Philip Lackner List detail
     // https://github.com/philipplackner/ListPaneScaffoldGuide
@@ -200,9 +224,16 @@ fun ItemEditorGreeting(
     // https://developer.android.com/develop/ui/compose/animation/composables-modifiers#animatedvisibility
     // https://developer.android.com/develop/ui/compose/animation/shared-elements
     // https://developer.android.com/develop/ui/compose/components/progress
-    val navigator = rememberListDetailPaneScaffoldNavigator<Any>()
-    // TODO: read file & type
-
+    // https://developer.android.com/guide/navigation/backstack
+    // https://developer.android.com/develop/ui/compose/layouts/adaptive/list-detail
+    // https://stackoverflow.com/questions/69192042/how-to-use-jetpack-compose-app-bar-backbutton
+    // https://oguzhanaslann.medium.com/handling-back-presses-in-jetpack-compose-and-onbackinvokedcallback-982e805173f0
+    // https://stackoverflow.com/questions/30231072/popbackstack-finishes-activity-in-onbackpressed
+    // https://developer.android.com/develop/ui/compose/layouts/adaptive/list-detail
+    // https://stackoverflow.com/questions/68560948/how-to-handle-back-navigation-with-jetpack-compose-navigation-without-fragmen
+//    val navigator = rememberListDetailPaneScaffoldNavigator<Any>()
+    // DONE: read file & type
+//    viewModel.setNavigator(navigator)
     Log.d("ItemEditor", "Numer ${editUri?.toString()} which is ${viewModel.editType}")
     if(editUri != null){
         viewModel.updateRawContent(openATextFile(
@@ -211,54 +242,94 @@ fun ItemEditorGreeting(
         ))
         if(viewModel.rawContent != null && viewModel.rawContent!!.isNotEmpty()){
 //            viewModel.updateJsoning(Json.decodeFromString(viewModel.rawContent!!))
+            viewModel.typedEditNow(viewModel.editType,viewModel.rawContent!!)
         }
     }
 
-    NavigableListDetailPaneScaffold(
-        modifier = modifier,
-        navigator = navigator,
-        listPane = {
-            when(viewModel.editType){
-                EditWhich.Items -> EditItemData(
-                    modifier = Modifier,
-                    viewModel = viewModel,
-                    data = viewModel.itemData
-                )
-                else -> {
-                    Column(
-                        modifier = Modifier
-                            .verticalScroll(rememberScrollState())
-                        ,
-                    ) {
+    viewModel.setGoBack(navigator.canNavigateBack())
+    BackHandler(navigator.canNavigateBack()) {
+        navigator.navigateBack()
+    }
+    BackHandler {
+        onBack()
+    }
+
+    Scaffold(
+        modifier = Modifier.fillMaxSize(),
+        topBar = {
+            HTAppBar(
+                textTitle = "Edito",
+                textDescription = "(${viewModel.editType?.toString()}) ${viewModel.uri?.toString()}",
+                canNavigateBack = true,
+                navigateUp = {
+                    onBack()
+                    if(navigator.canNavigateBack()){
+                        navigator.navigateBack()
+                    }
+                },
+                onMoreMenu = {
+
+                }
+            )
+        },
+    ){ innerPadding ->
+        NavigableListDetailPaneScaffold(
+            modifier = modifier.padding(innerPadding),
+            navigator = navigator,
+            listPane = {
+                when(viewModel.editType){
+                    EditWhich.Items -> EditItemData(
+                        modifier = Modifier,
+                        viewModel = viewModel,
+                        data = viewModel.itemData
+                    )
+                    else -> {
+                        Column(
+                            modifier = Modifier
+                                .verticalScroll(rememberScrollState())
+                            ,
+                        ) {
 //                Text("FILE!! ${viewModel.uri}")
-                        Text("FILE!! ${editUri}")
+                            Text("FILE!! ${editUri}")
 //                viewModel.uri?.let {
-                        editUri?.let {
+                            editUri?.let {
 //                    viewModel.updateRawContent(openATextFile(
 //                        uri = viewModel.uri!!,
 //                        contentResolver = context.contentResolver
 //                    ))
-                            Text("Contain:\n${viewModel.rawContent}")
+                                Text("Contain:\n${viewModel.rawContent}")
 
+                            }
+                            HTButton(
+                                modifier = Modifier,
+                                title = "Hello",
+                                onClick = {
+                                    navigator.navigateTo(
+                                        pane = ListDetailPaneScaffoldRole.Detail,
+                                        content = "Item aaa ${viewModel.rawContent}"
+                                    )
+                                }
+                            )
                         }
                     }
                 }
-            }
 
-        },
-        detailPane = {
-            val content = navigator.currentDestination?.content?.toString() ?: "idk"
-            AnimatedPane {
+            },
+            detailPane = {
+                val content = navigator.currentDestination?.content?.toString() ?: "idk"
+                AnimatedPane {
+                    Text(content)
+                }
+            },
+            extraPane = {
+                val content = navigator.currentDestination?.content?.toString() ?: "aaa"
+                AnimatedPane {
 
+                }
             }
-        },
-        extraPane = {
-            val content = navigator.currentDestination?.content?.toString() ?: "aaa"
-            AnimatedPane {
+        )
+    }
 
-            }
-        }
-    )
 }
 
 
