@@ -2,6 +2,7 @@ package com.perkedel.htlauncher.widgets
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -12,6 +13,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -47,6 +49,7 @@ fun HTHorizontalPageIndicators(
         modifier = modifier
             .wrapContentSize()
             .height(selectedIndicatorSize + indicatorPadding * 2)
+            .horizontalScroll(rememberScrollState())
     ) {
 
         // draw an indicator for each page
