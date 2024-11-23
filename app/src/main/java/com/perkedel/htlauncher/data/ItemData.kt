@@ -8,15 +8,16 @@ import kotlinx.serialization.Serializable
 data class ItemData(
     val type:String = "Item",
     val name:String = "anItem", // Name of this item. Not showing
-    val label:String = name, // Label that shows above the icon. If empty, showLabel shows name above.
-    val aria:String = label, // Aria says to be read by A11y narrator system.
+    var label:String = name, // Label that shows above the icon. If empty, showLabel shows name above.
+    var aria:String = label, // Aria says to be read by A11y narrator system.
+    var imagePath:String = name, // Icon image path
     val action:List<ActionData> = listOf(
         ActionData(),
     ), // What should this item do?
 
     // Customize
-    val showLabel:Boolean = true, // Show the label
-    val showWhichIcon:Int = 0, // 0 = App Icon, 1 = TV Banner
-    val textFillColor: String = "Black", // Color say of this label text
-    val textOutlineColor: String = "White", // Color say of this label text stroke
+    var showLabel:Boolean = true, // Show the label
+    var showWhichIcon:Int = 0, // 0 = App Icon, 1 = TV Banner
+    var textFillColor: String = "Black", // Color say of this label text
+    var textOutlineColor: String = "White", // Color say of this label text stroke
 )

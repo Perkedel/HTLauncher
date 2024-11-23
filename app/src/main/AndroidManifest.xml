@@ -36,6 +36,9 @@
     <uses-feature
         android:name="android.hardware.nfc"
         android:required="false" />
+<!--    <uses-feature-->
+<!--        android:name="android.hardware.type.watch"-->
+<!--        />-->
 
     <application
         android:allowBackup="true"
@@ -47,7 +50,15 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.HTLauncher"
-        tools:targetApi="31">
+        android:enableOnBackInvokedCallback="true"
+        tools:targetApi="35">
+<!--        <uses-library android:name="com.google.android.wearable"-->
+<!--            android:required="false"/>-->
+<!--        <meta-data-->
+<!--            android:name="com.google.android.wearable.standalone"-->
+<!--            android:value="false" />-->
+        <!--    https://youtube.com/shorts/231jCl6QbKM Philip Lackner predictive back    -->
+
         <activity
             android:name=".ui.activities.ItemEditorActivity"
             android:exported="true"

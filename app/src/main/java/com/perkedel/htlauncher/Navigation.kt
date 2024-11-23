@@ -560,6 +560,7 @@ fun Navigation(
         }
     ) {
         Scaffold(
+
             topBar = {
                 HTAppBar(
                     currentScreen = currentScreen,
@@ -651,7 +652,8 @@ fun Navigation(
                         contentResolver = saveDirResolver,
                         systemUiController = systemUiController,
                         uiState = htuiState,
-                        isReady = htuiState.isReady
+                        coroutineScope = coroutineScope,
+                        isReady = htuiState.isReady,
                     )
 
                     LaunchedEffect(true) {

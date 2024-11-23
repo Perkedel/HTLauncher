@@ -69,6 +69,7 @@ import kotlinx.serialization.json.Json
 )
 @Composable
 fun ItemCell(
+    readTheItemData: ItemData? = null,
     readTheItemFile: String = "",
     handoverText:String = "",
     modifier: Modifier = Modifier,
@@ -96,9 +97,12 @@ fun ItemCell(
 //        Log.d("ItemCell", "Eval filename = ${readTheItemFile}")
 //        Log.d("ItemCell", "Eval selected save = ${uiState.selectedSaveDir}")
 
-        if(uiState.itemList.contains(readTheItemFile) && uiState.itemList[readTheItemFile] != null){
-            itemOfIt = uiState.itemList[readTheItemFile]!!
+        if(readTheItemData != null){
+            itemOfIt = readTheItemData
         } else {
+            if (uiState.itemList.contains(readTheItemFile) && uiState.itemList[readTheItemFile] != null) {
+                itemOfIt = uiState.itemList[readTheItemFile]!!
+            } else {
 //            if (readTheItemFile.isNotEmpty() && uiState.selectedSaveDir != null && uiState.selectedSaveDir.toString()
 //                    .isNotEmpty()
 //            ) {
@@ -122,10 +126,15 @@ fun ItemCell(
 //                Log.d("ItemCell", "(EMPTY) an Item ${readTheItemFile} has:\n${itemOfIt}")
 //            }
 //            uiState.itemList[readTheItemFile] = itemOfIt
+            }
         }
     }
-    if(uiState.itemList.contains(readTheItemFile) && uiState.itemList[readTheItemFile] != null) {
-        itemOfIt = uiState.itemList[readTheItemFile]!!
+    if(readTheItemData != null){
+        itemOfIt = readTheItemData
+    } else {
+        if (uiState.itemList.contains(readTheItemFile) && uiState.itemList[readTheItemFile] != null) {
+            itemOfIt = uiState.itemList[readTheItemFile]!!
+        }
     }
 
 
@@ -174,12 +183,20 @@ fun ItemCell(
 
             ,
         ){
-            Image(
-                // https://developer.android.com/develop/ui/compose/graphics/images/loading
-                painter = painterResource(id = R.drawable.mavrickle),
-
-                contentDescription = "Mavrickle",
+//            Image(
+//                // https://developer.android.com/develop/ui/compose/graphics/images/loading
+//                painter = painterResource(id = R.drawable.mavrickle),
+//
+//                contentDescription = "Mavrickle",
+//                modifier = Modifier.fillMaxSize(),
+//            )
+            AsyncImage(
+                // https://stackoverflow.com/a/73197578/9079640
+                // https://stackoverflow.com/a/68727678/9079640
+                model = itemOfIt.imagePath, // TODO: load image from Medias folder
+                contentDescription = itemOfIt.aria,
                 modifier = Modifier.fillMaxSize(),
+                error = painterResource(id = R.drawable.mavrickle),
             )
 
             OutlinedText(

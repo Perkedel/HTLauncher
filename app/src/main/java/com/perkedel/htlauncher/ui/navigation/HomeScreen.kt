@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.content.res.Configuration
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.SurfaceCoroutineScope
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
@@ -26,6 +27,7 @@ import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -50,6 +52,9 @@ import com.perkedel.htlauncher.ui.page.BasePage
 import com.perkedel.htlauncher.ui.previews.HTPreviewAnnotations
 import com.perkedel.htlauncher.ui.theme.HTLauncherTheme
 import com.perkedel.htlauncher.ui.theme.rememberColorScheme
+import com.perkedel.htlauncher.widgets.HTHorizontalPageIndicators
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
 
@@ -78,6 +83,7 @@ fun HomeScreen(
         prettyPrint = true
         encodeDefaults = true
     },
+    coroutineScope: CoroutineScope = rememberCoroutineScope(),
     isReady:Boolean = false,
 ){
 
@@ -135,35 +141,65 @@ fun HomeScreen(
 
             }
             // Indicator?!
-            Row(
-                Modifier
-                    .wrapContentHeight()
-                    .fillMaxWidth()
+//            Row(
+//                Modifier
+//                    .wrapContentHeight()
+//                    .fillMaxWidth()
+//                    .align(Alignment.BottomCenter)
+//                    .padding(bottom = 8.dp),
+//                horizontalArrangement = Arrangement.Center
+//            ) {
+//                repeat(handoverPagerState.pageCount) { iteration ->
+//                    val color =
+//                        if (handoverPagerState.currentPage == iteration) Color.DarkGray else Color.LightGray
+//                    Box(
+//                        modifier = Modifier
+//                            .padding(2.dp)
+//                            .clip(CircleShape)
+//                            .background(color)
+//                            .size(16.dp)
+//                            .combinedClickable(
+//                                onClick = {
+//                                    // Set to what page
+//                                    // https://developer.android.com/develop/ui/compose/layouts/pager HOW?
+//                                    // https://medium.com/@domen.lanisnik/exploring-the-official-pager-in-compose-8c2698c49a98
+////                                    handoverPagerState.targetPage
+//                                    coroutineScope.launch {
+//                                        handoverPagerState.animateScrollToPage(iteration)
+//                                    }
+//
+//                                },
+//                                onLongClick = {
+//
+//                                }
+//                            ),
+//
+//                        )
+//                }
+//            }
+            HTHorizontalPageIndicators(
+                pageCount = handoverPagerState.pageCount,
+                currentPage = handoverPagerState.currentPage,
+                targetPage = handoverPagerState.targetPage,
+                currentPageOffsetFraction = handoverPagerState.currentPageOffsetFraction,
+                modifier = Modifier
                     .align(Alignment.BottomCenter)
-                    .padding(bottom = 8.dp),
-                horizontalArrangement = Arrangement.Center
-            ) {
-                repeat(handoverPagerState.pageCount) { iteration ->
-                    val color =
-                        if (handoverPagerState.currentPage == iteration) Color.DarkGray else Color.LightGray
-                    Box(
-                        modifier = Modifier
-                            .padding(2.dp)
-                            .clip(CircleShape)
-                            .background(color)
-                            .size(16.dp)
-                            .combinedClickable(
-                                onClick = {
-                                    // Set to what page
-                                },
-                                onLongClick = {
-
-                                }
-                            ),
-
-                        )
+                    .fillMaxWidth()
+                ,
+                indicatorColor = rememberColorScheme().primary,
+                selectedIndicatorSize = 32.dp,
+                unselectedIndicatorSize = 24.dp,
+                indicatorCornerRadius = 8.dp, // you asked for it, Srf. Yarn! Same, I'm obsessed with capsule shape!
+                onSetPage = { page ->
+                    // Set to what page
+                    // https://developer.android.com/develop/ui/compose/layouts/pager HOW?
+                    // https://medium.com/@domen.lanisnik/exploring-the-official-pager-in-compose-8c2698c49a98
+//                                    handoverPagerState.targetPage
+                    coroutineScope.launch {
+                        handoverPagerState.animateScrollToPage(page)
+                    }
                 }
-            }
+            )
         } else {
 //            Column(
 //                modifier = modifier
@@ -184,7 +220,10 @@ fun HomeScreen(
 fun HomeScreenPreview(){
     HTLauncherTheme {
         HomeScreen(
-                isReady = true,
+            modifier = Modifier
+                .navigationBarsPadding()
+                .statusBarsPadding(),
+            isReady = true,
 //            onAllAppButtonClicked = {},
 //            onMoreMenuButtonClicked = {},
         )

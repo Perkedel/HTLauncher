@@ -50,13 +50,21 @@ import com.perkedel.htlauncher.ui.theme.HTLauncherTheme
 import com.perkedel.htlauncher.ui.theme.rememberColorScheme
 import android.net.Uri
 import android.util.Log
+import androidx.activity.BackEventCompat
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.compose.BackHandler
+import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.activity.viewModels
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.adaptive.layout.ThreePaneScaffoldValue
 import androidx.compose.material3.adaptive.navigation.ThreePaneScaffoldNavigator
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.perkedel.htlauncher.R
 import com.perkedel.htlauncher.data.viewmodels.ItemEditorViewModel
@@ -74,6 +82,7 @@ class ItemEditorActivity : ComponentActivity() {
     private val editorViewModel by viewModels<ItemEditorViewModel>()
 //    private val navigator = rememberListDetailPaneScaffoldNavigator<Any>()
 //    private val navigator: ThreePaneScaffoldNavigator<Any>
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         // https://stackoverflow.com/questions/10107442/android-how-to-pass-parcelable-object-to-intent-and-use-getparcelable-method-of
@@ -188,6 +197,13 @@ class ItemEditorActivity : ComponentActivity() {
             pressBackButton()
         }
 
+        override fun handleOnBackProgressed(backEvent: BackEventCompat) {
+            super.handleOnBackProgressed(backEvent)
+        }
+
+        override fun handleOnBackCancelled() {
+            super.handleOnBackCancelled()
+        }
     }
 }
 
@@ -207,7 +223,12 @@ fun ItemEditorGreeting(
     viewModel: ItemEditorViewModel = ItemEditorViewModel(),
     editUri:Uri? = null,
     navigator:ThreePaneScaffoldNavigator<Any> = rememberListDetailPaneScaffoldNavigator<Any>(),
-    onBack:()-> Unit = {}
+    onBack:()-> Unit = {},
+    json: Json = Json {
+        // https://coldfusion-example.blogspot.com/2022/03/jetpack-compose-kotlinx-serialization_79.html
+        prettyPrint = true
+        encodeDefaults = true
+    },
 ) {
     // https://youtu.be/W3R_ETKMj0E Philip Lackner List detail
     // https://github.com/philipplackner/ListPaneScaffoldGuide
@@ -246,12 +267,50 @@ fun ItemEditorGreeting(
         }
     }
 
-    viewModel.setGoBack(navigator.canNavigateBack())
-    BackHandler(navigator.canNavigateBack()) {
-        navigator.navigateBack()
+    var backProgress: Float? by remember {
+        mutableStateOf(null)
     }
-    BackHandler {
-        onBack()
+
+    val onBackPressedCallback:OnBackPressedCallback = object :OnBackPressedCallback(true){
+        // https://github.com/philipplackner/PredictiveBackMigration
+        override fun handleOnBackPressed() {
+//            pressBackButton()
+            if(navigator.canNavigateBack()){
+                navigator.navigateBack()
+            } else {
+                onBack()
+            }
+            backProgress = null
+        }
+
+        override fun handleOnBackProgressed(backEvent: BackEventCompat) {
+            super.handleOnBackProgressed(backEvent)
+            backProgress = backEvent.progress
+        }
+
+        override fun handleOnBackCancelled() {
+            super.handleOnBackCancelled()
+            backProgress = null
+        }
+    }
+
+    viewModel.setGoBack(navigator.canNavigateBack())
+//    BackHandler(navigator.canNavigateBack()) {
+//        navigator.navigateBack()
+//    }
+//    BackHandler {
+//        onBack()
+//    }
+    val backPressedDispatcher = LocalOnBackPressedDispatcherOwner.current!!.onBackPressedDispatcher
+    DisposableEffect(backPressedDispatcher, navigator) {
+        if(navigator.canNavigateBack()){
+            backPressedDispatcher.addCallback(onBackPressedCallback)
+//            navigator.navigateBack()
+        }
+
+        onDispose {
+            onBackPressedCallback.remove()
+        }
     }
 
     Scaffold(

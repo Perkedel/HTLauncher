@@ -1,10 +1,12 @@
 package com.perkedel.htlauncher.data
 
+import com.perkedel.htlauncher.enumerations.PageViewStyle
 import kotlinx.serialization.Serializable
 
 @Serializable
 data class PageData( // And inside a page, there are:
     val type:String = "Page",
+    val viewStyle: PageViewStyle = PageViewStyle.Default,
     val items:List<String> = listOf(
         "Item",
         "Item2",
