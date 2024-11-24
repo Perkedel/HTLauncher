@@ -1,11 +1,13 @@
 package com.perkedel.htlauncher.data
 
+import com.perkedel.htlauncher.enumerations.PageGridType
 import com.perkedel.htlauncher.enumerations.PageViewStyle
 import kotlinx.serialization.Serializable
 
 @Serializable
 data class PageData( // And inside a page, there are:
     val type:String = "Page",
+    val name:String = "anPage",
     val viewStyle: PageViewStyle = PageViewStyle.Default,
     val items:List<String> = listOf(
         "Item",
@@ -18,6 +20,8 @@ data class PageData( // And inside a page, there are:
         "Item8",
         "Item9",
     ), // Cells you can interact to make it do something
+    val gridType: PageGridType = PageGridType.Default,
     val cellSize:Int = 125, // Grid Size to be handed over to Cell Size
+    val cellCount:Int = 3, // Grid count for Fixed
     val isHome:Boolean = true, // if this page is considered default page
 )

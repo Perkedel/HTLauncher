@@ -16,6 +16,7 @@
     <!--  Site  -->
 
     <!--  Home Screen  -->
+    <string name="action_load">Muat</string>
     <string name="home_screen">Rumah</string>
     <string name="all_apps">Semua Aplikasi</string>
     <string name="configuration_screen">Konfigurasi</string>
@@ -215,7 +216,13 @@
     </string>
 
     <!--  Humane Units  -->
-    <string name="pieces_unit">Butir</string>
+    <string name="pieces_unit">butir</string>
+    <plurals name="pieces_units">
+        <item quantity="other">%d butir</item>
+    </plurals>
+    <plurals name="animals_units">
+        <item quantity="other">%d ekor</item>
+    </plurals>
 
     <!--  Humane Prefixes  -->
     <string name="number_prefix_short">No.</string>
@@ -227,4 +234,7 @@
     <string name="unit_version_number">iterasi</string>
     <string name="iteration">iterasi</string>
     <string name="title_activity_item_editor">ItemEditorActivity</string>
+    <string name="action_save">Simpan</string>
+    <string name="action_delete">Hapus</string>
+    <string name="action_open">Buka</string>
 </resources>

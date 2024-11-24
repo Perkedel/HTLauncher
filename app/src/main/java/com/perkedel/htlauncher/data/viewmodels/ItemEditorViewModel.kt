@@ -61,6 +61,16 @@ class ItemEditorViewModel:ViewModel() {
         this.hasGoBack = into
     }
 
+    fun updateItemData(with: ItemData){
+        this.itemData = with
+    }
+    fun updatePageData(with: PageData){
+        this.pageData = with
+    }
+    fun updateHomeData(with: HomepagesWeHave){
+        this.homeData = with
+    }
+
     fun typedEditNow(editType: EditWhich?, rawJson: String = ""){
         val json = Json {
             // https://coldfusion-example.blogspot.com/2022/03/jetpack-compose-kotlinx-serialization_79.html
@@ -68,9 +78,9 @@ class ItemEditorViewModel:ViewModel() {
             encodeDefaults = true
         }
         when(editType){
-            EditWhich.Items -> itemData = json.decodeFromString<ItemData>(rawJson)
-            EditWhich.Pages -> pageData = json.decodeFromString<PageData>(rawJson)
-            EditWhich.Home -> homeData = json.decodeFromString<HomepagesWeHave>(rawJson)
+            EditWhich.Items -> updateItemData(json.decodeFromString<ItemData>(rawJson))
+            EditWhich.Pages -> updatePageData(json.decodeFromString<PageData>(rawJson))
+            EditWhich.Home -> updateHomeData(json.decodeFromString<HomepagesWeHave>(rawJson))
             else -> {}
         }
 //        updateJsoning(json.decodeFromString(rawJson))

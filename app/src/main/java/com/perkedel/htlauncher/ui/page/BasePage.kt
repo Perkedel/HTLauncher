@@ -18,7 +18,9 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -47,6 +49,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewDynamicColors
 import androidx.compose.ui.tooling.preview.PreviewFontScale
 import androidx.compose.ui.tooling.preview.PreviewLightDark
+import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.compose.ui.unit.dp
 import com.perkedel.htlauncher.HTUIState
@@ -54,12 +57,15 @@ import com.perkedel.htlauncher.HTViewModel
 import com.perkedel.htlauncher.R
 import com.perkedel.htlauncher.data.HomepagesWeHave
 import com.perkedel.htlauncher.data.PageData
+import com.perkedel.htlauncher.enumerations.PageGridType
 import com.perkedel.htlauncher.func.WindowInfo
 import com.perkedel.htlauncher.func.rememberWindowInfo
 import com.perkedel.htlauncher.getADirectory
 import com.perkedel.htlauncher.getATextFile
 import com.perkedel.htlauncher.openATextFile
+import com.perkedel.htlauncher.ui.previews.BasePagePreviewParameter
 import com.perkedel.htlauncher.ui.previews.HTPreviewAnnotations
+import com.perkedel.htlauncher.ui.previews.PagePreviewParameter
 import com.perkedel.htlauncher.ui.theme.HTLauncherTheme
 import com.perkedel.htlauncher.ui.theme.rememberColorScheme
 import com.perkedel.htlauncher.widgets.FirstPageCard
@@ -70,6 +76,7 @@ import kotlinx.serialization.json.Json
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun BasePage(
+    pageData: PageData? = null,
     fileName:String = "",
     isOnNumberWhat: Int = 0,
     isFirstPage: Boolean = false,
@@ -100,9 +107,12 @@ fun BasePage(
 //        Log.d("BasePage", "Eval filename = ${fileName}")
 //        Log.d("BasePage", "Eval selected save = ${uiState.selectedSaveDir}")
 
-        if(uiState.pageList.contains(fileName) && uiState.pageList[fileName] != null){
-            pageOfIt = uiState.pageList[fileName]!!
+        if(pageData != null){
+            pageOfIt = pageData
         } else {
+            if (uiState.pageList.contains(fileName) && uiState.pageList[fileName] != null) {
+                pageOfIt = uiState.pageList[fileName]!!
+            } else {
 //            if (fileName.isNotEmpty() && uiState.selectedSaveDir != null && uiState.selectedSaveDir.toString()
 //                    .isNotEmpty()
 //            ) {
@@ -124,10 +134,16 @@ fun BasePage(
 //                Log.d("BasePage", "(EMPTY) a Page ${fileName} has:\n${pageOfIt}")
 //            }
 //            uiState.pageList[fileName] = pageOfIt
+            }
         }
     }
-    if(uiState.pageList.contains(fileName) && uiState.pageList[fileName] != null){
-        pageOfIt = uiState.pageList[fileName]!!
+
+    if(pageData != null){
+        pageOfIt = pageData
+    } else {
+        if (uiState.pageList.contains(fileName) && uiState.pageList[fileName] != null) {
+            pageOfIt = uiState.pageList[fileName]!!
+        }
     }
 
     // https://youtu.be/UhnTTk3cwc4?si=5BoNxc4uZdM6y5nG
@@ -146,7 +162,11 @@ fun BasePage(
             // if screen is compact
             LazyVerticalGrid(
                 modifier = Modifier,
-                columns = GridCells.Adaptive(pageOfIt.cellSize.dp),
+                columns = when(pageOfIt.gridType){
+                    PageGridType.Default -> GridCells.Fixed(pageOfIt.cellCount)
+                    PageGridType.Adaptive -> GridCells.Adaptive(pageOfIt.cellSize.dp)
+                    else -> GridCells.Fixed(pageOfIt.cellCount)
+                },
                 state = lazyListState,
                 content = {
                     // Permanent Card on first page
@@ -155,7 +175,7 @@ fun BasePage(
                             span = { GridItemSpan(this.maxLineSpan) }
                         ){
                             FirstPageCard(
-                                handoverText = fileName,
+                                handoverText = pageOfIt.name,
                                 isCompact = isCompact,
                                 isOnNumberWhat = isOnNumberWhat,
                                 modifier = Modifier.weight(1f),
@@ -187,7 +207,7 @@ fun BasePage(
                 // Permanent Card on first page
                 if(isFirstPage || pageOfIt.isHome){
                     FirstPageCard(
-                        handoverText = fileName,
+                        handoverText = pageOfIt.name,
                         isCompact = isCompact,
                         isOnNumberWhat = isOnNumberWhat,
                         modifier = Modifier,
@@ -195,7 +215,11 @@ fun BasePage(
                     )
                 }
                 LazyVerticalGrid(
-                    columns = GridCells.Adaptive(pageOfIt.cellSize.dp),
+                    columns = when(pageOfIt.gridType){
+                        PageGridType.Default -> GridCells.Fixed(pageOfIt.cellCount)
+                        PageGridType.Adaptive -> GridCells.Adaptive(pageOfIt.cellSize.dp)
+                        else -> GridCells.Fixed(pageOfIt.cellCount)
+                    },
                     state = lazyListState,
                     content = {
                         // Rest of the items
@@ -218,14 +242,27 @@ fun BasePage(
 
 @HTPreviewAnnotations
 @Composable
-fun BasePagePreview(){
+fun BasePagePreview(
+    @PreviewParameter(BasePagePreviewParameter::class) data:PagePreviewParameter
+){
     HTLauncherTheme {
         BasePage(
+            pageData = PageData(
+                name = when(data.gridType){
+                    PageGridType.Default -> "Default ${data.fixedCount} ${data.adaptiveSize}"
+                    PageGridType.Fixed -> "Fixed ${data.fixedCount}"
+                    PageGridType.Adaptive -> "Adaptive ${data.adaptiveSize}"
+                    else -> "Idk ${data.fixedCount} ${data.adaptiveSize}"
+                },
+                gridType = data.gridType,
+                cellCount = data.fixedCount,
+                cellSize = data.adaptiveSize,
+            ),
             isOnNumberWhat = 0,
             isFirstPage = true,
             howManyItemsHere = 10,
             onMoreMenuButtonClicked = {},
-            modifier = Modifier,
+            modifier = Modifier.navigationBarsPadding().statusBarsPadding(),
         )
     }
 }

@@ -80,7 +80,7 @@ fun LevelEditor(
                 key = "pages_editor",
                 title = { Text(text = stringResource(R.string.pages_folder_label) ) },
                 icon = { Icon(imageVector = Icons.Default.Pages, contentDescription = null) },
-                summary = { Text(text = "${uiState.pageList.size} ${stringResource(R.string.pieces_unit)}") },
+                summary = { Text(text = "${uiState.pageList.size} ${context.resources.getQuantityString(R.plurals.pieces_units, uiState.pageList.size, uiState.pageList.size)}") },
                 onClick = {
                     onEditWhat(EditWhich.Pages)
                 }
@@ -89,7 +89,7 @@ fun LevelEditor(
                 key = "items_editor",
                 title = { Text(text = stringResource(R.string.items_folder_label) ) },
                 icon = { Icon(imageVector = Icons.Default.Category, contentDescription = null) },
-                summary = { Text(text = "${uiState.itemList.size} ${stringResource(R.string.pieces_unit)}") },
+                summary = { Text(text = "${uiState.itemList.size} ${context.resources.getQuantityString(R.plurals.pieces_units, uiState.itemList.size, uiState.itemList.size)}") },
                 onClick = {
                     onEditWhat(EditWhich.Items)
                 }

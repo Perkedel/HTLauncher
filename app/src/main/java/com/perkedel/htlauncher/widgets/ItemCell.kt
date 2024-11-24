@@ -13,6 +13,8 @@ import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -48,6 +50,7 @@ import androidx.compose.ui.tooling.preview.PreviewFontScale
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
 import com.bumptech.glide.load.resource.drawable.DrawableResource
 import com.perkedel.htlauncher.HTUIState
@@ -90,6 +93,7 @@ fun ItemCell(
     // Load file
     var itemFolder = Uri.parse("")
     var itemUri:Uri = Uri.parse("")
+    var mediaFolder:Uri = Uri.parse("")
     var itemOfIt:ItemData = ItemData(
         name = readTheItemFile
     )
@@ -135,6 +139,18 @@ fun ItemCell(
         if (uiState.itemList.contains(readTheItemFile) && uiState.itemList[readTheItemFile] != null) {
             itemOfIt = uiState.itemList[readTheItemFile]!!
         }
+    }
+    if(uiState.selectedSaveDir != null){
+//        mediaFolder = getADirectory(
+//            dirUri = uiState.selectedSaveDir,
+//            context = context,
+//            dirName = stringResource(R.string.medias_folder)
+//            )
+//        itemFolder = getADirectory(
+//            dirUri = uiState.selectedSaveDir,
+//            context = context,
+//            dirName = stringResource(R.string.items_folder)
+//        )
     }
 
 
@@ -201,7 +217,7 @@ fun ItemCell(
 
             OutlinedText(
                 modifier = Modifier
-
+//                    .fillMaxWidth()
                     .align(Alignment.BottomCenter)
                 ,
                 text = if(itemOfIt.label.isNotEmpty()) itemOfIt.label else handoverText,
@@ -225,7 +241,7 @@ fun ItemCell(
                     width = 10f,
                     miter = 5f,
                     join = StrokeJoin.Round,
-                )
+                ),
             )
 
         }

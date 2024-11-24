@@ -13,6 +13,9 @@ plugins {
 //    }
 //}
 
+// https://youtu.be/vvP5vnmzY84 Philip Lackner Compose Multiplatform
+// https://www.youtube.com/playlist?list=PLQkwcJG4YTCS55alEYv3J8CD4BXhqLUuk
+
 android {
     namespace = "com.perkedel.htlauncher"
     compileSdk = 35
@@ -30,8 +33,11 @@ android {
             useSupportLibrary = true
         }
     }
-
+    flavorDimensions += listOf("version") // https://developer.android.com/build/build-variants#kts
     buildTypes {
+        debug {
+
+        }
         release {
             isMinifyEnabled = true
             isShrinkResources = true
@@ -68,6 +74,7 @@ dependencies {
     val nav_version = "2.8.3"
     val viewModel_version = "2.6.1"
     val retrofit_version = "2.11.0" // https://github.com/square/retrofit
+    val happyFresh_version = "1.5.5"
 
     implementation(libs.androidx.navigation.compose)
     implementation(libs.retrofit)
@@ -150,6 +157,14 @@ dependencies {
     // https://youtu.be/W3R_ETKMj0E Philip Lackner List detail
     implementation(libs.androidx.compose.material3.adaptive.navigation.suite)
     implementation(libs.androidx.compose.material3.adaptive.navigation)
+
+    // HappyFresh. https://github.com/happyfresh/HappySupportAndroid Yes, that fruit store!
+    // StringHelper.getString(context, R.string.welcome)
+//    implementation(libs.happysupport)
+//    implementation(libs.happysupport.kotlinextentions)
+//    implementation(libs.happytracker)
+//    implementation(libs.happyrouter)
+//    implementation(libs.happyrouter.processor)
 }
 
 //composeCompiler {

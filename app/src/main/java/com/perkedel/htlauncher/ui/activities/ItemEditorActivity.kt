@@ -5,6 +5,8 @@
 
 package com.perkedel.htlauncher.ui.activities
 
+import android.content.ClipData.Item
+import android.content.ContentResolver
 import android.content.Context
 import android.content.Intent
 import android.os.Build
@@ -57,6 +59,10 @@ import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.activity.viewModels
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Save
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.adaptive.layout.ThreePaneScaffoldValue
 import androidx.compose.material3.adaptive.navigation.ThreePaneScaffoldNavigator
 import androidx.compose.runtime.DisposableEffect
@@ -65,6 +71,7 @@ import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.perkedel.htlauncher.R
 import com.perkedel.htlauncher.data.viewmodels.ItemEditorViewModel
@@ -75,7 +82,12 @@ import kotlinx.serialization.json.Json
 import javax.annotation.meta.When
 import androidx.fragment.app.FragmentActivity
 import androidx.navigation.findNavController
+import com.perkedel.htlauncher.data.HomepagesWeHave
+import com.perkedel.htlauncher.data.ItemData
+import com.perkedel.htlauncher.data.PageData
 import com.perkedel.htlauncher.widgets.HTButton
+import com.perkedel.htlauncher.writeATextFile
+import kotlinx.serialization.encodeToString
 
 class ItemEditorActivity : ComponentActivity() {
 
@@ -215,6 +227,14 @@ fun soPressBack(nav:ThreePaneScaffoldNavigator<Any>){
     }
 }
 
+fun saveThisFile(saveUri:Uri, contentResolver: ContentResolver, itemType: EditWhich, content:String = "{}"){
+    writeATextFile(
+        uri = saveUri,
+        contentResolver = contentResolver,
+        with = content
+    )
+}
+
 @Composable
 fun ItemEditorGreeting(
     modifier: Modifier = Modifier,
@@ -224,6 +244,9 @@ fun ItemEditorGreeting(
     editUri:Uri? = null,
     navigator:ThreePaneScaffoldNavigator<Any> = rememberListDetailPaneScaffoldNavigator<Any>(),
     onBack:()-> Unit = {},
+    onSave:(Uri,ContentResolver,EditWhich, String)-> Unit = { uri, resolver, editType, content ->
+        saveThisFile(uri, resolver, editType, content)
+    },
     json: Json = Json {
         // https://coldfusion-example.blogspot.com/2022/03/jetpack-compose-kotlinx-serialization_79.html
         prettyPrint = true
@@ -328,6 +351,43 @@ fun ItemEditorGreeting(
                 },
                 onMoreMenu = {
 
+                },
+                actions = {
+                    IconButton(
+                        onClick = {
+                            if(editUri != null) {
+                                viewModel.updateRawContent(
+                                    when(viewModel.editType){
+                                        EditWhich.Items -> json.encodeToString<ItemData>(viewModel.itemData ?: ItemData())
+                                        EditWhich.Pages -> json.encodeToString<PageData>(viewModel.pageData ?: PageData())
+                                        EditWhich.Home -> json.encodeToString<HomepagesWeHave>(viewModel.homeData ?: HomepagesWeHave())
+                                        else -> "{}"
+                                    }
+                                )
+//                                viewModel.updateRawContent(json.encodeToString(value = when(viewModel.editType){
+//                                    EditWhich.Items -> viewModel.itemData
+//                                    EditWhich.Pages -> viewModel.pageData
+//                                    EditWhich.Home -> viewModel.homeData
+//                                    else -> "{}"
+////                                    EditWhich.Themes -> TODO()
+////                                    EditWhich.Medias -> TODO()
+////                                    EditWhich.Shortcuts -> TODO()
+////                                    EditWhich.Misc -> TODO()
+////                                    null -> TODO()
+//                                }))
+                                onSave(editUri,context.contentResolver,viewModel.editType ?: EditWhich.Misc, viewModel.rawContent ?: "")
+//                                onSave(editUri,context.contentResolver,viewModel.editType ?: EditWhich.Misc, when(viewModel.editType){
+//                                    EditWhich.Items -> json.encodeToString<ItemData>(value = viewModel.itemData ?: ItemData())
+//                                    else -> "{}"
+//                                })
+                            }
+                        },
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Save,
+                            contentDescription = stringResource(R.string.action_save)
+                        )
+                    }
                 }
             )
         },

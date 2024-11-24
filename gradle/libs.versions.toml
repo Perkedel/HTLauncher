@@ -10,6 +10,7 @@ datastorePreferences = "1.1.1"
 documentfile = "1.0.1"
 gson = "2.10.1"
 guava = "33.3.1-android"
+happyfresh = "1.5.5"
 jsontree = "2.3.0"
 kotlin = "2.0.20"
 coreKtx = "1.15.0"
@@ -56,6 +57,11 @@ coil-compose = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coilCo
 coil-network-okhttp = { module = "io.coil-kt.coil3:coil-network-okhttp", version.ref = "coilNetworkOkhttp" }
 gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
 guava = { module = "com.google.guava:guava", version.ref = "guava" }
+happyrouter = { module = "com.github.happyfresh.HappySupportAndroid:happyrouter", version.ref = "happyfresh" }
+happyrouter-processor = { module = "com.github.happyfresh.HappySupportAndroid:happyrouter-processor", version.ref = "happyfresh" }
+happysupport = { module = "com.github.happyfresh.HappySupportAndroid:happysupport", version.ref = "happyfresh" }
+happysupport-kotlinextentions = { module = "com.github.happyfresh.HappySupportAndroid:happysupport-kotlinextentions", version.ref = "happyfresh" }
+happytracker = { module = "com.github.happyfresh.HappySupportAndroid:happytracker", version.ref = "happyfresh" }
 jsontree = { module = "com.sebastianneubauer.jsontree:jsontree", version.ref = "jsontree" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }

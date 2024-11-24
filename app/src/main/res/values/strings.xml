@@ -1,4 +1,10 @@
 <resources>
+    <!--  https://medium.com/@amqcesar/referencing-xml-strings-into-other-xml-strings-at-build-time-7de8bb4101e1  -->
+    <!--  https://stackoverflow.com/a/39870268/9079640  -->
+    <!--  https://medium.com/happytech/include-other-resources-in-xml-string-android-4698a08c314a  -->
+    <!--  https://github.com/happyfresh/HappySupportAndroid  -->
+    <!--  https://www.happyfresh.id/ HUH?  -->
+
     <string name="app_name" translatable="false">HT Launcher</string>
     <string name="title_activity_main2">Leanback MainActivity2</string>
     <string name="browse_title">Videos by Your Company</string>
@@ -17,6 +23,12 @@
     <!--  Site  -->
     <string name="source_code_site_0" translatable="false">https://github.com/Perkedel/HTLauncher</string>
     <string name="web_site_0" translatable="false">https://perkedel.netlify.app/ht</string>
+
+    <!--  Actions  -->
+    <string name="action_save">Save</string>
+    <string name="action_delete">Delete</string>
+    <string name="action_open">Open</string>
+    <string name="action_load">Load</string>
 
     <!--  Home Screen  -->
     <string name="home_screen">Home</string>
@@ -227,7 +239,17 @@
     </string>
 
     <!--  Humane Units  -->
-    <string name="pieces_unit">Pcs</string>
+    <string name="pieces_unit">pcs</string>
+    <plurals name="pieces_units">
+        <item quantity="zero">%d pc</item>
+        <item quantity="one">%d pc</item>
+        <item quantity="other">%d pcs</item>
+    </plurals>
+    <plurals name="animals_units">
+        <item quantity="zero">%d unit</item>
+        <item quantity="one">%d unit</item>
+        <item quantity="other">%d units</item>
+    </plurals>
 
     <!--  Humane Prefixes  -->
     <string name="number_prefix_short">No.</string>

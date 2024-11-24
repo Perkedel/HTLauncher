@@ -1292,6 +1292,7 @@ public fun getATextFile(dirUri:Uri, context: Context, fileName:String = "text.tx
 
 public fun getADirectory(dirUri:Uri, context: Context, dirName:String = "Folder"): Uri{
     // https://github.com/abdallahmehiz/mpvKt/blob/74d407106e1fb0bae4b7bc66e3b0f83e77a6cbc2/app/src/main/java/live/mehiz/mpvkt/ui/preferences/AdvancedPreferencesScreen.kt#L189
+    Log.d("GetDirectory", "Attempt Get Directory ${dirUri} of ${dirName}")
     val thingieTree:DocumentFile = DocumentFile.fromTreeUri(context,dirUri)!!
 //    var thingieDir = thingieTree.createDirectory(dirName)!!
     return if(thingieTree.findFile(dirName) == null || !thingieTree.findFile(dirName)!!.isDirectory){

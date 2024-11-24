@@ -4,6 +4,7 @@ package com.perkedel.htlauncher.ui.bars
 
 import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -63,6 +64,7 @@ fun HTAppBar(
     navigateUp: () -> Unit = {},
     hideIt: Boolean = false,
     modifier: Modifier = Modifier,
+    actions: @Composable() (RowScope.() -> Unit) = {},
     onMoreMenu: (() -> Unit)? = null,
     moreMenuIcon: @Composable () -> Unit = {
         Icon(
@@ -104,6 +106,7 @@ fun HTAppBar(
                 }
             },
             actions = {
+                actions() // https://youtu.be/laL2lAts_Rc
                 if (onMoreMenu != null) {
                     IconButton(
                         onClick = {

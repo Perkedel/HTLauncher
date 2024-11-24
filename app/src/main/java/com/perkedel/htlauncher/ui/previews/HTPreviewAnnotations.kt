@@ -43,41 +43,41 @@ annotation class HTPreviewAnnotationsPOC
 @Preview(
     // https://stackoverflow.com/a/78279389/9079640
     name = "Workaround Dynamic Color",
-    apiLevel = 34,
+    apiLevel = 31,
     uiMode = Configuration.UI_MODE_NIGHT_NO,
 )
 @Preview(
     // https://stackoverflow.com/a/78279389/9079640
     name = "Workaround Dynamic Color Red",
-    apiLevel = 34,
+    apiLevel = 31,
     wallpaper = Wallpapers.RED_DOMINATED_EXAMPLE,
     uiMode = Configuration.UI_MODE_NIGHT_NO,
 )
 @Preview(
     // https://stackoverflow.com/a/78279389/9079640
     name = "Workaround Dynamic Color Blue",
-    apiLevel = 34,
+    apiLevel = 31,
     wallpaper = Wallpapers.BLUE_DOMINATED_EXAMPLE,
     uiMode = Configuration.UI_MODE_NIGHT_NO,
 )
 @Preview(
     // https://stackoverflow.com/a/78279389/9079640
     name = "Workaround Dynamic Color Green",
-    apiLevel = 34,
+    apiLevel = 31,
     wallpaper = Wallpapers.GREEN_DOMINATED_EXAMPLE,
     uiMode = Configuration.UI_MODE_NIGHT_NO,
 )
 @Preview(
     // https://stackoverflow.com/a/78279389/9079640
     name = "Workaround Dynamic Color Yellow",
-    apiLevel = 34,
+    apiLevel = 31,
     wallpaper = Wallpapers.YELLOW_DOMINATED_EXAMPLE,
     uiMode = Configuration.UI_MODE_NIGHT_NO,
 )
 @Preview(
     // https://stackoverflow.com/a/78279389/9079640
     name = "Workaround Dynamic Color",
-    apiLevel = 34,
+    apiLevel = 31,
     uiMode = Configuration.UI_MODE_NIGHT_NO,
 )
 annotation class PreviewDynamicColorsWorkaroundLight
@@ -91,21 +91,21 @@ annotation class PreviewDynamicColorsWorkaroundLight
 )
 @Preview(
     // https://stackoverflow.com/a/78279389/9079640
-    name = "Workaround Dynamic Color Blue",
+    name = "Workaround Dynamic Color Blue Dark",
     apiLevel = 31,
     wallpaper = Wallpapers.BLUE_DOMINATED_EXAMPLE,
     uiMode = Configuration.UI_MODE_NIGHT_YES,
 )
 @Preview(
     // https://stackoverflow.com/a/78279389/9079640
-    name = "Workaround Dynamic Color Green",
+    name = "Workaround Dynamic Color Green Dark",
     apiLevel = 31,
     wallpaper = Wallpapers.GREEN_DOMINATED_EXAMPLE,
     uiMode = Configuration.UI_MODE_NIGHT_YES,
 )
 @Preview(
     // https://stackoverflow.com/a/78279389/9079640
-    name = "Workaround Dynamic Color Yellow",
+    name = "Workaround Dynamic Color Yellow Dark",
     apiLevel = 31,
     wallpaper = Wallpapers.YELLOW_DOMINATED_EXAMPLE,
     uiMode = Configuration.UI_MODE_NIGHT_YES,

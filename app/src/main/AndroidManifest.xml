@@ -21,6 +21,10 @@
         android:maxSdkVersion="32"
         tools:ignore="ScopedStorage" /> <!-- <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE" -->
     <!-- tools:ignore="ScopedStorage" /> -->
+    <uses-permission android:name="android.permission.BIND_APPWIDGET"
+        tools:ignore="ProtectedPermissions" />
+
+
     <uses-feature
         android:name="android.hardware.touchscreen"
         android:required="false" />
@@ -39,6 +43,16 @@
 <!--    <uses-feature-->
 <!--        android:name="android.hardware.type.watch"-->
 <!--        />-->
+    <!--  https://developer.android.com/training/cars/parked  -->
+    <uses-feature
+        android:name="android.hardware.type.automotive"
+        android:required="false" />
+    <uses-feature
+        android:name="android.hardware.screen.portrait"
+        android:required="false"/>
+    <uses-feature
+        android:name="android.hardware.screen.landscape"
+        android:required="false"/>
 
     <application
         android:allowBackup="true"
@@ -70,6 +84,7 @@
                 <data android:mimeType="@string/text_all_type"/>
             </intent-filter>
         </activity>
+
         <activity
             android:name=".MainActivity"
             android:exported="true"
@@ -84,6 +99,7 @@
                 <category android:name="android.intent.category.LEANBACK_LAUNCHER" />
             </intent-filter>
         </activity>
+
     </application>
 
     <queries>
