@@ -52,6 +52,7 @@ import com.perkedel.htlauncher.ui.theme.HTLauncherTheme
 import com.perkedel.htlauncher.ui.theme.rememberColorScheme
 import android.net.Uri
 import android.util.Log
+import android.widget.Toast
 import androidx.activity.BackEventCompat
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.compose.BackHandler
@@ -61,6 +62,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Save
+import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.adaptive.layout.ThreePaneScaffoldValue
@@ -72,6 +74,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontFamily
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.perkedel.htlauncher.R
 import com.perkedel.htlauncher.data.viewmodels.ItemEditorViewModel
@@ -85,9 +88,11 @@ import androidx.navigation.findNavController
 import com.perkedel.htlauncher.data.HomepagesWeHave
 import com.perkedel.htlauncher.data.ItemData
 import com.perkedel.htlauncher.data.PageData
+import com.perkedel.htlauncher.ui.dialog.HTAlertDialog
 import com.perkedel.htlauncher.widgets.HTButton
 import com.perkedel.htlauncher.writeATextFile
 import kotlinx.serialization.encodeToString
+import okio.IOException
 
 class ItemEditorActivity : ComponentActivity() {
 
@@ -227,12 +232,29 @@ fun soPressBack(nav:ThreePaneScaffoldNavigator<Any>){
     }
 }
 
-fun saveThisFile(saveUri:Uri, contentResolver: ContentResolver, itemType: EditWhich, content:String = "{}"){
+fun saveThisFile(saveUri:Uri, context: Context, contentResolver: ContentResolver, itemType: EditWhich, content:String = "{}", viewModel: ItemEditorViewModel,){
+    try{
     writeATextFile(
         uri = saveUri,
         contentResolver = contentResolver,
         with = content
     )
+        Toast.makeText(context,context.resources.getString(R.string.save_success),Toast.LENGTH_SHORT).show()
+    } catch (e:Exception){
+        e.printStackTrace()
+        viewModel.updateError(
+            into = true,
+            message = e.localizedMessage ?: context.resources.getString(R.string.error_unknown_reason)
+        )
+        Toast.makeText(context,context.resources.getString(R.string.save_error),Toast.LENGTH_SHORT).show()
+    } catch (e:IOException){
+        e.printStackTrace()
+        viewModel.updateError(
+            into = true,
+            message = e.localizedMessage ?: context.resources.getString(R.string.error_unknown_reason)
+        )
+        Toast.makeText(context,context.resources.getString(R.string.save_error),Toast.LENGTH_SHORT).show()
+    }
 }
 
 @Composable
@@ -245,7 +267,14 @@ fun ItemEditorGreeting(
     navigator:ThreePaneScaffoldNavigator<Any> = rememberListDetailPaneScaffoldNavigator<Any>(),
     onBack:()-> Unit = {},
     onSave:(Uri,ContentResolver,EditWhich, String)-> Unit = { uri, resolver, editType, content ->
-        saveThisFile(uri, resolver, editType, content)
+        saveThisFile(
+            saveUri = uri,
+            context = context,
+            contentResolver = resolver,
+            itemType = editType,
+            content = content,
+            viewModel = viewModel
+        )
     },
     json: Json = Json {
         // https://coldfusion-example.blogspot.com/2022/03/jetpack-compose-kotlinx-serialization_79.html
@@ -335,6 +364,34 @@ fun ItemEditorGreeting(
             onBackPressedCallback.remove()
         }
     }
+    val saveNow: () -> Unit = {
+        if(editUri != null) {
+            viewModel.updateRawContent(
+                when(viewModel.editType){
+                    EditWhich.Items -> json.encodeToString<ItemData>(viewModel.itemData ?: ItemData())
+                    EditWhich.Pages -> json.encodeToString<PageData>(viewModel.pageData ?: PageData())
+                    EditWhich.Home -> json.encodeToString<HomepagesWeHave>(viewModel.homeData ?: HomepagesWeHave())
+                    else -> "{}"
+                }
+            )
+//                                viewModel.updateRawContent(json.encodeToString(value = when(viewModel.editType){
+//                                    EditWhich.Items -> viewModel.itemData
+//                                    EditWhich.Pages -> viewModel.pageData
+//                                    EditWhich.Home -> viewModel.homeData
+//                                    else -> "{}"
+////                                    EditWhich.Themes -> TODO()
+////                                    EditWhich.Medias -> TODO()
+////                                    EditWhich.Shortcuts -> TODO()
+////                                    EditWhich.Misc -> TODO()
+////                                    null -> TODO()
+//                                }))
+            onSave(editUri,context.contentResolver,viewModel.editType ?: EditWhich.Misc, viewModel.rawContent ?: "")
+//                                onSave(editUri,context.contentResolver,viewModel.editType ?: EditWhich.Misc, when(viewModel.editType){
+//                                    EditWhich.Items -> json.encodeToString<ItemData>(value = viewModel.itemData ?: ItemData())
+//                                    else -> "{}"
+//                                })
+        }
+    }
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -354,34 +411,7 @@ fun ItemEditorGreeting(
                 },
                 actions = {
                     IconButton(
-                        onClick = {
-                            if(editUri != null) {
-                                viewModel.updateRawContent(
-                                    when(viewModel.editType){
-                                        EditWhich.Items -> json.encodeToString<ItemData>(viewModel.itemData ?: ItemData())
-                                        EditWhich.Pages -> json.encodeToString<PageData>(viewModel.pageData ?: PageData())
-                                        EditWhich.Home -> json.encodeToString<HomepagesWeHave>(viewModel.homeData ?: HomepagesWeHave())
-                                        else -> "{}"
-                                    }
-                                )
-//                                viewModel.updateRawContent(json.encodeToString(value = when(viewModel.editType){
-//                                    EditWhich.Items -> viewModel.itemData
-//                                    EditWhich.Pages -> viewModel.pageData
-//                                    EditWhich.Home -> viewModel.homeData
-//                                    else -> "{}"
-////                                    EditWhich.Themes -> TODO()
-////                                    EditWhich.Medias -> TODO()
-////                                    EditWhich.Shortcuts -> TODO()
-////                                    EditWhich.Misc -> TODO()
-////                                    null -> TODO()
-//                                }))
-                                onSave(editUri,context.contentResolver,viewModel.editType ?: EditWhich.Misc, viewModel.rawContent ?: "")
-//                                onSave(editUri,context.contentResolver,viewModel.editType ?: EditWhich.Misc, when(viewModel.editType){
-//                                    EditWhich.Items -> json.encodeToString<ItemData>(value = viewModel.itemData ?: ItemData())
-//                                    else -> "{}"
-//                                })
-                            }
-                        },
+                        onClick = saveNow,
                     ) {
                         Icon(
                             imageVector = Icons.Default.Save,
@@ -447,6 +477,32 @@ fun ItemEditorGreeting(
                 }
             }
         )
+
+        if(viewModel.errorOccured == true){
+            HTAlertDialog(
+                modifier = Modifier,
+                context = context,
+                title = stringResource(R.string.save_error),
+                text = stringResource(R.string.save_error_description),
+                onDismissRequest = {
+                    viewModel.updateError(false)
+                },
+                onConfirm = {
+                    viewModel.updateError(false)
+                    saveNow()
+                },
+                confirmText = stringResource(R.string.action_retry)
+            ){
+                Card(
+                    modifier = Modifier.fillMaxSize(),
+                ) {
+                    Text(
+                        text = viewModel.errorMessage ?: "",
+                        fontFamily = FontFamily.Monospace
+                    )
+                }
+            }
+        }
     }
 
 }

@@ -1,8 +1,12 @@
+@file:OptIn(ExperimentalComposeUiApi::class)
+
 package com.perkedel.htlauncher.widgets
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.focusable
 import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -16,10 +20,15 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.semantics.invisibleToUser
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.perkedel.htlauncher.ui.previews.HTPreviewAnnotations
@@ -43,10 +52,16 @@ fun HTHorizontalPageIndicators(
     onSetPage: (Int) -> Unit = {},
 ){
     // https://medium.com/@domen.lanisnik/exploring-the-official-pager-in-compose-8c2698c49a98 yoink!!
+    // https://stackoverflow.com/a/75771001/9079640
+    // https://developer.android.com/develop/ui/compose/touch-input/focus/change-focus-behavior
+
     Row(
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically,
         modifier = modifier
+            .semantics {
+                invisibleToUser()
+            }
             .wrapContentSize()
             .height(selectedIndicatorSize + indicatorPadding * 2)
             .horizontalScroll(rememberScrollState())
@@ -73,6 +88,10 @@ fun HTHorizontalPageIndicators(
                     indicatorColor.copy(alpha = 0.1f) to unselectedIndicatorSize
                 }
 
+//            val interactionSource = remember { MutableInteractionSource(
+//
+//            ) }
+
             // draw indicator
             Box(
                 modifier = Modifier
@@ -85,11 +104,15 @@ fun HTHorizontalPageIndicators(
                     .background(color)
                     .width(size)
                     .height(size / 2)
+                    .focusProperties {
+                        canFocus = false
+                    }
                     .clickable(
                         onClick = {
                             onSetPage(page)
-                        }
+                        },
                     )
+
             )
         }
     }

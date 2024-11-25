@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.net.Uri
+import android.speech.tts.TextToSpeech
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.CombinedClickableNode
@@ -33,6 +34,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -62,6 +64,7 @@ import com.perkedel.htlauncher.func.WindowInfo
 import com.perkedel.htlauncher.func.rememberWindowInfo
 import com.perkedel.htlauncher.getADirectory
 import com.perkedel.htlauncher.getATextFile
+import com.perkedel.htlauncher.modules.rememberTextToSpeech
 import com.perkedel.htlauncher.openATextFile
 import com.perkedel.htlauncher.ui.previews.BasePagePreviewParameter
 import com.perkedel.htlauncher.ui.previews.HTPreviewAnnotations
@@ -96,6 +99,7 @@ fun BasePage(
         prettyPrint = true
         encodeDefaults = true
     },
+    tts: MutableState<TextToSpeech?> = rememberTextToSpeech(),
 ){
     // Load this file!
     var pageUri:Uri = Uri.parse("")
@@ -192,6 +196,7 @@ fun BasePage(
                             pm = pm,
                             uiState = uiState,
                             viewModel = viewModel,
+                            tts = tts,
                         )
                     }
 
@@ -230,6 +235,7 @@ fun BasePage(
                                 pm = pm,
                                 uiState = uiState,
                                 viewModel = viewModel,
+                                tts = tts,
                             )
                         }
                     }

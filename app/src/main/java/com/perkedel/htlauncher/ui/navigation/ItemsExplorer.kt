@@ -4,6 +4,7 @@ import android.content.ContentResolver
 import android.content.Context
 import android.content.pm.PackageManager
 import android.net.Uri
+import android.speech.tts.TextToSpeech
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -14,6 +15,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.hapticfeedback.HapticFeedback
 import androidx.compose.ui.input.pointer.motionEventSpy
@@ -30,6 +32,7 @@ import com.perkedel.htlauncher.HTViewModel
 import com.perkedel.htlauncher.R
 import com.perkedel.htlauncher.data.ItemData
 import com.perkedel.htlauncher.enumerations.EditWhich
+import com.perkedel.htlauncher.modules.rememberTextToSpeech
 import com.perkedel.htlauncher.ui.previews.HTPreviewAnnotations
 import com.perkedel.htlauncher.ui.theme.HTLauncherTheme
 import me.zhanghai.compose.preference.Preference
@@ -58,7 +61,8 @@ fun ItemsExplorer(
     viewModel: HTViewModel = HTViewModel(),
     uiState: HTUIState = HTUIState(),
     exploreType:EditWhich = EditWhich.Items,
-    inspectionMode: Boolean = LocalInspectionMode.current
+    inspectionMode: Boolean = LocalInspectionMode.current,
+    tts: MutableState<TextToSpeech?> = rememberTextToSpeech(),
 ){
 //    val counts:Int = if(!inspectionMode) when(exploreType){
 //        EditWhich.Items -> uiState.itemList.size

@@ -165,6 +165,10 @@ dependencies {
 //    implementation(libs.happytracker)
 //    implementation(libs.happyrouter)
 //    implementation(libs.happyrouter.processor)
+
+    // https://composables.com/tv-foundation/tvlazyverticalgrid
+    // https://joebirch.co/android/lazy-grids-for-android-tv-using-jetpack-compose/
+    implementation(libs.androidx.tv.foundation)
 }
 
 //composeCompiler {

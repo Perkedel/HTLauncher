@@ -3,6 +3,7 @@ package com.perkedel.htlauncher.ui.navigation
 import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.pm.PackageManager
+import android.speech.tts.TextToSpeech
 import androidx.compose.foundation.MarqueeAnimationMode
 import androidx.compose.foundation.MarqueeSpacing
 import androidx.compose.foundation.basicMarquee
@@ -16,6 +17,7 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
@@ -33,6 +35,7 @@ import androidx.navigation.compose.rememberNavController
 import coil3.compose.AsyncImage
 import com.google.accompanist.systemuicontroller.SystemUiController
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
+import com.perkedel.htlauncher.modules.rememberTextToSpeech
 import com.perkedel.htlauncher.startApplication
 import com.perkedel.htlauncher.ui.previews.HTPreviewAnnotations
 import com.perkedel.htlauncher.ui.theme.HTLauncherTheme
@@ -54,6 +57,7 @@ fun AllAppsScreen(
     snackbarHostState: SnackbarHostState = remember {SnackbarHostState()},
     onSnackbarResult:(SnackbarResult) -> Unit = {  },
     systemUiController: SystemUiController = rememberSystemUiController(),
+    tts: MutableState<TextToSpeech?> = rememberTextToSpeech(),
     ) {
     // https://stackoverflow.com/questions/64377518/how-to-initialize-or-access-packagemanager-out-from-coroutinecontext
     // https://www.geeksforgeeks.org/different-ways-to-get-list-of-all-apps-installed-in-your-android-phone/

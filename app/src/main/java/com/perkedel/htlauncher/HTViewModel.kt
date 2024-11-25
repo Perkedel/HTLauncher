@@ -32,9 +32,15 @@ class HTViewModel : ViewModel() {
 
     val visiblePermissionDialogQueue = mutableStateListOf<String>()
 
-    suspend fun preloadFiles(context: Context, contentResolver: ContentResolver, uiStating:HTUIState, listOfFolder:List<String>, folders: MutableMap<String,Uri>, json: Json){
+    suspend fun preloadFiles(context: Context, contentResolver: ContentResolver, uiStating:HTUIState, listOfFolder:List<String>, folders: MutableMap<String,Uri>, json: Json, force:Boolean = false){
         // https://programmingheadache.com/2024/02/13/effortless-loading-screen-with-state-flows-and-jetpack-compose-just-4-easy-steps/
         setIsReady(into = false)
+
+        if(force){
+            // clear everything
+            uiStating.pageList.clear()
+            uiStating.itemList.clear()
+        }
 
 //        val launch = viewModelScope.launch {
 
@@ -266,6 +272,14 @@ class HTViewModel : ViewModel() {
         _uiState.update {
             currentState -> currentState.copy(
                 toEditWhatFile = into
+            )
+        }
+    }
+
+    fun setEditingLevel(into:Boolean = false){
+        _uiState.update {
+            currentState -> currentState.copy(
+                editingLevel = into
             )
         }
     }

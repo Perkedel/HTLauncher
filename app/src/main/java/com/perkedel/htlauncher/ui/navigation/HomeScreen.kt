@@ -4,6 +4,7 @@ import android.content.ContentResolver
 import android.content.Context
 import android.content.pm.PackageManager
 import android.content.res.Configuration
+import android.speech.tts.TextToSpeech
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.SurfaceCoroutineScope
 import androidx.compose.foundation.background
@@ -27,6 +28,7 @@ import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -48,6 +50,7 @@ import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.perkedel.htlauncher.HTUIState
 import com.perkedel.htlauncher.HTViewModel
 import com.perkedel.htlauncher.data.HomepagesWeHave
+import com.perkedel.htlauncher.modules.rememberTextToSpeech
 import com.perkedel.htlauncher.ui.page.BasePage
 import com.perkedel.htlauncher.ui.previews.HTPreviewAnnotations
 import com.perkedel.htlauncher.ui.theme.HTLauncherTheme
@@ -85,6 +88,7 @@ fun HomeScreen(
     },
     coroutineScope: CoroutineScope = rememberCoroutineScope(),
     isReady:Boolean = false,
+    tts: MutableState<TextToSpeech?> = rememberTextToSpeech(),
 ){
 
 
@@ -136,6 +140,7 @@ fun HomeScreen(
                         viewModel = viewModel,
                         contentResolver = contentResolver,
                         uiState = uiState,
+                        tts = tts,
                     )
                 }
 

@@ -17,6 +17,7 @@
 
     <!--  Home Screen  -->
     <string name="action_load">Muat</string>
+    <string name="action_retry">Retry</string>
     <string name="home_screen">Rumah</string>
     <string name="all_apps">Semua Aplikasi</string>
     <string name="configuration_screen">Konfigurasi</string>
@@ -58,6 +59,7 @@
     <string name="disclaimer_option_desc">Sesuatu yg harap diperhatikan</string>
     <string name="click_here_to_check_update_snippet">Klik disini untuk periksa update</string>
     <string name="donation_option">Donasi</string>
+    <string name="donation_option_desc">Anda sudah memiliki VERSI PENUH</string>
     <string name="quick_start_option">Quick Start Guide</string>
     <string name="language_option">Bahasa</string>
     <string name="display_option">Tampilan</string>
@@ -75,9 +77,13 @@
     <string name="save_dir_option">Ubah Lokasi Folder Konfigurasi</string>
     <string name="debug_test_option">[DEBUG] Tes Json</string>
     <string name="About_option">Tentang</string>
+    <string name="About_version_readout">HTLauncher kini berada dalam versi %s iterasi ke-%d</string>
     <string name="iteration_option">Iterasi</string>
     <string name="emergency_option">SOS</string>
     <string name="permissions_option">Periksa Izin-izin</string>
+    <string name="category_type_pages">Halaman</string>
+    <string name="category_type_functions">Fungsi</string>
+    <string name="category_type_standards">Standar</string>
 
     <!--  Filename & Directory name  -->
 
@@ -104,6 +110,11 @@
     <string name="value_null"><i>null</i></string>
     <string name="value_unselected"><i>tidak terpilih</i></string>
 
+    <string name="reloading_save">Konfigurasi Dimuat Ulang</string>
+    <string name="save_error">Galat Menyimpan</string>
+    <string name="save_error_description">Galat ketika menyimpan</string>
+    <string name="save_success">Tersimpan</string>
+    <string name="error_unknown_reason">lah mboh</string>
     <string name="menu_home">Home</string>
     <string name="menu_gallery">Gallery</string>
     <string name="menu_slideshow">Slideshow</string>
@@ -204,10 +215,10 @@
         "Disklaimer\n\n"
 
         "Software ini dibuat dengan tujuan parodi. Apapun bentuk produk softwarenya baik itu"
-        ": sungguhan, palsu, atau usang; adalah kebetulan belaka dan dibuat2.\n\n"
+        ": sungguhan, palsu, atau usang; adalah kebetulan belaka dan di-buat2.\n\n"
 
         "Pembuatan produk ini tunduk terhadap tindakan satir, jadi tidak membenarkan ataupun menyinggung hal2 berupa"
-        "pencemaran nama baik, ledekan, ataupun ekposisi apapun itu (bahkan apabila terdapat beberapa string"
+        "pencemaran nama baik, ledekan, ataupun eksposisi apapun itu (bahkan apabila terdapat beberapa string"
         "yang tertulis demikian).\n\n"
     </string>
     <string name="permission_description">
@@ -237,4 +248,6 @@
     <string name="action_save">Simpan</string>
     <string name="action_delete">Hapus</string>
     <string name="action_open">Buka</string>
+    <string name="category_bar">Kategori</string>
+    <string name="category_bar_fill">Kategori %s</string>
 </resources>

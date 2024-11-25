@@ -1,6 +1,7 @@
 package com.perkedel.htlauncher.data
 
 import android.graphics.Color
+import com.perkedel.htlauncher.enumerations.ShowWhichIcon
 import com.perkedel.htlauncher.ui.theme.rememberColorScheme
 import kotlinx.serialization.Serializable
 
@@ -17,7 +18,7 @@ data class ItemData(
 
     // Customize
     var showLabel:Boolean = true, // Show the label
-    var showWhichIcon:Int = 0, // 0 = App Icon, 1 = TV Banner
+    var showWhichIcon:ShowWhichIcon = ShowWhichIcon.Default, // 0 = App Icon, 1 = TV Banner
     var textFillColor: String = "Black", // Color say of this label text
     var textOutlineColor: String = "White", // Color say of this label text stroke
 )

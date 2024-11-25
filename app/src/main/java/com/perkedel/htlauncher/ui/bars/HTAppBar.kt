@@ -63,6 +63,7 @@ fun HTAppBar(
     canNavigateBack: Boolean = false,
     navigateUp: () -> Unit = {},
     hideIt: Boolean = false,
+    hideMenuButton: Boolean = true,
     modifier: Modifier = Modifier,
     actions: @Composable() (RowScope.() -> Unit) = {},
     onMoreMenu: (() -> Unit)? = null,
@@ -107,11 +108,9 @@ fun HTAppBar(
             },
             actions = {
                 actions() // https://youtu.be/laL2lAts_Rc
-                if (onMoreMenu != null) {
+                if (onMoreMenu != null && !hideMenuButton) {
                     IconButton(
-                        onClick = {
-
-                        },
+                        onClick = onMoreMenu,
                     ) {
                         moreMenuIcon()
                     }

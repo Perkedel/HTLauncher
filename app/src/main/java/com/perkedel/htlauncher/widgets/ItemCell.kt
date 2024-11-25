@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.graphics.drawable.Drawable
 import android.net.Uri
+import android.speech.tts.TextToSpeech
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -26,6 +27,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -60,6 +62,8 @@ import com.perkedel.htlauncher.data.ItemData
 import com.perkedel.htlauncher.data.PageData
 import com.perkedel.htlauncher.getADirectory
 import com.perkedel.htlauncher.getATextFile
+import com.perkedel.htlauncher.modules.rememberTextToSpeech
+import com.perkedel.htlauncher.modules.ttsSpeakOrStop
 import com.perkedel.htlauncher.openATextFile
 import com.perkedel.htlauncher.ui.previews.HTPreviewAnnotations
 import com.perkedel.htlauncher.ui.theme.HTLauncherTheme
@@ -87,6 +91,7 @@ fun ItemCell(
         prettyPrint = true
         encodeDefaults = true
     },
+    tts: MutableState<TextToSpeech?> = rememberTextToSpeech(),
     onClick: (()->Unit)? = {},
     onLongClick: (()->Unit)? = {},
 ){
@@ -173,11 +178,15 @@ fun ItemCell(
                     }
                 },
                 onLongClick = {
+                    ttsSpeakOrStop(
+                        handover = tts,
+                        message = itemOfIt.aria,
+                    )
                     haptic.performHapticFeedback(HapticFeedbackType.LongPress)
                     Toast
                         .makeText(
                             context,
-                            "Long Click ${handoverText}",
+                            "Long Click ${itemOfIt.label}",
                             Toast.LENGTH_SHORT
                         )
                         .show()

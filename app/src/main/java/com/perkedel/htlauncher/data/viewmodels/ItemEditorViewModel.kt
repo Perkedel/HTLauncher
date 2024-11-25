@@ -4,6 +4,7 @@ package com.perkedel.htlauncher.data.viewmodels
 
 import android.content.ClipData.Item
 import android.net.Uri
+import android.os.Message
 import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
 import androidx.compose.material3.adaptive.navigation.ThreePaneScaffoldNavigator
 import androidx.compose.runtime.getValue
@@ -32,6 +33,10 @@ class ItemEditorViewModel:ViewModel() {
     var homeData: HomepagesWeHave? by mutableStateOf(null)
     var pageData: PageData? by mutableStateOf(null)
     var jsoning: Json? by mutableStateOf(null)
+
+    // Error
+    var errorOccured: Boolean? by mutableStateOf(false)
+    var errorMessage: String? by mutableStateOf("")
 
 //    var navigator: ThreePaneScaffoldNavigator<Any>? = null
     var hasGoBack:Boolean = false
@@ -84,5 +89,10 @@ class ItemEditorViewModel:ViewModel() {
             else -> {}
         }
 //        updateJsoning(json.decodeFromString(rawJson))
+    }
+
+    fun updateError(into: Boolean = false, message: String = ""){
+        this.errorMessage = message.ifEmpty { this.errorMessage }
+        this.errorOccured = into
     }
 }

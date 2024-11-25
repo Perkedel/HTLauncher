@@ -29,6 +29,7 @@
     <string name="action_delete">Delete</string>
     <string name="action_open">Open</string>
     <string name="action_load">Load</string>
+    <string name="action_retry">Retry</string>
 
     <!--  Home Screen  -->
     <string name="home_screen">Home</string>
@@ -72,6 +73,7 @@
     <string name="disclaimer_option_desc">Something to keep in mind</string>
     <string name="click_here_to_check_update_snippet">Click here to check update</string>
     <string name="donation_option">Donation</string>
+    <string name="donation_option_desc">You are already FULL VERSION</string>
     <string name="quick_start_option">Quick Start Guide</string>
     <string name="language_option">Languages</string>
     <string name="display_option">Display</string>
@@ -89,9 +91,15 @@
     <string name="save_dir_option">Change Configuration Folder Location</string>
     <string name="debug_test_option">[DEBUG] Test Json</string>
     <string name="About_option">About</string>
+    <string name="About_version_readout">HTLauncher is currently on %s iteration %d</string>
     <string name="iteration_option">Iteration</string>
     <string name="emergency_option">SOS</string>
     <string name="permissions_option">Check Permissions</string>
+    <string name="category_bar">Category</string>
+    <string name="category_bar_fill">Category %s</string>
+    <string name="category_type_pages">Pages</string>
+    <string name="category_type_functions">Functions</string>
+    <string name="category_type_standards">Standards</string>
 
 
     <!--  Filename & Directory name  -->
@@ -126,6 +134,11 @@
     <string name="action_settings">Settings</string>
     <string name="value_null"><i>null</i></string>
     <string name="value_unselected"><i>unselected</i></string>
+    <string name="reloading_save">Configuration Reloaded</string>
+    <string name="save_error">Save Werror</string>
+    <string name="save_error_description">Werror when saving</string>
+    <string name="save_success">Saved</string>
+    <string name="error_unknown_reason">idk why</string>
 
     <string name="menu_home">Home</string>
     <string name="menu_gallery">Gallery</string>

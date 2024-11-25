@@ -4,6 +4,7 @@ import android.content.ContentResolver
 import android.content.Context
 import android.content.pm.PackageManager
 import android.net.Uri
+import android.speech.tts.TextToSpeech
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
@@ -18,6 +19,7 @@ import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.hapticfeedback.HapticFeedback
 import androidx.compose.ui.platform.LocalContext
@@ -31,6 +33,7 @@ import com.perkedel.htlauncher.HTUIState
 import com.perkedel.htlauncher.HTViewModel
 import com.perkedel.htlauncher.R
 import com.perkedel.htlauncher.enumerations.EditWhich
+import com.perkedel.htlauncher.modules.rememberTextToSpeech
 import com.perkedel.htlauncher.ui.previews.HTPreviewAnnotations
 import com.perkedel.htlauncher.ui.theme.HTLauncherTheme
 import me.zhanghai.compose.preference.ProvidePreferenceLocals
@@ -56,6 +59,7 @@ fun LevelEditor(
     systemUiController: SystemUiController = rememberSystemUiController(),
     viewModel: HTViewModel = HTViewModel(),
     uiState: HTUIState = HTUIState(),
+    tts: MutableState<TextToSpeech?> = rememberTextToSpeech(),
 ){
     // https://fonts.google.com/icons?selected=Material+Symbols+Outlined:logout:FILL@0;wght@400;GRAD@0;opsz@24&icon.size=24&icon.color=%23e8eaed
     // https://developer.android.com/reference/kotlin/androidx/compose/material/icons/package-summary
@@ -80,7 +84,7 @@ fun LevelEditor(
                 key = "pages_editor",
                 title = { Text(text = stringResource(R.string.pages_folder_label) ) },
                 icon = { Icon(imageVector = Icons.Default.Pages, contentDescription = null) },
-                summary = { Text(text = "${uiState.pageList.size} ${context.resources.getQuantityString(R.plurals.pieces_units, uiState.pageList.size, uiState.pageList.size)}") },
+                summary = { Text(text = "${context.resources.getQuantityString(R.plurals.pieces_units, uiState.pageList.size, uiState.pageList.size)}") },
                 onClick = {
                     onEditWhat(EditWhich.Pages)
                 }
@@ -89,7 +93,7 @@ fun LevelEditor(
                 key = "items_editor",
                 title = { Text(text = stringResource(R.string.items_folder_label) ) },
                 icon = { Icon(imageVector = Icons.Default.Category, contentDescription = null) },
-                summary = { Text(text = "${uiState.itemList.size} ${context.resources.getQuantityString(R.plurals.pieces_units, uiState.itemList.size, uiState.itemList.size)}") },
+                summary = { Text(text = "${context.resources.getQuantityString(R.plurals.pieces_units, uiState.itemList.size, uiState.itemList.size)}") },
                 onClick = {
                     onEditWhat(EditWhich.Items)
                 }

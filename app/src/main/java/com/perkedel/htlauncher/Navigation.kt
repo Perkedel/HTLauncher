@@ -19,8 +19,8 @@ import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.net.Uri
 import android.os.Build
-import android.os.Parcelable
 import android.provider.Settings
+import android.speech.tts.TextToSpeech
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -30,7 +30,6 @@ import androidx.compose.animation.core.tween
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
@@ -62,7 +61,6 @@ import androidx.compose.ui.tooling.preview.PreviewDynamicColors
 import androidx.compose.ui.tooling.preview.PreviewFontScale
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
-import androidx.compose.ui.unit.sp
 import androidx.core.app.ActivityCompat.shouldShowRequestPermissionRationale
 import androidx.core.content.pm.PackageInfoCompat
 import androidx.datastore.core.DataStore
@@ -74,16 +72,12 @@ import androidx.documentfile.provider.DocumentFile
 import androidx.lifecycle.ViewModel
 import com.google.accompanist.systemuicontroller.SystemUiController
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
-import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
-import com.perkedel.htlauncher.data.HomepagesWeHave
-import com.perkedel.htlauncher.data.ItemData
-import com.perkedel.htlauncher.data.PageData
 import com.perkedel.htlauncher.data.TestJsonData
 import com.perkedel.htlauncher.enumerations.ConfigSelected
 import com.perkedel.htlauncher.enumerations.EditWhich
 import com.perkedel.htlauncher.enumerations.Screen
 import com.perkedel.htlauncher.func.createDataStore
+import com.perkedel.htlauncher.modules.rememberTextToSpeech
 import com.perkedel.htlauncher.ui.activities.ItemEditorActivity
 //import androidx.wear.compose.material3.ScaffoldState
 import com.perkedel.htlauncher.ui.dialog.HomeMoreMenu
@@ -102,21 +96,13 @@ import com.perkedel.htlauncher.ui.navigation.LevelEditor
 import com.perkedel.htlauncher.ui.theme.HTLauncherTheme
 import com.perkedel.htlauncher.ui.theme.rememberColorScheme
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
-import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.decodeFromJsonElement
-import kotlinx.serialization.json.encodeToJsonElement
-import kotlinx.serialization.json.jsonObject
 import java.io.BufferedReader
 import java.io.IOException
 import java.io.InputStreamReader
-import kotlin.math.log
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -144,6 +130,7 @@ fun Navigation(
         prettyPrint = true
         encodeDefaults = true
     },
+    tts: MutableState<TextToSpeech?> = rememberTextToSpeech(),
 ){
     var homePagerState: PagerState = rememberPagerState(pageCount = {10})
 
@@ -581,9 +568,27 @@ fun Navigation(
                         else -> null
                     },
                     canNavigateBack = navController.previousBackStackEntry != null,
-                    navigateUp = { navController.navigateUp() },
+                    navigateUp = {
+//                        if(navController.previousBackStackEntry?. == true){
+//
+//                        }
+                        navController.navigateUp()
+                    },
                     //                hideIt = hideTopBar
-                    hideIt = navController.previousBackStackEntry == null && htuiState.isReady
+                    hideIt = navController.previousBackStackEntry == null && htuiState.isReady,
+                    hideMenuButton = when(currentScreen){
+                        Screen.HomeScreen -> false
+                        else -> true
+                    },
+                    onMoreMenu = {
+                        when{
+                            currentScreen == Screen.HomeScreen && !htuiState.isReady -> {
+                                anViewModel.openTheMoreMenu(true)
+                            }
+
+                            else -> null
+                        }
+                    }
                 )
             },
             containerColor = Color.Transparent,
@@ -654,6 +659,7 @@ fun Navigation(
                         uiState = htuiState,
                         coroutineScope = coroutineScope,
                         isReady = htuiState.isReady,
+                        tts = tts,
                     )
 
                     LaunchedEffect(true) {
@@ -733,6 +739,7 @@ fun Navigation(
                             }
                         },
                         systemUiController = systemUiController,
+                        tts = tts,
                     )
                 }
                 composable(route = Screen.ConfigurationScreen.name,
@@ -764,6 +771,25 @@ fun Navigation(
                     val attemptChangeSaveDir = remember { mutableStateOf(false) }
                     val attemptPermission = remember { mutableStateOf(false) }
                     val areYouSureChangeSaveDir = remember { mutableStateOf(false) }
+                    LaunchedEffect(htuiState.editingLevel) {
+                        if(htuiState.editingLevel){
+                            anViewModel.preloadFiles(
+                                context = context,
+                                contentResolver = saveDirResolver,
+                                uiStating = htuiState,
+                                listOfFolder = listOfFolder,
+                                folders = folders,
+                                json = json,
+                                force = true,
+                            )
+                            coroutineScope.launch {
+                                snackbarHostState.showSnackbar(
+                                    message = context.resources.getString(R.string.reloading_save)
+                                )
+                            }
+                            anViewModel.setEditingLevel(false)
+                        }
+                    }
                     Configurationing(
                         navController = navController,
                         context = context,
@@ -805,6 +831,7 @@ fun Navigation(
                         systemUiController = systemUiController,
                         uiState = htuiState,
                         viewModel = anViewModel,
+                        tts = tts,
                     )
                     if(attemptChangeSaveDir.value) {
                         if (htuiState.selectedSaveDir != null && htuiState.selectedSaveDir.toString().isNotEmpty()) {
@@ -842,6 +869,7 @@ fun Navigation(
                                 areYouSureChangeSaveDir.value = false
                                 attemptChangeSaveDir.value = false
                             },
+                            tts = tts,
                         ){
                             val decompose = stringResource(R.string.value_unselected)
                             val say = remember {  if (htuiState.selectedSaveDir != null && htuiState.selectedSaveDir.toString()
@@ -891,7 +919,8 @@ fun Navigation(
                             },
                             onDismissRequest = {
                                 attemptPermission.value = false
-                            }
+                            },
+                            tts = tts,
                         )
                     } else {
 //                        attemptPermission.value = false
@@ -970,6 +999,7 @@ fun Navigation(
                         versionName = versionName,
                         versionNumber = versionNumber,
                         systemUiController = systemUiController,
+                        tts = tts,
                     )
                 }
                 composable(route = Screen.LevelEditor.name,
@@ -998,6 +1028,13 @@ fun Navigation(
                         )
                     }
                     ) {
+                    LaunchedEffect(htuiState.editingLevel) {
+//                        if(!htuiState.editingLevel && currentScreen == Screen.LevelEditor){
+//
+//                            anViewModel.setEditingLevel(true)
+//                        }
+                    }
+
                     LevelEditor(
                         navController = navController,
                         context = context,
@@ -1034,6 +1071,10 @@ fun Navigation(
                                 navController.navigate(Screen.ItemsExplorer.name)
                             } else {
                                 if(htuiState.selectedSaveDir != null) {
+                                    if (!htuiState.editingLevel && currentScreen == Screen.LevelEditor) {
+
+                                        anViewModel.setEditingLevel(true)
+                                    }
                                     var toIntent = Intent(
                                         context, ItemEditorActivity::class.java
                                     )
@@ -1060,9 +1101,12 @@ fun Navigation(
                                         context = context,
                                         what = toIntent
                                     )
+
+
                                 }
                             }
-                        }
+                        },
+                        tts = tts,
                     )
                 }
                 composable(Screen.ItemsExplorer.name,
@@ -1124,6 +1168,10 @@ fun Navigation(
                             // https://youtu.be/2hIY1xuImuQ
                             Log.d("ItemExplorer", "To Edit ${editType.name} ${filename}")
                             if(htuiState.selectedSaveDir != null) {
+                                if (!htuiState.editingLevel && currentScreen == Screen.LevelEditor) {
+
+                                    anViewModel.setEditingLevel(true)
+                                }
                                 var toIntent = Intent(
                                     context, ItemEditorActivity::class.java
                                 )
@@ -1159,9 +1207,12 @@ fun Navigation(
                                     context = context,
                                     what = toIntent
                                 )
+
+
                             }
                         },
-                        exploreType = htuiState.toEditWhatFile
+                        exploreType = htuiState.toEditWhatFile,
+                        tts = tts,
                     )
                 }
             }

@@ -6,6 +6,7 @@ package com.perkedel.htlauncher.ui.dialog
 
 import android.content.Context
 import android.graphics.drawable.Icon
+import android.speech.tts.TextToSpeech
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -28,6 +29,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -47,6 +49,7 @@ import androidx.compose.ui.unit.sp
 import com.perkedel.htlauncher.R
 import com.perkedel.htlauncher.enumerations.ButtonTypes
 import com.perkedel.htlauncher.enumerations.ThirdButtonPosition
+import com.perkedel.htlauncher.modules.rememberTextToSpeech
 import com.perkedel.htlauncher.ui.bars.HTAppBar
 import com.perkedel.htlauncher.ui.previews.DialogPreviewKind
 import com.perkedel.htlauncher.ui.previews.DialogPreviewParameter
@@ -88,6 +91,8 @@ fun HTAlertDialog(
     onDismissRequest: () -> Unit = {},
     onConfirm: () -> Unit = {},
     onThirdButton: () -> Unit = {}, // onSecondThought
+
+    tts: MutableState<TextToSpeech?> = rememberTextToSpeech(),
 
     content: @Composable () -> Unit = {},
 ){

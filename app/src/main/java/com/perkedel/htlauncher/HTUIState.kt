@@ -25,6 +25,7 @@ data class HTUIState(
 //    val testJsonElement:JsonElement = Json.parseToJsonElement(string = "{ \"test\" \n: \"HUAHAHU\" }"),
     val testJsonElement:TestJsonData = TestJsonData(),
     val testPreloadAll:Boolean = true,
+    val editingLevel:Boolean = false,
     val coreConfig:Uri? = null,
     val coreConfigJson:HomepagesWeHave? = null,
     // https://www.baeldung.com/kotlin/maps

@@ -1,5 +1,6 @@
 package com.perkedel.htlauncher.data
 
+import com.perkedel.htlauncher.enumerations.ActionDataLaunchType
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -10,7 +11,7 @@ data class ActionData(// Items will do something out of these:
         "",
         "",
     ), // Arguments of it this
-    val type:String = "", //Type of this action.
+    val type:ActionDataLaunchType = ActionDataLaunchType.LauncherActivity, //Type of this action.
 
     /*
     * Types of Actions possible

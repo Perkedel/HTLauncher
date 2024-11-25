@@ -7,6 +7,7 @@ import android.content.res.Configuration
 import android.content.res.Resources
 import android.net.Uri
 import android.os.Build
+import android.speech.tts.TextToSpeech
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.combinedClickable
@@ -36,6 +37,7 @@ import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
@@ -65,6 +67,7 @@ import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.perkedel.htlauncher.R
 import com.perkedel.htlauncher.func.WindowInfo
 import com.perkedel.htlauncher.func.rememberWindowInfo
+import com.perkedel.htlauncher.modules.rememberTextToSpeech
 import com.perkedel.htlauncher.startIntent
 import com.perkedel.htlauncher.ui.dialog.HTAlertDialog
 import com.perkedel.htlauncher.ui.previews.HTPreviewAnnotations
@@ -93,6 +96,7 @@ fun AboutTerms(
     versionNumber:Long = 0,
     onReadTerms: () -> Unit = {},
     onReadDisclaimer: () -> Unit = {},
+    tts: MutableState<TextToSpeech?> = rememberTextToSpeech(),
 ){
     ProvidePreferenceLocals {
         val windowInfo = rememberWindowInfo()
@@ -123,7 +127,8 @@ fun AboutTerms(
                         context = context,
                         pm = pm,
                     )
-                }
+                },
+                tts = tts,
             )
         } else {
             Row(
@@ -151,7 +156,8 @@ fun AboutTerms(
                     versionName = versionName,
                     onReadTerms = onReadTerms,
                     onReadDisclaimer = onReadDisclaimer,
-                    systemUiController = systemUiController
+                    systemUiController = systemUiController,
+                    tts = tts,
                 )
             }
         }

@@ -8,6 +8,7 @@ import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.net.Uri
 import android.os.Build
+import android.speech.tts.TextToSpeech
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
@@ -26,10 +27,12 @@ import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.hapticfeedback.HapticFeedback
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
@@ -46,6 +49,8 @@ import androidx.navigation.compose.rememberNavController
 import com.google.accompanist.systemuicontroller.SystemUiController
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.perkedel.htlauncher.R
+import com.perkedel.htlauncher.modules.rememberTextToSpeech
+import com.perkedel.htlauncher.modules.ttsSpeakOrStop
 import com.perkedel.htlauncher.startIntent
 import com.perkedel.htlauncher.ui.navigation.AboutTerms
 import com.perkedel.htlauncher.ui.theme.HTLauncherTheme
@@ -72,6 +77,7 @@ fun AboutTermsOptions(
     onReadTerms: () -> Unit = {},
     onReadDisclaimer: () -> Unit = {},
     addThese: @Composable ()->Unit = {},
+    tts: MutableState<TextToSpeech?> = rememberTextToSpeech(),
 ){
     LazyColumn(
         modifier = modifier,
@@ -154,7 +160,11 @@ fun AboutTermsOptions(
 
                         },
                         onLongClick = {
-
+                            ttsSpeakOrStop(
+                                handover = tts,
+                                message = context.resources.getString(R.string.disclaimer_full)
+                            )
+                            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
                         }
                     )
             ) {

@@ -3,11 +3,15 @@ package com.perkedel.htlauncher.ui.navigation
 import androidx.compose.foundation.gestures.rememberScrollableState
 import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Card
+import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -16,13 +20,19 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.perkedel.htlauncher.data.ActionData
 import com.perkedel.htlauncher.data.ItemData
 import com.perkedel.htlauncher.data.viewmodels.ItemEditorViewModel
+import com.perkedel.htlauncher.enumerations.ShowWhichIcon
 import com.perkedel.htlauncher.ui.previews.HTPreviewAnnotations
 import com.perkedel.htlauncher.ui.theme.HTLauncherTheme
+import com.perkedel.htlauncher.ui.theme.rememberColorScheme
+import com.perkedel.htlauncher.widgets.ActionDataBox
+import com.perkedel.htlauncher.widgets.HTButton
 import com.perkedel.htlauncher.widgets.ItemCell
 
 @Composable
@@ -33,8 +43,29 @@ fun EditItemData(
 
     ){
     val toChange by remember { mutableStateOf(data) }
-    var label by remember { mutableStateOf(toChange?.label ?: "") }
-    var aria by remember { mutableStateOf(toChange?.aria ?: "") }
+    var name by remember { mutableStateOf(data?.name ?: "anItem") }
+    var label by remember { mutableStateOf(data?.label ?: "") }
+    var aria by remember { mutableStateOf(data?.aria ?: "") }
+    var imagePath by remember { mutableStateOf(data?.imagePath ?: "") }
+    var action by remember { mutableStateOf(data?.action ?: emptyList<ActionData>()) }
+    var showLabel by remember { mutableStateOf(data?.showLabel ?: false) }
+    var showWhichIcon by remember { mutableStateOf(data?.showWhichIcon ?: ShowWhichIcon.Default) }
+
+    val rebuildNow: ()->Unit = {
+        rebuildItemData(
+            with = ItemData(
+                name = name,
+                label = label,
+                aria = aria,
+                imagePath = imagePath,
+                action = action,
+                showLabel = showLabel,
+                showWhichIcon = showWhichIcon,
+            ),
+            viewModel = viewModel
+        )
+    }
+
     Column(
         modifier = Modifier.verticalScroll(rememberScrollState())
     ) {
@@ -55,14 +86,7 @@ fun EditItemData(
                     label = it
                     toChange?.label = it
                     viewModel.itemData?.label = it
-                    rebuildItemData(
-                        with = ItemData(
-                            name = toChange?.name ?: "",
-                            label = label,
-                            aria = aria,
-                        ),
-                        viewModel = viewModel
-                    )
+                    rebuildNow()
                 }
             )
             OutlinedTextField(
@@ -78,16 +102,45 @@ fun EditItemData(
                     aria = it
 //                    toChange?.aria = it
                     viewModel.itemData?.aria = it
-                    rebuildItemData(
-                        with = ItemData(
-                            name = toChange?.name ?: "",
-                            label = label,
-                            aria = aria,
-                        ),
-                        viewModel = viewModel
-                    )
+                    rebuildNow()
                 }
             )
+
+            // Actions
+
+            OutlinedCard(
+
+            ) {
+                Column(
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(
+                        text = "Actions"
+                    )
+                    Row(
+                        modifier = Modifier.align(Alignment.End)
+                    ) {
+                        HTButton(
+                            title = "Add",
+                            leftIcon = Icons.Default.Add
+                        )
+                    }
+//                    ActionDataBox(
+//                        id = 4,
+//                        actionData = ActionData()
+//                    )
+                    repeat(
+                        times = viewModel.itemData?.action?.size ?: 0,
+                        action = {id ->
+                            ActionDataBox(
+                                id = id,
+                                actionData = viewModel.itemData?.action?.get(id) ?: ActionData()
+                            )
+                        }
+                    )
+                }
+            }
+
 
             Card(
                 modifier = Modifier.padding(16.dp)

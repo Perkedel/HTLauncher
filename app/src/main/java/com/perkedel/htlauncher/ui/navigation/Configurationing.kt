@@ -1,18 +1,15 @@
-@file:OptIn(ExperimentalFoundationApi::class, ExperimentalFoundationApi::class)
+@file:OptIn(ExperimentalFoundationApi::class, ExperimentalFoundationApi::class,
+    ExperimentalFoundationApi::class, ExperimentalFoundationApi::class
+)
 
 package com.perkedel.htlauncher.ui.navigation
 
 import android.content.ContentResolver
 import android.content.Context
-import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
-import android.os.Build
-import android.provider.DocumentsContract
+import android.speech.tts.TextToSpeech
 import android.widget.Toast
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.ActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
@@ -20,10 +17,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListScope
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Accessibility
 import androidx.compose.material.icons.filled.Apps
-import androidx.compose.material.icons.filled.Balance
 import androidx.compose.material.icons.filled.Book
 import androidx.compose.material.icons.filled.Contacts
 import androidx.compose.material.icons.filled.DisplaySettings
@@ -47,22 +45,13 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.hapticfeedback.HapticFeedback
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.tooling.preview.PreviewDynamicColors
-import androidx.compose.ui.tooling.preview.PreviewFontScale
-import androidx.compose.ui.tooling.preview.PreviewLightDark
-import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.compose.ui.unit.dp
-import androidx.core.app.ActivityCompat.startActivityForResult
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.google.accompanist.systemuicontroller.SystemUiController
@@ -71,6 +60,8 @@ import com.perkedel.htlauncher.HTUIState
 import com.perkedel.htlauncher.HTViewModel
 import com.perkedel.htlauncher.R
 import com.perkedel.htlauncher.enumerations.ConfigSelected
+import com.perkedel.htlauncher.modules.rememberTextToSpeech
+import com.perkedel.htlauncher.modules.ttsSpeak
 import com.perkedel.htlauncher.ui.previews.HTPreviewAnnotations
 import com.perkedel.htlauncher.ui.theme.HTLauncherTheme
 import com.perkedel.htlauncher.ui.theme.rememberColorScheme
@@ -78,7 +69,6 @@ import me.zhanghai.compose.preference.ProvidePreferenceLocals
 import me.zhanghai.compose.preference.footerPreference
 import me.zhanghai.compose.preference.listPreference
 import me.zhanghai.compose.preference.preference
-import java.net.URI
 
 //import com.perkedel.htlauncher.BuildConfig
 
@@ -97,12 +87,13 @@ fun Configurationing(
     onClickVersion:() -> Unit = {/* GO TO ABOUT SCREEN*/},
     saveDirResult: Uri? = null,
     testTextResult:String = "",
-    onOpenTextFile: ((uri:Uri,contentResolver:ContentResolver)->Unit)? = {uri,contentResolver -> {}},
+    onOpenTextFile: ((uri:Uri, contentResolver:ContentResolver)->Unit)? = { uri, contentResolver -> {}},
     versionName:String = "XXXX.XX.XX",
     versionNumber:Long = 0,
     systemUiController: SystemUiController = rememberSystemUiController(),
     viewModel:HTViewModel = HTViewModel(),
     uiState: HTUIState = HTUIState(),
+    tts: MutableState<TextToSpeech?> = rememberTextToSpeech(),
 ){
     // https://www.geeksforgeeks.org/how-to-get-the-build-version-number-of-an-android-application-using-jetpack-compose/
     // https://composeexamples.com/components/application-ui/screens/settings
@@ -114,6 +105,7 @@ fun Configurationing(
     // https://medium.com/@yogesh_shinde/implementing-image-video-documents-picker-in-jetpack-compose-73ef846cfffb
     // https://composables.com/jetpack-compose-tutorials/activityresultcontract
     // https://developer.android.com/reference/androidx/activity/result/contract/ActivityResultContracts.OpenDocumentTree
+    // https://serge-hulne.medium.com/how-to-do-text-to-speech-the-easy-way-with-android-kotlin-compose-2024-628015d4c5c2
 //    val saveDirResult = remember { mutableStateOf<Uri?>(null) }
 //    val saveDirLauncher = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocumentTree()) { dirUri ->
 //        if (dirUri != null){
@@ -125,22 +117,63 @@ fun Configurationing(
 //            println("No Save Dir Selected")
 //        }
 //    }
+//    rememberLazyListState()
+//    PivotOffsets()
+//    LazyColumn(
+//        modifier = Modifier,
+//        contentPadding = PaddingValues(0.dp),
+//        reverseLayout = false,
+//        verticalArrangement = if (!reverseLayout) Arrangement.Top else Arrangement.Bottom,
+//        horizontalAlignment = Alignment.Start,
+//        userScrollEnabled = true
+//    ) { }
+
 
     ProvidePreferenceLocals {
+        val lazyListState = rememberLazyListState()
         LazyColumn(
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier.fillMaxSize(),
+            reverseLayout = false,
+//            horizontalAlignment = Alignment.Start,
+            userScrollEnabled = true,
         ) {
             // Yoink Big Launcher!!!
             preference(
+                modifier = Modifier
+                    .combinedClickable(
+                        onClick = {},
+                        onLongClick = {
+                            ttsSpeak(
+                                handover = tts,
+                                message = "${context.resources.getString(R.string.donation_option)}. ${context.resources.getString(R.string.donation_option_desc)}"
+                            )
+                            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                        },
+                        onLongClickLabel = context.resources.getString(R.string.quick_start_option),
+                    )
+                ,
                 key = "Activation_License",
                 title = { Text(text = stringResource(R.string.donation_option) ) },
                 icon = { Icon(imageVector = Icons.Default.ShoppingCart, contentDescription = null) },
-                summary = { Text(text = "You are already FULL VERSION.") },
+                summary = { Text(text = stringResource(R.string.donation_option_desc)) },
                 onClick = {
 
                 }
             )
             preference(
+                modifier = Modifier
+                    .combinedClickable(
+                        onClick = {},
+                        onLongClick = {
+                            ttsSpeak(
+                                handover = tts,
+                                message = "${context.resources.getString(R.string.quick_start_option)}. ${""}"
+                            )
+                            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                        },
+                        onLongClickLabel = context.resources.getString(R.string.quick_start_option),
+                    )
+                ,
                 key = "quick_start",
                 title = { Text(text = stringResource(R.string.quick_start_option) ) },
                 icon = { Icon(imageVector = Icons.Default.Info, contentDescription = null) },
@@ -157,6 +190,19 @@ fun Configurationing(
                 summary = { Text(text = it) },
             )
             preference(
+                modifier = Modifier
+                    .combinedClickable(
+                        onClick = {},
+                        onLongClick = {
+                            ttsSpeak(
+                                handover = tts,
+                                message = "${context.resources.getString(R.string.display_option)}. ${""}"
+                            )
+                            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                        },
+                        onLongClickLabel = context.resources.getString(R.string.display_option),
+                    )
+                ,
                 key = "display",
                 title = { Text(text = stringResource(R.string.display_option) ) },
                 icon = { Icon(imageVector = Icons.Default.DisplaySettings, contentDescription = null) },
@@ -164,6 +210,19 @@ fun Configurationing(
                 }
             )
             preference(
+                modifier = Modifier
+                    .combinedClickable(
+                        onClick = {},
+                        onLongClick = {
+                            ttsSpeak(
+                                handover = tts,
+                                message = "${context.resources.getString(R.string.a11y_option)}. ${""}"
+                            )
+                            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                        },
+                        onLongClickLabel = context.resources.getString(R.string.a11y_option),
+                    )
+                ,
                 key = "accessibility",
                 title = { Text(text = stringResource(R.string.a11y_option) ) },
                 icon = { Icon(imageVector = Icons.Default.Accessibility, contentDescription = null) },
@@ -171,6 +230,19 @@ fun Configurationing(
                 }
             )
             preference(
+                modifier = Modifier
+                    .combinedClickable(
+                        onClick = {},
+                        onLongClick = {
+                            ttsSpeak(
+                                handover = tts,
+                                message = "${context.resources.getString(R.string.menus_option)}. ${""}"
+                            )
+                            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                        },
+                        onLongClickLabel = context.resources.getString(R.string.menus_option),
+                    )
+                ,
                 key = "menu_setting",
                 title = { Text(text = stringResource(R.string.menus_option) ) },
                 icon = { Icon(imageVector = Icons.Default.SettingsInputComponent, contentDescription = null) },
@@ -185,10 +257,23 @@ fun Configurationing(
 //                    modifier = Modifier.padding(vertical = 12.dp)
 //                )
                 SettingCategoryBar(
-                    title = "Pages"
+                    title = stringResource(R.string.category_type_pages)
                 )
             }
             preference(
+                modifier = Modifier
+                    .combinedClickable(
+                        onClick = {},
+                        onLongClick = {
+                            ttsSpeak(
+                                handover = tts,
+                                message = "${context.resources.getString(R.string.level_editor_option)}. ${""}"
+                            )
+                            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                        },
+                        onLongClickLabel = context.resources.getString(R.string.level_editor_option),
+                    )
+                ,
                 key = "edit",
                 title = { Text(text = stringResource(R.string.level_editor_option) ) },
                 icon = { Icon(imageVector = Icons.Default.Edit, contentDescription = null) },
@@ -197,6 +282,19 @@ fun Configurationing(
                 }
             )
             preference(
+                modifier = Modifier
+                    .combinedClickable(
+                        onClick = {},
+                        onLongClick = {
+                            ttsSpeak(
+                                handover = tts,
+                                message = "${context.resources.getString(R.string.items_pages_option)}. ${""}"
+                            )
+                            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                        },
+                        onLongClickLabel = context.resources.getString(R.string.items_pages_option),
+                    )
+                ,
                 key = "items_setting",
                 title = { Text(text = stringResource(R.string.items_pages_option) ) },
                 icon = { Icon(imageVector = Icons.Default.Pages, contentDescription = null) },
@@ -210,10 +308,23 @@ fun Configurationing(
 //                    modifier = Modifier.padding(vertical = 12.dp)
 //                )
                 SettingCategoryBar(
-                    title = "Functions"
+                    title = stringResource(R.string.category_type_functions),
                 )
             }
             preference(
+                modifier = Modifier
+                    .combinedClickable(
+                        onClick = {},
+                        onLongClick = {
+                            ttsSpeak(
+                                handover = tts,
+                                message = "${context.resources.getString(R.string.contacts_option)}. ${""}"
+                            )
+                            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                        },
+                        onLongClickLabel = context.resources.getString(R.string.contacts_option),
+                    )
+                ,
                 key = "contacts_setting",
                 title = { Text(text = stringResource(R.string.contacts_option) ) },
                 icon = { Icon(imageVector = Icons.Default.Contacts, contentDescription = null) },
@@ -221,6 +332,19 @@ fun Configurationing(
                 }
             )
             preference(
+                modifier = Modifier
+                    .combinedClickable(
+                        onClick = {},
+                        onLongClick = {
+                            ttsSpeak(
+                                handover = tts,
+                                message = "${context.resources.getString(R.string.telephone_option)}. ${""}"
+                            )
+                            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                        },
+                        onLongClickLabel = context.resources.getString(R.string.telephone_option),
+                    )
+                ,
                 key = "telephone_setting",
                 title = { Text(text = stringResource(R.string.telephone_option) ) },
                 icon = { Icon(imageVector = Icons.Default.Phone, contentDescription = null) },
@@ -228,6 +352,19 @@ fun Configurationing(
                 }
             )
             preference(
+                modifier = Modifier
+                    .combinedClickable(
+                        onClick = {},
+                        onLongClick = {
+                            ttsSpeak(
+                                handover = tts,
+                                message = "${context.resources.getString(R.string.messages_option)}. ${""}"
+                            )
+                            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                        },
+                        onLongClickLabel = context.resources.getString(R.string.messages_option),
+                    )
+                ,
                 key = "sms_setting",
                 title = { Text(text = stringResource(R.string.messages_option) ) },
                 icon = { Icon(imageVector = Icons.Default.Sms, contentDescription = null) },
@@ -235,6 +372,19 @@ fun Configurationing(
                 }
             )
             preference(
+                modifier = Modifier
+                    .combinedClickable(
+                        onClick = {},
+                        onLongClick = {
+                            ttsSpeak(
+                                handover = tts,
+                                message = "${context.resources.getString(R.string.emergency_option)}. ${""}"
+                            )
+                            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                        },
+                        onLongClickLabel = context.resources.getString(R.string.emergency_option),
+                    )
+                ,
                 key = "sos_setting",
                 title = { Text(text = stringResource(R.string.emergency_option) ) },
                 icon = { Icon(imageVector = Icons.Default.Sos, contentDescription = null) },
@@ -242,6 +392,19 @@ fun Configurationing(
                 }
             )
             preference(
+                modifier = Modifier
+                    .combinedClickable(
+                        onClick = {},
+                        onLongClick = {
+                            ttsSpeak(
+                                handover = tts,
+                                message = "${context.resources.getString(R.string.apps_option)}. ${""}"
+                            )
+                            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                        },
+                        onLongClickLabel = context.resources.getString(R.string.apps_option),
+                    )
+                ,
                 key = "apps_setting",
                 title = { Text(text = stringResource(R.string.apps_option) ) },
                 icon = { Icon(imageVector = Icons.Default.Apps, contentDescription = null) },
@@ -255,10 +418,23 @@ fun Configurationing(
 //                    modifier = Modifier.padding(vertical = 12.dp)
 //                )
                 SettingCategoryBar(
-                    title = "Standards"
+                    title = stringResource(R.string.category_type_standards)
                 )
             }
             preference(
+                modifier = Modifier
+                    .combinedClickable(
+                        onClick = {},
+                        onLongClick = {
+                            ttsSpeak(
+                                handover = tts,
+                                message = "${context.resources.getString(R.string.compatibility_option)}. ${""}"
+                            )
+                            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                        },
+                        onLongClickLabel = context.resources.getString(R.string.compatibility_option),
+                    )
+                ,
                 key = "compatibility_setting",
                 title = { Text(text = stringResource(R.string.compatibility_option) ) },
                 icon = { Icon(imageVector = Icons.Default.Error, contentDescription = null) },
@@ -274,6 +450,19 @@ fun Configurationing(
 //                }
 //            )
             preference(
+                modifier = Modifier
+                    .combinedClickable(
+                        onClick = {},
+                        onLongClick = {
+                            ttsSpeak(
+                                handover = tts,
+                                message = "${context.resources.getString(R.string.remove_default_option)}. ${""}"
+                            )
+                            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                        },
+                        onLongClickLabel = context.resources.getString(R.string.remove_default_option),
+                    )
+                ,
                 key = "remove_default",
                 title = { Text(text = stringResource(R.string.remove_default_option) ) },
                 icon = { Icon(imageVector = Icons.Default.Restore, contentDescription = null) },
@@ -281,6 +470,19 @@ fun Configurationing(
                 }
             )
             preference(
+                modifier = Modifier
+                    .combinedClickable(
+                        onClick = {},
+                        onLongClick = {
+                            ttsSpeak(
+                                handover = tts,
+                                message = "${context.resources.getString(R.string.manual_option)}. ${""}"
+                            )
+                            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                        },
+                        onLongClickLabel = context.resources.getString(R.string.manual_option),
+                    )
+                ,
                 key = "manual",
                 title = { Text(text = stringResource(R.string.manual_option) ) },
                 icon = { Icon(imageVector = Icons.Default.Book, contentDescription = null) },
@@ -288,6 +490,19 @@ fun Configurationing(
                 }
             )
             preference(
+                modifier = Modifier
+                    .combinedClickable(
+                        onClick = {},
+                        onLongClick = {
+                            ttsSpeak(
+                                handover = tts,
+                                message = "${context.resources.getString(R.string.permissions_option)}. ${""}"
+                            )
+                            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                        },
+                        onLongClickLabel = context.resources.getString(R.string.permissions_option),
+                    )
+                ,
                 key = "check_permission",
                 title = { Text(text = stringResource(R.string.permissions_option) ) },
                 summary = {
@@ -298,6 +513,19 @@ fun Configurationing(
                 onClick = onCheckPermission
             )
             preference(
+                modifier = Modifier
+                    .combinedClickable(
+                        onClick = {},
+                        onLongClick = {
+                            ttsSpeak(
+                                handover = tts,
+                                message = "${context.resources.getString(R.string.save_dir_option)}. ${""}"
+                            )
+                            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                        },
+                        onLongClickLabel = context.resources.getString(R.string.save_dir_option),
+                    )
+                ,
                 key = "save_location",
                 title = { Text(text = stringResource(R.string.save_dir_option) ) },
                 summary = {
@@ -308,6 +536,19 @@ fun Configurationing(
                 onClick = onChooseSaveDir
             )
             preference(
+                modifier = Modifier
+                    .combinedClickable(
+                        onClick = {},
+                        onLongClick = {
+                            ttsSpeak(
+                                handover = tts,
+                                message = "${context.resources.getString(R.string.debug_test_option)}. ${""}"
+                            )
+                            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                        },
+                        onLongClickLabel = context.resources.getString(R.string.debug_test_option),
+                    )
+                ,
                 key = "debug_testJson",
                 title = { Text(text = stringResource(R.string.debug_test_option) ) },
                 summary = {
@@ -315,7 +556,7 @@ fun Configurationing(
                     Text(text = "Selected file content:\n${testTextResult}" )
                 },
                 icon = { Icon(imageVector = Icons.Default.Star, contentDescription = null) },
-                onClick = onChooseTextFile
+                onClick = onChooseTextFile,
             )
 
             footerPreference(
@@ -326,22 +567,46 @@ fun Configurationing(
                     .combinedClickable(
                         onClick = onClickVersion,
                         onLongClick = {
+                            ttsSpeak(
+                                handover = tts,
+                                message = context.resources.getString(R.string.About_version_readout, versionName, versionNumber)
+                            )
                             haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                            Toast.makeText(context,"HELLO A", Toast.LENGTH_SHORT).show()
-                        }
+//                            Toast.makeText(context,"HELLO A", Toast.LENGTH_SHORT).show()
+                        },
+                        onLongClickLabel = context.resources.getString(R.string.About_version_readout, versionName, versionNumber)
                     )
             )
         }
     }
 }
 
+//fun HTpreference(
+//    key: String,
+//    title: @Composable () -> Unit,
+//    modifier: Modifier = Modifier.fillMaxWidth(),
+//    enabled: Boolean = true,
+//    icon: @Composable (() -> Unit)? = null,
+//    summary: @Composable (() -> Unit)? = null,
+//    widgetContainer: @Composable (() -> Unit)? = null,
+//    onClick: (() -> Unit)? = null,
+//    onLongClick: (()-> Unit)? = null,
+//){
+//    // filter the zhanghai preference item
+//
+//}
+
 @Composable
 fun SettingCategoryBar(
     title:String = "",
     modifier: Modifier = Modifier,
     haptic: HapticFeedback = LocalHapticFeedback.current,
+    context: Context = LocalContext.current,
+    tts: MutableState<TextToSpeech?> = rememberTextToSpeech(),
     icon: @Composable() (() -> Unit?)? = null,
 ){
+    val readout:String = stringResource(R.string.category_bar_fill, title)
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -350,10 +615,15 @@ fun SettingCategoryBar(
 
                 },
                 onLongClick = {
-                    // TODO: Talkback read this title!
+                    // DONE: Talkback read this title!
+                    ttsSpeak(
+                        handover = tts,
+                        message = readout
+                    )
+                    Toast.makeText(context,readout,Toast.LENGTH_SHORT)
                     haptic.performHapticFeedback(HapticFeedbackType.LongPress)
                 },
-                onClickLabel = "Category `${title}`"
+                onClickLabel = readout
             )
         ,
     ) {
@@ -362,7 +632,7 @@ fun SettingCategoryBar(
             Box(
                 modifier = Modifier.padding(25.dp)
             ){
-                icon
+                icon()
             }
         }
         Text(

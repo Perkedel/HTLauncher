@@ -9,6 +9,9 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import android.Manifest
+import android.speech.tts.TextToSpeech
+import androidx.compose.runtime.MutableState
+import com.perkedel.htlauncher.modules.rememberTextToSpeech
 
 @Composable
 fun PermissionDialog(
@@ -18,6 +21,7 @@ fun PermissionDialog(
     onDismiss: () -> Unit =  {},
     onOkClick: () -> Unit = {},
     onGoToAppSettingClick: () -> Unit = {},
+    tts: MutableState<TextToSpeech?> = rememberTextToSpeech(),
 ){
     // https://youtu.be/D3JCtaK8LSU
     HTAlertDialog(
@@ -28,6 +32,7 @@ fun PermissionDialog(
         confirmButtonDismiss = !isPermanentlyDeclined,
         onDismissRequest = onDismiss,
         onConfirm = if(!isPermanentlyDeclined) onGoToAppSettingClick else onOkClick,
+        tts = tts,
     ) { }
 }
 
