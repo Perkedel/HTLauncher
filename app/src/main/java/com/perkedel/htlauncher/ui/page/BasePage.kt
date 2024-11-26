@@ -100,6 +100,9 @@ fun BasePage(
         encodeDefaults = true
     },
     tts: MutableState<TextToSpeech?> = rememberTextToSpeech(),
+    windowInfo: WindowInfo = rememberWindowInfo(),
+    isCompact: Boolean = windowInfo.screenWidthInfo is WindowInfo.WindowType.Compact,
+    isOrientation: Int = configuration.orientation,
 ){
     // Load this file!
     var pageUri:Uri = Uri.parse("")
@@ -158,10 +161,10 @@ fun BasePage(
     Column(
         modifier.fillMaxSize()
     ) {
-        val windowInfo = rememberWindowInfo()
-        val isCompact = windowInfo.screenWidthInfo is WindowInfo.WindowType.Compact
+//        val windowInfo = rememberWindowInfo()
+//        val isCompact = windowInfo.screenWidthInfo is WindowInfo.WindowType.Compact
         // https://stackoverflow.com/a/64755245/9079640
-        val isOrientation:Int = configuration.orientation // This doesn't seems to work
+//        val isOrientation:Int = configuration.orientation // This doesn't seems to work
         if(isCompact){
             // if screen is compact
             LazyVerticalGrid(

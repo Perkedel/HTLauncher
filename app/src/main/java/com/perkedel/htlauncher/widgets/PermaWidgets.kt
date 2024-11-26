@@ -1,5 +1,6 @@
 package com.perkedel.htlauncher.widgets
 
+import android.content.res.Configuration
 import android.os.Build
 import android.os.SystemClock
 import android.widget.TextClock
@@ -7,11 +8,13 @@ import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.MoreVert
@@ -21,11 +24,13 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewDynamicColors
@@ -35,6 +40,9 @@ import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import com.perkedel.htlauncher.R
+import com.perkedel.htlauncher.enumerations.ButtonTypes
+import com.perkedel.htlauncher.func.WindowInfo
+import com.perkedel.htlauncher.func.rememberWindowInfo
 import com.perkedel.htlauncher.ui.theme.HTLauncherTheme
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -45,8 +53,11 @@ fun FirstPageCard(
     handoverText:String = "",
     isOnNumberWhat:Int = 0,
     modifier: Modifier,
-    isCompact:Boolean = true,
     onMoreMenuButton: () -> Unit,
+    windowInfo: WindowInfo = rememberWindowInfo(),
+    configuration: Configuration = LocalConfiguration.current,
+    isCompact: Boolean = windowInfo.screenWidthInfo is WindowInfo.WindowType.Compact,
+    isOrientation: Int = configuration.orientation,
 ){
 //    val mediumPadding = dimensionResource(R.dimen.padding_medium)
 
@@ -59,22 +70,23 @@ fun FirstPageCard(
         elevation = CardDefaults.cardElevation(defaultElevation = 5.dp),
         modifier = modifier
     ) {
-        Row(
-            modifier = Modifier
-        ) {
-            Column(
-                verticalArrangement = Arrangement.spacedBy(16.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = if(isCompact) Modifier
-                    .weight(1f)
-                else Modifier
-                    .fillMaxHeight()
-                    .size(200.dp)
-
+        if(isCompact) {
+            Row(
+                modifier = Modifier
             ) {
-                Text("${handoverText} ${isOnNumberWhat} | ${currentDateAndTime}")
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(16.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = if (isCompact) Modifier
+                        .weight(1f)
+                    else Modifier
+                        .fillMaxHeight()
+                        .size(200.dp)
 
-                // https://www.geeksforgeeks.org/text-clock-in-android-using-jetpack-compose/
+                ) {
+                    Text("${handoverText} ${isOnNumberWhat} | ${currentDateAndTime}")
+
+                    // https://www.geeksforgeeks.org/text-clock-in-android-using-jetpack-compose/
 //                AndroidView(
 //                    factory = { context ->
 //                        TextClock(context).apply {
@@ -92,16 +104,42 @@ fun FirstPageCard(
 //                    modifier = Modifier.padding(5.dp),
 //                )
 
-                // bottom the more menu?
-            }
-            IconButton(
-                onClick = onMoreMenuButton,
-                modifier = Modifier
+                    // bottom the more menu?
+                }
+                IconButton(
+                    onClick = onMoreMenuButton,
+                    modifier = Modifier
 
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.MoreVert,
+                        contentDescription = "Menu"
+                    )
+                }
+            }
+        } else {
+            Column(
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = if (isCompact) Modifier
+                    .weight(1f)
+                else Modifier
+                    .fillMaxHeight()
+                    .size(200.dp)
             ) {
-                Icon(
-                    imageVector = Icons.Filled.MoreVert,
-                    contentDescription = "Menu"
+                Text("CLOCK")
+                Text("BAT")
+                Text("SIGNAL")
+                Spacer(
+                    modifier = Modifier
+                        .weight(1f)
+                    ,
+                )
+                HTButton(
+                    modifier = Modifier,
+                    title = "Menu",
+                    leftIcon = Icons.Default.MoreVert,
+                    buttonType = ButtonTypes.TextButton,
                 )
             }
         }

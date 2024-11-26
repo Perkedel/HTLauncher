@@ -3,6 +3,7 @@ package com.perkedel.htlauncher.widgets
 import android.content.ContentResolver
 import android.content.Context
 import android.content.pm.PackageManager
+import android.content.res.Configuration
 import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.speech.tts.TextToSpeech
@@ -39,6 +40,7 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.hapticfeedback.HapticFeedback
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.painterResource
@@ -60,6 +62,8 @@ import com.perkedel.htlauncher.HTViewModel
 import com.perkedel.htlauncher.R
 import com.perkedel.htlauncher.data.ItemData
 import com.perkedel.htlauncher.data.PageData
+import com.perkedel.htlauncher.func.WindowInfo
+import com.perkedel.htlauncher.func.rememberWindowInfo
 import com.perkedel.htlauncher.getADirectory
 import com.perkedel.htlauncher.getATextFile
 import com.perkedel.htlauncher.modules.rememberTextToSpeech
@@ -94,6 +98,10 @@ fun ItemCell(
     tts: MutableState<TextToSpeech?> = rememberTextToSpeech(),
     onClick: (()->Unit)? = {},
     onLongClick: (()->Unit)? = {},
+    windowInfo: WindowInfo = rememberWindowInfo(),
+    configuration: Configuration = LocalConfiguration.current,
+    isCompact: Boolean = windowInfo.screenWidthInfo is WindowInfo.WindowType.Compact,
+    isOrientation: Int = configuration.orientation,
 ){
     // Load file
     var itemFolder = Uri.parse("")
