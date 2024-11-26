@@ -24,8 +24,11 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBarDefaults.topAppBarColors
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewDynamicColors
 import androidx.compose.ui.tooling.preview.PreviewFontScale
@@ -35,10 +38,15 @@ import androidx.compose.ui.unit.dp
 import androidx.core.app.ActivityCompat
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.booleanPreferencesKey
+import androidx.datastore.preferences.core.stringPreferencesKey
+import androidx.datastore.preferences.preferencesDataStore
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
+import com.perkedel.htlauncher.func.DATA_STORE_FILE_NAME
 import com.perkedel.htlauncher.func.createDataStore
 import com.perkedel.htlauncher.ui.theme.HTLauncherTheme
+import kotlinx.coroutines.flow.map
 
 class MainActivity : ComponentActivity() {
 
@@ -55,6 +63,15 @@ class MainActivity : ComponentActivity() {
         )
     }
 
+//    lateinit var dataStorePrefs: DataStore<Preferences> = createDataStore(applicationContext)
+    companion object{
+//        val dataStorePrefs: DataStore<Preferences> by preferencesDataStore(name = DATA_STORE_FILE_NAME)
+        // https://medium.com/@akarenina25/the-simplest-way-to-use-preferences-datastore-1083d23fade2
+        // https://developer.android.com/topic/libraries/architecture/datastore
+        private val Context.preferencesDataStore: DataStore<Preferences> by preferencesDataStore(name = DATA_STORE_FILE_NAME)
+//        val keyOnBoardingSession = booleanPreferencesKey(STRING_ONBOARDING_SESSION)
+    }
+
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge(
@@ -62,6 +79,18 @@ class MainActivity : ComponentActivity() {
             SystemBarStyle.auto(Color.TRANSPARENT,Color.TRANSPARENT)
         )
         super.onCreate(savedInstanceState)
+
+//        val prefs: DataStore<Preferences> = remember { createDataStore(applicationContext) }
+//        val selectedSaveDir by prefs
+//            .data
+//            .map {
+//                val saveDir = stringPreferencesKey("saveDir")
+//                it[saveDir] ?: ""
+//            }
+//            .collectAsState("")
+//        val dataStorePrefs: DataStore<Preferences> = createDataStore(applicationContext)
+        val dataStorePrefs: DataStore<Preferences> = applicationContext.preferencesDataStore
+
         if (Build.VERSION.SDK_INT < 26) {
 //        val permissionDialogQueue = htui.visiblePermissionDialogQueue
             // Permissioners
@@ -78,7 +107,9 @@ class MainActivity : ComponentActivity() {
             HomeGreeting(
 //                prefs = remember { createDataStore(applicationContext) }
                 permissionRequests = permissions,
-                activityHandOver = this
+                activityHandOver = this,
+                dataStorePrefs = dataStorePrefs,
+                prefs = remember { dataStorePrefs },
             )
         }
 
@@ -88,15 +119,20 @@ class MainActivity : ComponentActivity() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeGreeting(
-//    prefs:DataStore<Preferences>
-    permissionRequests:Array<String> = arrayOf(""),
-    activityHandOver:ComponentActivity = ComponentActivity()
+
+    context: Context = LocalContext.current,
+    permissionRequests: Array<String> = arrayOf(""),
+    activityHandOver: ComponentActivity = ComponentActivity(),
+    dataStorePrefs: DataStore<Preferences> = createDataStore(context),
+    prefs: DataStore<Preferences> = remember { dataStorePrefs },
 ){
     HTLauncherTheme {
         Navigation(
 //            prefs = prefs
             permissionRequests = permissionRequests,
-            activityHandOver = activityHandOver
+            activityHandOver = activityHandOver,
+            dataStorePrefs = dataStorePrefs,
+            prefs = prefs,
         )
     }
 }

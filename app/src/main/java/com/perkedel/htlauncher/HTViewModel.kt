@@ -131,7 +131,10 @@ class HTViewModel : ViewModel() {
                         val aPageUri: Uri = getATextFile(
                             dirUri = folders[context.resources.getString(R.string.pages_folder)]!!,
                             context = context,
-                            initData = json.encodeToString<PageData>(PageData()),
+                            initData = json.encodeToString<PageData>(PageData(
+                                name = i,
+                                isHome = i.contains("Home")
+                            )),
                             fileName = "$i.json",
                             hardOverwrite = false,
                         )

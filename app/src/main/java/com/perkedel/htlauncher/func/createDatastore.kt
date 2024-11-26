@@ -13,11 +13,15 @@ fun createDataStore(producePath: () -> String) :DataStore<Preferences>{
    )
 }
 
+//fun getDataStore(producePath: () -> String) :DataStore<Preferences>{
+//    return
+//}
+
 fun createDataStore(context: Context): DataStore<Preferences> {
-    // https://youtu.be/cQ64RkdPZBw?si=1S7vULWQwMTAtLHh
+    // https://youtu.be/cQ64RkdPZBw
     return createDataStore {
         context.filesDir.resolve(DATA_STORE_FILE_NAME).absolutePath
     }
 }
 
-internal const val DATA_STORE_FILE_NAME = "htlauncher.preferences_pb"
+const val DATA_STORE_FILE_NAME = "htlauncher.preferences_pb"

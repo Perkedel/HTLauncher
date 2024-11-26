@@ -11,6 +11,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
+import com.perkedel.htlauncher.data.ActionData
 import com.perkedel.htlauncher.data.HomepagesWeHave
 import com.perkedel.htlauncher.data.ItemData
 import com.perkedel.htlauncher.data.PageData
@@ -33,6 +34,8 @@ class ItemEditorViewModel:ViewModel() {
     var homeData: HomepagesWeHave? by mutableStateOf(null)
     var pageData: PageData? by mutableStateOf(null)
     var jsoning: Json? by mutableStateOf(null)
+    var actionEdit:ActionData? by mutableStateOf(null)
+    var actionId:Int? by mutableStateOf(0)
 
     // Error
     var errorOccured: Boolean? by mutableStateOf(false)
@@ -74,6 +77,39 @@ class ItemEditorViewModel:ViewModel() {
     }
     fun updateHomeData(with: HomepagesWeHave){
         this.homeData = with
+    }
+    fun updateActionData(with: ActionData){
+        this.actionEdit = with
+    }
+    fun updateActionDataId(with: Int = 0){
+        this.actionId = with
+    }
+
+    fun clearActionData(){
+        this.actionEdit = null
+    }
+
+    fun addItemDataAction(with: ActionData = ActionData()){
+        val compile: MutableList<ActionData> = (this.itemData?.action ?: ItemData().action).toMutableList()
+        compile.add(with)
+        this.itemData = this.itemData?.copy(
+            action = compile
+        )
+    }
+    fun appendItemDataAction(with:ActionData = ActionData(), id:Int = 0){
+        val compile: MutableList<ActionData> = (this.itemData?.action ?: ItemData().action).toMutableList()
+        compile[id] = with
+        this.itemData = this.itemData?.copy(
+            action = compile
+        )
+    }
+    fun reorderItemDataAction(whichIs:ActionData = ActionData(), into:Int = 0){
+        val compile: MutableList<ActionData> = (this.itemData?.action ?: ItemData().action).toMutableList()
+        compile.remove(whichIs)
+        compile.add(into,whichIs)
+        this.itemData = this.itemData?.copy(
+            action = compile
+        )
     }
 
     fun typedEditNow(editType: EditWhich?, rawJson: String = ""){

@@ -11,6 +11,7 @@ import android.speech.tts.TextToSpeech
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -97,12 +98,15 @@ fun AboutTerms(
     onReadTerms: () -> Unit = {},
     onReadDisclaimer: () -> Unit = {},
     tts: MutableState<TextToSpeech?> = rememberTextToSpeech(),
+    windowInfo: WindowInfo = rememberWindowInfo(),
+    isCompact: Boolean = windowInfo.screenWidthInfo is WindowInfo.WindowType.Compact,
+    isOrientation: Int = configuration.orientation,
 ){
     ProvidePreferenceLocals {
-        val windowInfo = rememberWindowInfo()
-        val isCompact = windowInfo.screenWidthInfo is WindowInfo.WindowType.Compact
+//        val windowInfo = rememberWindowInfo()
+//        val isCompact = windowInfo.screenWidthInfo is WindowInfo.WindowType.Compact
         // https://stackoverflow.com/a/64755245/9079640
-        val isOrientation:Int = configuration.orientation // This doesn't seems to work
+//        val isOrientation:Int = configuration.orientation // This doesn't seems to work
         if(isCompact){
             AboutTermsOptions(
                 modifier = Modifier,

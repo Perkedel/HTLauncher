@@ -1,6 +1,7 @@
 @file:OptIn(
     ExperimentalMaterial3Api::class,
     ExperimentalMaterial3AdaptiveApi::class, ExperimentalMaterial3Api::class,
+    ExperimentalMaterial3AdaptiveApi::class,
 )
 
 package com.perkedel.htlauncher.ui.activities
@@ -9,6 +10,7 @@ import android.content.ClipData.Item
 import android.content.ContentResolver
 import android.content.Context
 import android.content.Intent
+import android.content.res.Configuration
 import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -73,6 +75,7 @@ import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -85,11 +88,16 @@ import kotlinx.serialization.json.Json
 import javax.annotation.meta.When
 import androidx.fragment.app.FragmentActivity
 import androidx.navigation.findNavController
+import com.perkedel.htlauncher.data.ActionData
 import com.perkedel.htlauncher.data.HomepagesWeHave
 import com.perkedel.htlauncher.data.ItemData
 import com.perkedel.htlauncher.data.PageData
+import com.perkedel.htlauncher.func.WindowInfo
+import com.perkedel.htlauncher.func.rememberWindowInfo
 import com.perkedel.htlauncher.ui.dialog.HTAlertDialog
+import com.perkedel.htlauncher.ui.navigation.EditActionData
 import com.perkedel.htlauncher.widgets.HTButton
+import com.perkedel.htlauncher.widgets.ItemCell
 import com.perkedel.htlauncher.writeATextFile
 import kotlinx.serialization.encodeToString
 import okio.IOException
@@ -118,13 +126,13 @@ class ItemEditorActivity : ComponentActivity() {
             } else {
                 intent.getParcelableExtra("uri")
             }
-            val editType: EditWhich? = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                intent.getParcelableExtra("editType", EditWhich::class.java)
-//                intent.extras?.getParcelable("editType", EditWhich::class.java)
-            } else {
-//                intent.getParcelableExtra("editType")
-                intent.extras?.getParcelable("editType")
-            }
+//            val editType: EditWhich? = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+//                intent.getParcelableExtra("editType", EditWhich::class.java)
+////                intent.extras?.getParcelable("editType", EditWhich::class.java)
+//            } else {
+////                intent.getParcelableExtra("editType")
+//                intent.extras?.getParcelable("editType")
+//            }
 //            val editTypeName: String? = (if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
 //                intent.getParcelableExtra("editTypeName", String::class.java)
 //            } else {
@@ -281,6 +289,10 @@ fun ItemEditorGreeting(
         prettyPrint = true
         encodeDefaults = true
     },
+    windowInfo: WindowInfo = rememberWindowInfo(),
+    configuration: Configuration = LocalConfiguration.current,
+    isCompact: Boolean = windowInfo.screenWidthInfo is WindowInfo.WindowType.Compact,
+    isOrientation: Int = configuration.orientation,
 ) {
     // https://youtu.be/W3R_ETKMj0E Philip Lackner List detail
     // https://github.com/philipplackner/ListPaneScaffoldGuide
@@ -392,6 +404,9 @@ fun ItemEditorGreeting(
 //                                })
         }
     }
+    val rebuildItem: ()-> Unit = {
+
+    }
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -430,7 +445,15 @@ fun ItemEditorGreeting(
                     EditWhich.Items -> EditItemData(
                         modifier = Modifier,
                         viewModel = viewModel,
-                        data = viewModel.itemData
+                        data = viewModel.itemData,
+                        onEditActionData = { actionData, idOf ->
+                            viewModel.updateActionDataId(idOf)
+                            viewModel.updateActionData(actionData)
+                            navigator.navigateTo(
+                                pane = ListDetailPaneScaffoldRole.Detail,
+                                content = "Action ${idOf} ${viewModel.actionEdit}"
+                            )
+                        }
                     )
                     else -> {
                         Column(
@@ -466,8 +489,54 @@ fun ItemEditorGreeting(
             },
             detailPane = {
                 val content = navigator.currentDestination?.content?.toString() ?: "idk"
+//                val content: Any? = navigator.currentDestination?.content? ?: {
+//                    when{
+//                        viewModel.editType == EditWhich.Items -> {
+//
+//                        }
+//                        else -> {}
+//                    }
+//                }
                 AnimatedPane {
-                    Text(content)
+//
+                    Surface(
+//                        color = rememberColorScheme().inversePrimary
+                    ) {
+                        Box(
+//                            modifier = Modifier.fillMaxSize(),
+                            contentAlignment = Alignment.Center
+                        ){
+                            when{
+                                viewModel.actionEdit != null -> {
+                                    EditActionData(
+                                        modifier = Modifier.fillMaxSize(),
+                                        data = viewModel.actionEdit,
+                                        id = viewModel.actionId ?: 0,
+                                        onRebuild = { actioning:ActionData,idOf:Int ->
+
+                                        },
+                                        onClose = {
+                                            viewModel.clearActionData()
+                                            navigator.navigateBack()
+                                        }
+                                    )
+                                }
+                                viewModel.editType == EditWhich.Items -> {
+                                    Card(
+                                        modifier = Modifier.padding(16.dp)
+                                    ) {
+                                        ItemCell(
+                                            readTheItemData = viewModel.itemData ?: ItemData()
+                                        )
+                                    }
+                                }
+                                else -> {
+                                    Text(content)
+                                }
+                            }
+                        }
+                    }
+
                 }
             },
             extraPane = {

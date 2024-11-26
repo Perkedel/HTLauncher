@@ -18,6 +18,7 @@ data class ItemData(
 
     // Customize
     var showLabel:Boolean = true, // Show the label
+    var useAria:Boolean = false, // Use Custom Aria
     var showWhichIcon:ShowWhichIcon = ShowWhichIcon.Default, // 0 = App Icon, 1 = TV Banner
     var textFillColor: String = "Black", // Color say of this label text
     var textOutlineColor: String = "White", // Color say of this label text stroke

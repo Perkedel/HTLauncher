@@ -112,7 +112,8 @@ fun Navigation(
     configuration: Configuration = LocalConfiguration.current,
     pm: PackageManager = context.packageManager,
     haptic: HapticFeedback = LocalHapticFeedback.current,
-    prefs: DataStore<Preferences> = remember { createDataStore(context) },
+    dataStorePrefs: DataStore<Preferences> = createDataStore(context),
+    prefs: DataStore<Preferences> = remember { dataStorePrefs },
     anViewModel: HTViewModel = viewModel(),
 //    homePagerState: PagerState = rememberPagerState(pageCount = {10}),
 //    scaffoldState: ScaffoldState = rememberScaffoldState(),
@@ -1168,7 +1169,7 @@ fun Navigation(
                             // https://youtu.be/2hIY1xuImuQ
                             Log.d("ItemExplorer", "To Edit ${editType.name} ${filename}")
                             if(htuiState.selectedSaveDir != null) {
-                                if (!htuiState.editingLevel && currentScreen == Screen.LevelEditor) {
+                                if (!htuiState.editingLevel && currentScreen == Screen.ItemsExplorer) {
 
                                     anViewModel.setEditingLevel(true)
                                 }

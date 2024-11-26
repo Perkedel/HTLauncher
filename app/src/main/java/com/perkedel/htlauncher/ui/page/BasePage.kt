@@ -221,15 +221,16 @@ fun BasePage(
                 }
                 LazyVerticalGrid(
                     columns = when(pageOfIt.gridType){
-                        PageGridType.Default -> GridCells.Fixed(pageOfIt.cellCount)
+                        PageGridType.Default -> GridCells.Fixed(pageOfIt.cellCountLandscape)
                         PageGridType.Adaptive -> GridCells.Adaptive(pageOfIt.cellSize.dp)
-                        else -> GridCells.Fixed(pageOfIt.cellCount)
+                        else -> GridCells.Fixed(pageOfIt.cellCountLandscape)
                     },
                     state = lazyListState,
                     content = {
                         // Rest of the items
                         items(pageOfIt.items.size){i->
                             ItemCell(
+                                readTheItemFile = pageOfIt.items[i],
                                 handoverText = "Item ${i}",
                                 context = context,
                                 pm = pm,

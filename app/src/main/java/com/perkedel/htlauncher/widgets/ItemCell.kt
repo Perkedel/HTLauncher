@@ -178,15 +178,16 @@ fun ItemCell(
                     }
                 },
                 onLongClick = {
+                    val readout:String = if(itemOfIt.useAria && itemOfIt.aria.isNotEmpty()) itemOfIt.aria else itemOfIt.label
                     ttsSpeakOrStop(
                         handover = tts,
-                        message = itemOfIt.aria,
+                        message = readout,
                     )
                     haptic.performHapticFeedback(HapticFeedbackType.LongPress)
                     Toast
                         .makeText(
                             context,
-                            "Long Click ${itemOfIt.label}",
+                            readout,
                             Toast.LENGTH_SHORT
                         )
                         .show()
