@@ -170,6 +170,10 @@ dependencies {
     // https://composables.com/tv-foundation/tvlazyverticalgrid
     // https://joebirch.co/android/lazy-grids-for-android-tv-using-jetpack-compose/
     implementation(libs.androidx.tv.foundation)
+
+    // https://github.com/saket/cascade
+//    implementation(libs.cascade)
+//    implementation(libs.cascade.compose) // INCOMPATIBLE with API < 23
 }
 
 //composeCompiler {

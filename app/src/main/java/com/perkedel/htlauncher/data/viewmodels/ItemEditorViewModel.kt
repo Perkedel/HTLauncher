@@ -3,6 +3,7 @@
 package com.perkedel.htlauncher.data.viewmodels
 
 import android.content.ClipData.Item
+import android.content.pm.ApplicationInfo
 import android.net.Uri
 import android.os.Message
 import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
@@ -16,6 +17,7 @@ import com.perkedel.htlauncher.data.HomepagesWeHave
 import com.perkedel.htlauncher.data.ItemData
 import com.perkedel.htlauncher.data.PageData
 import com.perkedel.htlauncher.enumerations.EditWhich
+import com.perkedel.htlauncher.enumerations.ItemExtraPaneNavigate
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.encodeToJsonElement
 
@@ -36,6 +38,8 @@ class ItemEditorViewModel:ViewModel() {
     var jsoning: Json? by mutableStateOf(null)
     var actionEdit:ActionData? by mutableStateOf(null)
     var actionId:Int? by mutableStateOf(0)
+    var itemExtraPaneNavigate: ItemExtraPaneNavigate? by mutableStateOf(ItemExtraPaneNavigate.Default)
+    var isEditingAction:Boolean by mutableStateOf(false)
 
     // Error
     var errorOccured: Boolean? by mutableStateOf(false)
@@ -84,12 +88,31 @@ class ItemEditorViewModel:ViewModel() {
     fun updateActionDataId(with: Int = 0){
         this.actionId = with
     }
+    fun selectActionPackage(with:ApplicationInfo){
+        if(actionEdit != null){
+            actionEdit = actionEdit?.copy(
+                action = with.packageName
+            ) ?: ActionData(
+                action = with.packageName
+            )
+            appendItemDataAction(
+                with = actionEdit ?: ActionData(
+                    action = with.packageName
+                ),
+                id = actionId ?: 0
+            )
+        }
+    }
 
     fun clearActionData(){
         this.actionEdit = null
     }
+    fun setOpenActionData(into:Boolean = false){
+        this.isEditingAction = into
+    }
 
     fun addItemDataAction(with: ActionData = ActionData()){
+        actionEdit = with
         val compile: MutableList<ActionData> = (this.itemData?.action ?: ItemData().action).toMutableList()
         compile.add(with)
         this.itemData = this.itemData?.copy(
@@ -97,6 +120,7 @@ class ItemEditorViewModel:ViewModel() {
         )
     }
     fun appendItemDataAction(with:ActionData = ActionData(), id:Int = 0){
+        actionEdit = with
         val compile: MutableList<ActionData> = (this.itemData?.action ?: ItemData().action).toMutableList()
         compile[id] = with
         this.itemData = this.itemData?.copy(
@@ -104,9 +128,17 @@ class ItemEditorViewModel:ViewModel() {
         )
     }
     fun reorderItemDataAction(whichIs:ActionData = ActionData(), into:Int = 0){
+        actionEdit = whichIs
         val compile: MutableList<ActionData> = (this.itemData?.action ?: ItemData().action).toMutableList()
         compile.remove(whichIs)
         compile.add(into,whichIs)
+        this.itemData = this.itemData?.copy(
+            action = compile
+        )
+    }
+    fun resyncItemDataAction(){
+        val compile: MutableList<ActionData> = (this.itemData?.action ?: ItemData().action).toMutableList()
+        compile[actionId ?: 0] = actionEdit ?: ActionData()
         this.itemData = this.itemData?.copy(
             action = compile
         )

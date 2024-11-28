@@ -70,6 +70,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.adaptive.layout.ThreePaneScaffoldValue
 import androidx.compose.material3.adaptive.navigation.ThreePaneScaffoldNavigator
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -92,9 +93,11 @@ import com.perkedel.htlauncher.data.ActionData
 import com.perkedel.htlauncher.data.HomepagesWeHave
 import com.perkedel.htlauncher.data.ItemData
 import com.perkedel.htlauncher.data.PageData
+import com.perkedel.htlauncher.enumerations.ItemExtraPaneNavigate
 import com.perkedel.htlauncher.func.WindowInfo
 import com.perkedel.htlauncher.func.rememberWindowInfo
 import com.perkedel.htlauncher.ui.dialog.HTAlertDialog
+import com.perkedel.htlauncher.ui.navigation.ActionSelectApp
 import com.perkedel.htlauncher.ui.navigation.EditActionData
 import com.perkedel.htlauncher.widgets.HTButton
 import com.perkedel.htlauncher.widgets.ItemCell
@@ -247,7 +250,7 @@ fun saveThisFile(saveUri:Uri, context: Context, contentResolver: ContentResolver
         contentResolver = contentResolver,
         with = content
     )
-        Toast.makeText(context,context.resources.getString(R.string.save_success),Toast.LENGTH_SHORT).show()
+//        Toast.makeText(context,context.resources.getString(R.string.save_success),Toast.LENGTH_SHORT).show()
     } catch (e:Exception){
         e.printStackTrace()
         viewModel.updateError(
@@ -273,7 +276,8 @@ fun ItemEditorGreeting(
     viewModel: ItemEditorViewModel = ItemEditorViewModel(),
     editUri:Uri? = null,
     navigator:ThreePaneScaffoldNavigator<Any> = rememberListDetailPaneScaffoldNavigator<Any>(),
-    onBack:()-> Unit = {},
+    onBack:()-> Unit = {
+    },
     onSave:(Uri,ContentResolver,EditWhich, String)-> Unit = { uri, resolver, editType, content ->
         saveThisFile(
             saveUri = uri,
@@ -319,6 +323,11 @@ fun ItemEditorGreeting(
 //    val navigator = rememberListDetailPaneScaffoldNavigator<Any>()
     // DONE: read file & type
 //    viewModel.setNavigator(navigator)
+    LaunchedEffect(
+        key1 = true
+    ) {
+
+    }
     Log.d("ItemEditor", "Numer ${editUri?.toString()} which is ${viewModel.editType}")
     if(editUri != null){
         viewModel.updateRawContent(openATextFile(
@@ -331,6 +340,35 @@ fun ItemEditorGreeting(
         }
     }
 
+    val saveNow: () -> Unit = {
+        if(editUri != null) {
+            viewModel.updateRawContent(
+                when(viewModel.editType){
+                    EditWhich.Items -> json.encodeToString<ItemData>(viewModel.itemData ?: ItemData())
+                    EditWhich.Pages -> json.encodeToString<PageData>(viewModel.pageData ?: PageData())
+                    EditWhich.Home -> json.encodeToString<HomepagesWeHave>(viewModel.homeData ?: HomepagesWeHave())
+                    else -> "{}"
+                }
+            )
+//                                viewModel.updateRawContent(json.encodeToString(value = when(viewModel.editType){
+//                                    EditWhich.Items -> viewModel.itemData
+//                                    EditWhich.Pages -> viewModel.pageData
+//                                    EditWhich.Home -> viewModel.homeData
+//                                    else -> "{}"
+////                                    EditWhich.Themes -> TODO()
+////                                    EditWhich.Medias -> TODO()
+////                                    EditWhich.Shortcuts -> TODO()
+////                                    EditWhich.Misc -> TODO()
+////                                    null -> TODO()
+//                                }))
+            onSave(editUri,context.contentResolver,viewModel.editType ?: EditWhich.Misc, viewModel.rawContent ?: "")
+//                                onSave(editUri,context.contentResolver,viewModel.editType ?: EditWhich.Misc, when(viewModel.editType){
+//                                    EditWhich.Items -> json.encodeToString<ItemData>(value = viewModel.itemData ?: ItemData())
+//                                    else -> "{}"
+//                                })
+        }
+    }
+
     var backProgress: Float? by remember {
         mutableStateOf(null)
     }
@@ -338,6 +376,7 @@ fun ItemEditorGreeting(
     val onBackPressedCallback:OnBackPressedCallback = object :OnBackPressedCallback(true){
         // https://github.com/philipplackner/PredictiveBackMigration
         override fun handleOnBackPressed() {
+            saveNow()
 //            pressBackButton()
             if(navigator.canNavigateBack()){
                 navigator.navigateBack()
@@ -376,33 +415,8 @@ fun ItemEditorGreeting(
             onBackPressedCallback.remove()
         }
     }
-    val saveNow: () -> Unit = {
-        if(editUri != null) {
-            viewModel.updateRawContent(
-                when(viewModel.editType){
-                    EditWhich.Items -> json.encodeToString<ItemData>(viewModel.itemData ?: ItemData())
-                    EditWhich.Pages -> json.encodeToString<PageData>(viewModel.pageData ?: PageData())
-                    EditWhich.Home -> json.encodeToString<HomepagesWeHave>(viewModel.homeData ?: HomepagesWeHave())
-                    else -> "{}"
-                }
-            )
-//                                viewModel.updateRawContent(json.encodeToString(value = when(viewModel.editType){
-//                                    EditWhich.Items -> viewModel.itemData
-//                                    EditWhich.Pages -> viewModel.pageData
-//                                    EditWhich.Home -> viewModel.homeData
-//                                    else -> "{}"
-////                                    EditWhich.Themes -> TODO()
-////                                    EditWhich.Medias -> TODO()
-////                                    EditWhich.Shortcuts -> TODO()
-////                                    EditWhich.Misc -> TODO()
-////                                    null -> TODO()
-//                                }))
-            onSave(editUri,context.contentResolver,viewModel.editType ?: EditWhich.Misc, viewModel.rawContent ?: "")
-//                                onSave(editUri,context.contentResolver,viewModel.editType ?: EditWhich.Misc, when(viewModel.editType){
-//                                    EditWhich.Items -> json.encodeToString<ItemData>(value = viewModel.itemData ?: ItemData())
-//                                    else -> "{}"
-//                                })
-        }
+    val onBacking: () -> Unit = {
+
     }
     val rebuildItem: ()-> Unit = {
 
@@ -449,6 +463,7 @@ fun ItemEditorGreeting(
                         onEditActionData = { actionData, idOf ->
                             viewModel.updateActionDataId(idOf)
                             viewModel.updateActionData(actionData)
+                            viewModel.setOpenActionData(true)
                             navigator.navigateTo(
                                 pane = ListDetailPaneScaffoldRole.Detail,
                                 content = "Action ${idOf} ${viewModel.actionEdit}"
@@ -507,17 +522,29 @@ fun ItemEditorGreeting(
                             contentAlignment = Alignment.Center
                         ){
                             when{
-                                viewModel.actionEdit != null -> {
+                                viewModel.isEditingAction -> {
                                     EditActionData(
                                         modifier = Modifier.fillMaxSize(),
                                         data = viewModel.actionEdit,
                                         id = viewModel.actionId ?: 0,
                                         onRebuild = { actioning:ActionData,idOf:Int ->
-
+                                            viewModel.appendItemDataAction(actioning,idOf)
+//                                            viewModel.resyncItemDataAction()
+//                                            saveNow()
                                         },
                                         onClose = {
+                                            saveNow()
+//                                            viewModel.resyncItemDataAction()
                                             viewModel.clearActionData()
+                                            viewModel.setOpenActionData(false)
+                                            Log.d("ItemEditorActivity","Total Action${viewModel.itemData?.action}")
                                             navigator.navigateBack()
+                                        },
+                                        onSelectAction = {
+                                            navigator.navigateTo(
+                                                pane = ListDetailPaneScaffoldRole.Extra,
+                                                content = "select action aaa ${viewModel.rawContent}"
+                                            )
                                         }
                                     )
                                 }
@@ -542,7 +569,19 @@ fun ItemEditorGreeting(
             extraPane = {
                 val content = navigator.currentDestination?.content?.toString() ?: "aaa"
                 AnimatedPane {
-
+                    when{
+                        viewModel.itemExtraPaneNavigate == ItemExtraPaneNavigate.SelectApp -> {
+                            ActionSelectApp(
+//                                modifier = Modifier.fillMaxSize()
+                                onSelectedApp = {
+                                    viewModel.selectActionPackage(it)
+                                    viewModel.resyncItemDataAction()
+                                    navigator.navigateBack()
+                                }
+                            )
+                        }
+                        else -> {}
+                    }
                 }
             }
         )

@@ -140,6 +140,7 @@ fun FirstPageCard(
                     title = "Menu",
                     leftIcon = Icons.Default.MoreVert,
                     buttonType = ButtonTypes.TextButton,
+                    onClick = onMoreMenuButton
                 )
             }
         }
