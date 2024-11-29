@@ -1,6 +1,7 @@
 @file:OptIn(
     ExperimentalMaterial3Api::class,
-    ExperimentalMaterial3AdaptiveApi::class, ExperimentalMaterial3Api::class,
+    ExperimentalMaterial3AdaptiveApi::class,
+    ExperimentalMaterial3Api::class,
     ExperimentalMaterial3AdaptiveApi::class,
 )
 
@@ -405,6 +406,7 @@ fun ItemEditorGreeting(
 //        onBack()
 //    }
     val backPressedDispatcher = LocalOnBackPressedDispatcherOwner.current!!.onBackPressedDispatcher
+
     DisposableEffect(backPressedDispatcher, navigator) {
         if(navigator.canNavigateBack()){
             backPressedDispatcher.addCallback(onBackPressedCallback)
@@ -430,9 +432,11 @@ fun ItemEditorGreeting(
                 textDescription = "(${viewModel.editType?.toString()}) ${viewModel.uri?.toString()}",
                 canNavigateBack = true,
                 navigateUp = {
-                    onBack()
+                    saveNow()
                     if(navigator.canNavigateBack()){
                         navigator.navigateBack()
+                    } else {
+                        onBack()
                     }
                 },
                 onMoreMenu = {
@@ -541,6 +545,7 @@ fun ItemEditorGreeting(
                                             navigator.navigateBack()
                                         },
                                         onSelectAction = {
+                                            viewModel.selectExtraNavigate(ItemExtraPaneNavigate.SelectApp)
                                             navigator.navigateTo(
                                                 pane = ListDetailPaneScaffoldRole.Extra,
                                                 content = "select action aaa ${viewModel.rawContent}"
@@ -575,7 +580,8 @@ fun ItemEditorGreeting(
 //                                modifier = Modifier.fillMaxSize()
                                 onSelectedApp = {
                                     viewModel.selectActionPackage(it)
-                                    viewModel.resyncItemDataAction()
+                                    saveNow()
+//                                    viewModel.resyncItemDataAction()
                                     navigator.navigateBack()
                                 }
                             )
@@ -614,8 +620,6 @@ fun ItemEditorGreeting(
     }
 
 }
-
-
 
 @HTPreviewAnnotations
 @Composable

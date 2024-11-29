@@ -39,6 +39,10 @@
     <string name="editor_screen">Editor</string>
     <string name="items_explorer_screen">Editing</string>
     <string name="back_button">Back</string>
+    <string name="more_menu_button">Menu</string>
+    <string name="aria_label_LauncherActivity">%s Application</string>
+    <string name="aria_label_Activity">Launch the %s action</string>
+    <string name="aria_label_ShellOpen">Open the %s</string>
 
     <!--  Home More Menu  -->
     <string name="Home_more_edit">Edit Launcher Buttons</string>

@@ -110,6 +110,9 @@ class ItemEditorViewModel:ViewModel() {
     fun setOpenActionData(into:Boolean = false){
         this.isEditingAction = into
     }
+    fun selectExtraNavigate(whichIs: ItemExtraPaneNavigate = ItemExtraPaneNavigate.Default){
+        this.itemExtraPaneNavigate = whichIs
+    }
 
     fun addItemDataAction(with: ActionData = ActionData()){
         actionEdit = with

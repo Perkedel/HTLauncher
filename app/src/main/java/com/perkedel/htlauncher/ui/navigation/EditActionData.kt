@@ -4,9 +4,12 @@ package com.perkedel.htlauncher.ui.navigation
 
 import android.content.res.Configuration
 import android.util.Log
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -27,6 +30,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -71,10 +75,10 @@ fun EditActionData(
         // https://youtu.be/5h737wNN-qM stoffe dropdown
         // https://developer.android.com/reference/kotlin/androidx/compose/material/ExposedDropdownMenuBoxScope
         Text("Action ${id}\n${data}")
-        var name by remember { mutableStateOf(data?.name ?: "Launcher") }
-        var action by remember { mutableStateOf(data?.action ?: "") }
-        var args by remember { mutableStateOf(data?.args ?: emptyList<String>()) }
-        var type by remember { mutableStateOf(data?.type ?: ActionDataLaunchType.LauncherActivity) }
+        var name:String by remember { mutableStateOf(data?.name ?: "Launcher") }
+        var action:String by remember { mutableStateOf(data?.action ?: "") }
+        var args:List<String> by remember { mutableStateOf(data?.args ?: emptyList<String>()) }
+        var type:ActionDataLaunchType by remember { mutableStateOf(data?.type ?: ActionDataLaunchType.LauncherActivity) }
 
         var typeMenuExpanded by remember { mutableStateOf(false) }
 
@@ -153,11 +157,16 @@ fun EditActionData(
                         label = {
                             Text("Application Package")
                         },
-                        readOnly = true,
+                        readOnly = false,
                         value = action,
-                        onValueChange = {},
+                        onValueChange = {
+                            action = it
+                            rebuildNow()
+                        },
                         trailingIcon = {
-                            Icon(Icons.Default.ChevronRight, "")
+                            Icon(Icons.Default.ChevronRight, "",modifier=Modifier.clickable(
+                                onClick = onSelectAction
+                            ))
                         }
                     )
                 }
@@ -167,11 +176,16 @@ fun EditActionData(
                         label = {
                             Text("Application Package")
                         },
-                        readOnly = true,
+                        readOnly = false,
                         value = action,
-                        onValueChange = {},
+                        onValueChange = {
+                            action = it
+                            rebuildNow()
+                        },
                         trailingIcon = {
-                            Icon(Icons.Default.ChevronRight, "")
+                            Icon(Icons.Default.ChevronRight, "",modifier=Modifier.clickable(
+                                onClick = onSelectAction
+                            ))
                         }
                     )
                     // TODO: args text
@@ -193,7 +207,9 @@ fun EditActionData(
 @Composable
 fun EditActionDataPreview(){
     HTLauncherTheme {
-        Surface {
+        Surface(
+            modifier = Modifier.navigationBarsPadding().statusBarsPadding()
+        ) {
             EditActionData(
                 data = ActionData(),
                 modifier = Modifier.fillMaxSize()

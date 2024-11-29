@@ -49,6 +49,7 @@ import com.google.accompanist.systemuicontroller.SystemUiController
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.perkedel.htlauncher.HTUIState
 import com.perkedel.htlauncher.HTViewModel
+import com.perkedel.htlauncher.data.ActionData
 import com.perkedel.htlauncher.data.HomepagesWeHave
 import com.perkedel.htlauncher.modules.rememberTextToSpeech
 import com.perkedel.htlauncher.ui.page.BasePage
@@ -89,6 +90,7 @@ fun HomeScreen(
     coroutineScope: CoroutineScope = rememberCoroutineScope(),
     isReady:Boolean = false,
     tts: MutableState<TextToSpeech?> = rememberTextToSpeech(),
+    onLaunchOneOfAction: (List<ActionData>)->Unit = {}
 ){
 
 
@@ -141,6 +143,7 @@ fun HomeScreen(
                         contentResolver = contentResolver,
                         uiState = uiState,
                         tts = tts,
+                        onLaunchOneOfAction = onLaunchOneOfAction,
                     )
                 }
 

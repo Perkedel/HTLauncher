@@ -57,6 +57,7 @@ import androidx.compose.ui.unit.dp
 import com.perkedel.htlauncher.HTUIState
 import com.perkedel.htlauncher.HTViewModel
 import com.perkedel.htlauncher.R
+import com.perkedel.htlauncher.data.ActionData
 import com.perkedel.htlauncher.data.HomepagesWeHave
 import com.perkedel.htlauncher.data.PageData
 import com.perkedel.htlauncher.enumerations.PageGridType
@@ -103,6 +104,7 @@ fun BasePage(
     windowInfo: WindowInfo = rememberWindowInfo(),
     isCompact: Boolean = windowInfo.screenWidthInfo is WindowInfo.WindowType.Compact,
     isOrientation: Int = configuration.orientation,
+    onLaunchOneOfAction: (List<ActionData>)->Unit = {}
 ){
     // Load this file!
     var pageUri:Uri = Uri.parse("")
@@ -200,6 +202,7 @@ fun BasePage(
                             uiState = uiState,
                             viewModel = viewModel,
                             tts = tts,
+                            onClick = onLaunchOneOfAction,
                         )
                     }
 
@@ -240,6 +243,7 @@ fun BasePage(
                                 uiState = uiState,
                                 viewModel = viewModel,
                                 tts = tts,
+                                onClick = onLaunchOneOfAction,
                             )
                         }
                     }

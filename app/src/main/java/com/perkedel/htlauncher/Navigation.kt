@@ -1,6 +1,7 @@
 package com.perkedel.htlauncher
 
 import android.Manifest
+import android.content.ActivityNotFoundException
 import android.content.ContentResolver
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
@@ -39,6 +40,7 @@ import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
@@ -73,6 +75,7 @@ import androidx.lifecycle.ViewModel
 import com.google.accompanist.systemuicontroller.SystemUiController
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.perkedel.htlauncher.data.TestJsonData
+import com.perkedel.htlauncher.enumerations.ActionDataLaunchType
 import com.perkedel.htlauncher.enumerations.ConfigSelected
 import com.perkedel.htlauncher.enumerations.EditWhich
 import com.perkedel.htlauncher.enumerations.Screen
@@ -661,6 +664,33 @@ fun Navigation(
                         coroutineScope = coroutineScope,
                         isReady = htuiState.isReady,
                         tts = tts,
+                        onLaunchOneOfAction = {
+                            when(it[0].type){
+                                ActionDataLaunchType.LauncherActivity -> {
+                                    try{
+                                        if(it[0].action.isNotEmpty()) {
+                                            startApplication(
+                                                context = context,
+                                                pm = pm,
+                                                what = it[0].action
+                                            )
+                                        }
+                                    } catch (e:Exception) {
+                                        coroutineScope.launch {
+                                            snackbarHostState.showSnackbar("WERROR 404! Launcher Activity undefined")
+                                        }
+                                        e.printStackTrace()
+                                    } catch (e: ActivityNotFoundException){
+                                        coroutineScope.launch {
+                                            snackbarHostState.showSnackbar("WERROR 404! Launcher Activity undefined")
+                                        }
+                                        e.printStackTrace()
+                                    }
+                                }
+                                else -> {}
+                            }
+
+                        }
                     )
 
                     LaunchedEffect(true) {
@@ -741,6 +771,23 @@ fun Navigation(
                         },
                         systemUiController = systemUiController,
                         tts = tts,
+                        onLaunchApp = {
+                            try {
+                                startApplication(context, it.packageName)
+                            } catch (e: Exception) {
+                                e.printStackTrace()
+                                coroutineScope.launch {
+                                    snackbarHostState.showSnackbar("WERROR 404! Launcher Activity undefined")
+                                }
+                            } catch (e: ActivityNotFoundException){
+                                // https://youtu.be/2hIY1xuImuQ
+                                // https://youtu.be/2hIY1xuImuQ
+                                e.printStackTrace()
+                                coroutineScope.launch {
+                                    snackbarHostState.showSnackbar("WERROR 404! Launcher Activity undefined")
+                                }
+                            }
+                        }
                     )
                 }
                 composable(route = Screen.ConfigurationScreen.name,

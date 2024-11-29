@@ -20,7 +20,7 @@ data class WindowInfo(
 
 @Composable
 fun rememberWindowInfo() : WindowInfo{
-    // https://youtu.be/HmXgVBys7BU
+    // https://youtu.be/HmXgVBys7BU Philip Lackner window info
     val configuration = LocalConfiguration.current
     return WindowInfo(
         screenWidthInfo = when{

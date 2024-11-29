@@ -136,7 +136,7 @@ fun FirstPageCard(
                     ,
                 )
                 HTButton(
-                    modifier = Modifier,
+                    modifier = Modifier.fillMaxWidth(),
                     title = "Menu",
                     leftIcon = Icons.Default.MoreVert,
                     buttonType = ButtonTypes.TextButton,

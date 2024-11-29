@@ -25,6 +25,10 @@
     <string name="editor_screen">Editor</string>
     <string name="items_explorer_screen">Mengedit</string>
     <string name="back_button">Kembali</string>
+    <string name="more_menu_button">Menu</string>
+    <string name="aria_label_LauncherActivity">Aplikasi %s</string>
+    <string name="aria_label_Activity">Luncurkan tindakan %s</string>
+    <string name="aria_label_ShellOpen">Buka %s</string>
 
     <!--  Home More Menu  -->
     <string name="Home_more_edit">Ubah Tombol Peluncur</string>

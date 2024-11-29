@@ -2,6 +2,7 @@ package com.perkedel.htlauncher.ui.navigation
 
 import android.content.ActivityNotFoundException
 import android.content.Context
+import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
 import android.speech.tts.TextToSpeech
 import androidx.compose.foundation.MarqueeAnimationMode
@@ -58,6 +59,7 @@ fun AllAppsScreen(
     onSnackbarResult:(SnackbarResult) -> Unit = {  },
     systemUiController: SystemUiController = rememberSystemUiController(),
     tts: MutableState<TextToSpeech?> = rememberTextToSpeech(),
+    onLaunchApp: (ApplicationInfo)->Unit = {},
     ) {
     // https://stackoverflow.com/questions/64377518/how-to-initialize-or-access-packagemanager-out-from-coroutinecontext
     // https://www.geeksforgeeks.org/different-ways-to-get-list-of-all-apps-installed-in-your-android-phone/
@@ -150,25 +152,25 @@ fun AllAppsScreen(
                         },
 
                         onClick = {
-                            try {
-//                            startIntent(context, packList[it].applicationInfo.packageName)
-//                                startApplication(context, packList[it].applicationInfo.packageName)
-                                startApplication(context, appList[it].packageName)
-                            } catch (e: Exception) {
-//                                println(e)
-                                e.printStackTrace()
-                                coroutineScope.launch {
-                                    onSnackbarResult(snackbarHostState.showSnackbar("WERROR 404! Launcher Activity undefined"))
-                                }
-                            } catch (e: ActivityNotFoundException){
-                                // https://youtu.be/2hIY1xuImuQ
-                                // https://youtu.be/2hIY1xuImuQ
-                                e.printStackTrace()
-                                coroutineScope.launch {
-                                    onSnackbarResult(snackbarHostState.showSnackbar("WERROR 404! Launcher Activity undefined"))
-                                }
-                            }
-
+//                            try {
+////                            startIntent(context, packList[it].applicationInfo.packageName)
+////                                startApplication(context, packList[it].applicationInfo.packageName)
+//                                startApplication(context, appList[it].packageName)
+//                            } catch (e: Exception) {
+////                                println(e)
+//                                e.printStackTrace()
+//                                coroutineScope.launch {
+//                                    onSnackbarResult(snackbarHostState.showSnackbar("WERROR 404! Launcher Activity undefined"))
+//                                }
+//                            } catch (e: ActivityNotFoundException){
+//                                // https://youtu.be/2hIY1xuImuQ
+//                                // https://youtu.be/2hIY1xuImuQ
+//                                e.printStackTrace()
+//                                coroutineScope.launch {
+//                                    onSnackbarResult(snackbarHostState.showSnackbar("WERROR 404! Launcher Activity undefined"))
+//                                }
+//                            }
+                            onLaunchApp(appList[it])
 
                         }
                     )

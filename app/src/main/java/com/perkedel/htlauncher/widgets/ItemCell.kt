@@ -2,6 +2,8 @@ package com.perkedel.htlauncher.widgets
 
 import android.content.ContentResolver
 import android.content.Context
+import android.content.pm.ApplicationInfo
+import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.graphics.drawable.Drawable
@@ -43,6 +45,7 @@ import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
@@ -60,8 +63,11 @@ import com.bumptech.glide.load.resource.drawable.DrawableResource
 import com.perkedel.htlauncher.HTUIState
 import com.perkedel.htlauncher.HTViewModel
 import com.perkedel.htlauncher.R
+import com.perkedel.htlauncher.data.ActionData
 import com.perkedel.htlauncher.data.ItemData
 import com.perkedel.htlauncher.data.PageData
+import com.perkedel.htlauncher.enumerations.ActionDataLaunchType
+import com.perkedel.htlauncher.enumerations.ShowWhichIcon
 import com.perkedel.htlauncher.func.WindowInfo
 import com.perkedel.htlauncher.func.rememberWindowInfo
 import com.perkedel.htlauncher.getADirectory
@@ -96,7 +102,7 @@ fun ItemCell(
         encodeDefaults = true
     },
     tts: MutableState<TextToSpeech?> = rememberTextToSpeech(),
-    onClick: (()->Unit)? = {},
+    onClick: ((List<ActionData>)->Unit)? = {},
     onLongClick: (()->Unit)? = {},
     windowInfo: WindowInfo = rememberWindowInfo(),
     configuration: Configuration = LocalConfiguration.current,
@@ -165,7 +171,45 @@ fun ItemCell(
 //            dirName = stringResource(R.string.items_folder)
 //        )
     }
+    var selectImage:Any = itemOfIt.imagePath
+    var selectLabel:String = if(itemOfIt.label.isNotEmpty()) itemOfIt.label else handoverText
+    if(LocalInspectionMode.current){
 
+    } else {
+        try {
+            selectImage = when (itemOfIt.showWhichIcon) {
+                ShowWhichIcon.Default -> if (itemOfIt.action[0].action.isNotEmpty()) pm.getApplicationIcon(
+                    itemOfIt.action[0].action
+                ) else "idk"
+
+                else -> if (itemOfIt.action[0].action.isNotEmpty()) pm.getApplicationIcon(itemOfIt.action[0].action) else "idk"
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+        try {
+            if (itemOfIt.useLabel) {
+                selectLabel = if (itemOfIt.label.isNotEmpty()) itemOfIt.label else handoverText
+            } else {
+                if (itemOfIt.action[0].action.isNotEmpty()) {
+                    // https://stackoverflow.com/a/5841353/9079640
+                    val ai: ApplicationInfo = pm.getApplicationInfo(itemOfIt.action[0].action, 0)
+                    selectLabel = if (ai != null) pm.getApplicationLabel(ai)
+                        .toString() else if (itemOfIt.label.isNotEmpty()) itemOfIt.label else handoverText
+                }
+            }
+        } catch (e: Exception) {
+            selectLabel = if (itemOfIt.label.isNotEmpty()) itemOfIt.label else handoverText
+            e.printStackTrace()
+        }
+    }
+    var selectCompartmentType:String = when(itemOfIt.action[0].type){
+        ActionDataLaunchType.LauncherActivity -> stringResource(R.string.aria_label_LauncherActivity,selectLabel)
+        ActionDataLaunchType.ShellOpen -> stringResource(R.string.aria_label_ShellOpen,selectLabel)
+        ActionDataLaunchType.Activity -> stringResource(R.string.aria_label_Activity,selectLabel)
+        else -> selectLabel
+    }
+    var selectAria:String = if(itemOfIt.useAria && itemOfIt.aria.isNotEmpty()) itemOfIt.aria else selectCompartmentType
 
     Surface(
         modifier = modifier
@@ -177,25 +221,27 @@ fun ItemCell(
                     haptic.performHapticFeedback(
                         HapticFeedbackType.LongPress
                     )
-                    Toast
-                        .makeText(context, "Click ${handoverText}", Toast.LENGTH_SHORT)
-                        .show()
+//                    Toast
+//                        .makeText(context, "Click ${handoverText}", Toast.LENGTH_SHORT)
+//                        .show()
                     Log.d("ItemCell","Click ${handoverText}\n${uiState.itemList[readTheItemFile]}")
                     if (onClick != null) {
-                        onClick()
+                        onClick(
+                            itemOfIt.action
+                        )
                     }
                 },
                 onLongClick = {
-                    val readout:String = if(itemOfIt.useAria && itemOfIt.aria.isNotEmpty()) itemOfIt.aria else itemOfIt.label
+//                    val readout:String = if(itemOfIt.useAria && itemOfIt.aria.isNotEmpty()) itemOfIt.aria else itemOfIt.label
                     ttsSpeakOrStop(
                         handover = tts,
-                        message = readout,
+                        message = selectAria,
                     )
                     haptic.performHapticFeedback(HapticFeedbackType.LongPress)
                     Toast
                         .makeText(
                             context,
-                            readout,
+                            selectAria,
                             Toast.LENGTH_SHORT
                         )
                         .show()
@@ -203,7 +249,7 @@ fun ItemCell(
                         onLongClick()
                     }
                 },
-                onClickLabel = itemOfIt.aria,
+                onClickLabel = selectAria,
             )
             .padding(8.dp)
             .aspectRatio(1f)
@@ -224,23 +270,25 @@ fun ItemCell(
 //                contentDescription = "Mavrickle",
 //                modifier = Modifier.fillMaxSize(),
 //            )
+
             AsyncImage(
                 // https://stackoverflow.com/a/73197578/9079640
                 // https://stackoverflow.com/a/68727678/9079640
-                model = itemOfIt.imagePath, // TODO: load image from Medias folder
+//                model = itemOfIt.imagePath, // TODO: load image from Medias folder
+                model = selectImage,
                 contentDescription = itemOfIt.aria,
                 modifier = Modifier.fillMaxSize(),
                 error = painterResource(id = R.drawable.mavrickle),
             )
 
-            OutlinedText(
-                modifier = Modifier
+            if(itemOfIt.showLabel) {
+                OutlinedText(
+                    modifier = Modifier
 //                    .fillMaxWidth()
-                    .align(Alignment.BottomCenter)
-                ,
-                text = if(itemOfIt.label.isNotEmpty()) itemOfIt.label else handoverText,
+                        .align(Alignment.BottomCenter),
+                    text = selectLabel,
 //                text = if(uiState.itemList[readTheItemFile] != null && uiState.itemList[readTheItemFile]!!.label.isNotEmpty()) uiState.itemList[readTheItemFile]!!.label else handoverText,
-                textAlign = TextAlign.Center,
+                    textAlign = TextAlign.Center,
 //                color = rememberColorScheme().primary,
 //                style = TextStyle.Default.copy(
 //                    // https://stackoverflow.com/a/66958833/9079640
@@ -253,14 +301,15 @@ fun ItemCell(
 //                    ,
 //                    color = Color(0xFFF67C37)
 //                )
-                fillColor = rememberColorScheme().onSurface,
-                outlineColor = rememberColorScheme().surfaceBright,
-                outlineDrawStyle = Stroke(
-                    width = 10f,
-                    miter = 5f,
-                    join = StrokeJoin.Round,
-                ),
-            )
+                    fillColor = rememberColorScheme().onSurface,
+                    outlineColor = rememberColorScheme().surfaceBright,
+                    outlineDrawStyle = Stroke(
+                        width = 10f,
+                        miter = 5f,
+                        join = StrokeJoin.Round,
+                    ),
+                )
+            }
 
         }
 
@@ -272,7 +321,10 @@ fun ItemCell(
 fun ItemCellPreview(){
     HTLauncherTheme {
         ItemCell(
-            handoverText = "HALLO"
+            handoverText = "HALLO",
+            readTheItemData = ItemData(
+
+            )
         )
     }
 }
