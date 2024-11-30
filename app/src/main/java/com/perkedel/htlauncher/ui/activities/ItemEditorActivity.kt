@@ -577,7 +577,8 @@ fun ItemEditorGreeting(
                     when{
                         viewModel.itemExtraPaneNavigate == ItemExtraPaneNavigate.SelectApp -> {
                             ActionSelectApp(
-//                                modifier = Modifier.fillMaxSize()
+//                                modifier = Modifier.fillMaxSize(),
+                                viewModel = viewModel,
                                 onSelectedApp = {
                                     viewModel.selectActionPackage(it)
                                     saveNow()

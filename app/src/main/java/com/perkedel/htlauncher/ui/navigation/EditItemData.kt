@@ -1,5 +1,7 @@
 package com.perkedel.htlauncher.ui.navigation
 
+import android.content.Context
+import android.content.pm.PackageManager
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -7,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -26,6 +29,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.unit.dp
 import com.perkedel.htlauncher.data.ActionData
@@ -48,6 +52,8 @@ import me.zhanghai.compose.preference.switchPreference
 fun EditItemData(
     modifier:Modifier = Modifier,
     data:ItemData? = null,
+    context: Context = LocalContext.current,
+    pm: PackageManager = context.packageManager,
     viewModel: ItemEditorViewModel = ItemEditorViewModel(),
     windowInfo: WindowInfo = rememberWindowInfo(),
     configuration: Configuration = LocalConfiguration.current,
@@ -157,7 +163,10 @@ fun EditItemData(
                             toChange?.label = it
                             viewModel.itemData?.label = it
                             rebuildNow()
-                        }
+                        },
+                        keyboardOptions = KeyboardOptions(
+                            showKeyboardOnFocus = false,
+                        )
                     )
                 }
 
@@ -185,7 +194,10 @@ fun EditItemData(
 //                    toChange?.aria = it
                             viewModel.itemData?.aria = it
                             rebuildNow()
-                        }
+                        },
+                        keyboardOptions = KeyboardOptions(
+                            showKeyboardOnFocus = false,
+                        )
                     )
                 }
 

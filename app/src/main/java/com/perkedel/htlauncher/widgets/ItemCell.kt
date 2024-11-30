@@ -10,6 +10,8 @@ import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.speech.tts.TextToSpeech
 import android.util.Log
+import android.view.SoundEffectConstants
+import android.view.View
 import android.widget.Toast
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
@@ -20,10 +22,13 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AcUnit
 import androidx.compose.material.icons.filled.Adb
+import androidx.compose.material.icons.filled.Apps
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
@@ -47,6 +52,7 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.LocalInspectionMode
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
@@ -60,6 +66,7 @@ import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
+import coil3.request.ImageRequest
 import com.bumptech.glide.load.resource.drawable.DrawableResource
 import com.perkedel.htlauncher.HTUIState
 import com.perkedel.htlauncher.HTViewModel
@@ -68,6 +75,7 @@ import com.perkedel.htlauncher.data.ActionData
 import com.perkedel.htlauncher.data.ItemData
 import com.perkedel.htlauncher.data.PageData
 import com.perkedel.htlauncher.enumerations.ActionDataLaunchType
+import com.perkedel.htlauncher.enumerations.ActionInternalCommand
 import com.perkedel.htlauncher.enumerations.ShowWhichIcon
 import com.perkedel.htlauncher.func.WindowInfo
 import com.perkedel.htlauncher.func.rememberWindowInfo
@@ -96,6 +104,7 @@ fun ItemCell(
     haptic: HapticFeedback = LocalHapticFeedback.current,
     uiState: HTUIState = HTUIState(),
     viewModel: HTViewModel = HTViewModel(),
+    view: View = LocalView.current,
     contentResolver: ContentResolver = context.contentResolver,
     json: Json = Json {
         // https://coldfusion-example.blogspot.com/2022/03/jetpack-compose-kotlinx-serialization_79.html
@@ -144,9 +153,7 @@ fun ItemCell(
     // Done:
     var selectImage:Any = itemOfIt.imagePath
     var selectLabel:String = if(itemOfIt.label.isNotEmpty()) itemOfIt.label else handoverText
-    if(LocalInspectionMode.current){
-
-    } else {
+    if(itemOfIt.action[0].type != ActionDataLaunchType.Internal) {
         try {
             selectImage = when (itemOfIt.showWhichIcon) {
                 ShowWhichIcon.Default -> if (itemOfIt.action[0].action.isNotEmpty()) pm.getApplicationIcon(
@@ -173,11 +180,43 @@ fun ItemCell(
             selectLabel = if (itemOfIt.label.isNotEmpty()) itemOfIt.label else handoverText
             e.printStackTrace()
         }
+    } else {
+        // CRASH
+//        selectImage = ActionInternalCommand.valueOf(itemOfIt.action[0].action).icon
+//        selectLabel = stringResource(ActionInternalCommand.valueOf(itemOfIt.action[0].action).label)
+        selectImage = when(itemOfIt.action[0].action){
+            stringResource(ActionInternalCommand.AllApps.id) -> ""
+            else -> ""
+        }
+        selectLabel = when(itemOfIt.action[0].action){
+            stringResource(ActionInternalCommand.AllApps.id)-> stringResource(ActionInternalCommand.AllApps.label)
+            else -> ""
+        }
     }
     val selectCompartmentType:String = when(itemOfIt.action[0].type){
         ActionDataLaunchType.LauncherActivity -> stringResource(R.string.aria_label_LauncherActivity,selectLabel)
         ActionDataLaunchType.ShellOpen -> stringResource(R.string.aria_label_ShellOpen,selectLabel)
         ActionDataLaunchType.Activity -> stringResource(R.string.aria_label_Activity,selectLabel)
+        ActionDataLaunchType.Internal ->{
+            // NO SOLUTION
+            // if enum not found, crash
+            // https://stackoverflow.com/questions/69163458/java-lang-illegalargumentexception-no-enum-constant-found
+            // https://www.reddit.com/r/JetpackCompose/comments/1fvyftg/help_im_creating_an_app_just_to_practice_im/
+            // https://www.reddit.com/r/JetpackCompose/comments/1fvyftg/help_im_creating_an_app_just_to_practice_im/
+            // https://stackoverflow.com/questions/77933152/using-mutablestateof-with-enums-kotlin-jetpack-composable
+            // https://stackoverflow.com/questions/74860799/how-to-catch-an-error-in-jetpack-compose
+
+//            try {
+//                stringResource(ActionInternalCommand.valueOf(itemOfIt.action[0].action).label)
+//            } catch (e:Exception){
+//                ""
+//            }
+            when(itemOfIt.action[0].action){
+                stringResource(ActionInternalCommand.AllApps.id)-> stringResource(ActionInternalCommand.AllApps.label)
+                else -> ""
+            }
+        }
+
         else -> selectLabel
     }
     val selectAria:String = if(itemOfIt.useAria && itemOfIt.aria.isNotEmpty()) itemOfIt.aria else selectCompartmentType
@@ -196,6 +235,7 @@ fun ItemCell(
 //                    Toast
 //                        .makeText(context, "Click ${handoverText}", Toast.LENGTH_SHORT)
 //                        .show()
+                    view.playSoundEffect(SoundEffectConstants.CLICK)
                     Log.d("ItemCell","Click ${handoverText}\n${uiState.itemList[readTheItemFile]}")
                     if (onClick != null) {
                         onClick(
@@ -250,9 +290,11 @@ fun ItemCell(
                 // https://stackoverflow.com/a/68727678/9079640
 //                model = itemOfIt.imagePath, // TODO: load image from Medias folder
                 model = selectImage,
+//                model = Drawable.cre,
                 contentDescription = selectAria,
                 modifier = Modifier.fillMaxSize(),
                 error = painterResource(id = R.drawable.mavrickle),
+                placeholder = painterResource(id = R.drawable.mavrickle),
             )
 
             if(itemOfIt.showLabel) {
@@ -290,16 +332,39 @@ fun ItemCell(
     }
 }
 
-//@HTPreviewAnnotations
-@Preview
+@HTPreviewAnnotations
+//@Preview
 @Composable
 fun ItemCellPreview(){
     HTLauncherTheme {
-        ItemCell(
-            handoverText = "HALLO",
-            readTheItemData = ItemData(
+        LazyVerticalGrid(
+            columns = GridCells.Fixed(3)
+        ) {
+            item {
+                ItemCell(
+                    handoverText = "HALLO",
+                    readTheItemData = ItemData(
 
-            )
-        )
+                    )
+                )
+
+            }
+            item {
+                ItemCell(
+                    handoverText = "HALLOa",
+                    readTheItemData = ItemData(
+                        name = "ALLAPP",
+                        label = "ALLAPP",
+                        action = listOf(
+                            ActionData(
+                                type = ActionDataLaunchType.Internal,
+                                action = stringResource(ActionInternalCommand.AllApps.id)
+                            )
+                        )
+                    )
+                )
+            }
+        }
+
     }
 }

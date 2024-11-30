@@ -23,6 +23,8 @@ import android.os.Build
 import android.provider.Settings
 import android.speech.tts.TextToSpeech
 import android.util.Log
+import android.view.SoundEffectConstants
+import android.view.View
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -57,6 +59,7 @@ import androidx.compose.ui.hapticfeedback.HapticFeedback
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewDynamicColors
@@ -74,8 +77,10 @@ import androidx.documentfile.provider.DocumentFile
 import androidx.lifecycle.ViewModel
 import com.google.accompanist.systemuicontroller.SystemUiController
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
+import com.perkedel.htlauncher.data.ActionData
 import com.perkedel.htlauncher.data.TestJsonData
 import com.perkedel.htlauncher.enumerations.ActionDataLaunchType
+import com.perkedel.htlauncher.enumerations.ActionInternalCommand
 import com.perkedel.htlauncher.enumerations.ConfigSelected
 import com.perkedel.htlauncher.enumerations.EditWhich
 import com.perkedel.htlauncher.enumerations.Screen
@@ -135,6 +140,7 @@ fun Navigation(
         encodeDefaults = true
     },
     tts: MutableState<TextToSpeech?> = rememberTextToSpeech(),
+    view: View = LocalView.current,
 ){
     var homePagerState: PagerState = rememberPagerState(pageCount = {10})
 
@@ -241,6 +247,14 @@ fun Navigation(
     // https://github.com/abdallahmehiz/mpvKt
     //
 //    val saveDirResult = remember { mutableStateOf<Uri?>(null) }
+    val listOfFolder = listOf(
+        context.resources.getString(R.string.pages_folder),
+        context.resources.getString(R.string.items_folder),
+        context.resources.getString(R.string.themes_folder),
+        context.resources.getString(R.string.medias_folder),
+        context.resources.getString(R.string.shortcuts_folder),
+    )
+    val folders: MutableMap<String,Uri> = LinkedHashMap<String,Uri>()
     val takeFlags: Int = Intent.FLAG_GRANT_READ_URI_PERMISSION or
             Intent.FLAG_GRANT_WRITE_URI_PERMISSION
     val saveDirResolver = context.contentResolver
@@ -326,7 +340,9 @@ fun Navigation(
                     e.printStackTrace()
                 }
             }
-
+            coroutineScope.launch {
+                anViewModel.preloadFiles(context,saveDirResolver,htuiState, listOfFolder = listOfFolder, folders = folders, json = json, force = true)
+            }
         } else {
             println("No Save Dir Selected")
         }
@@ -350,14 +366,7 @@ fun Navigation(
         }
     }
 
-    val listOfFolder = listOf(
-        context.resources.getString(R.string.pages_folder),
-        context.resources.getString(R.string.items_folder),
-        context.resources.getString(R.string.themes_folder),
-        context.resources.getString(R.string.medias_folder),
-        context.resources.getString(R.string.shortcuts_folder),
-    )
-    val folders: MutableMap<String,Uri> = LinkedHashMap<String,Uri>()
+
 
 
     LaunchedEffect(true, htuiState.selectedSaveDir, context) {
@@ -384,14 +393,16 @@ fun Navigation(
 //            json = json,
 //        )
 //        preloadThing
-        anViewModel.preloadFiles(
-            context = context,
-            contentResolver = saveDirResolver,
-            uiStating = htuiState,
-            listOfFolder = listOfFolder,
-            folders = folders,
-            json = json,
-        )
+        coroutineScope.launch {
+            anViewModel.preloadFiles(
+                context = context,
+                contentResolver = saveDirResolver,
+                uiStating = htuiState,
+                listOfFolder = listOfFolder,
+                folders = folders,
+                json = json,
+            )
+        }
 //        coroutineScope.launch {
 //
 //            // Full screen
@@ -665,31 +676,15 @@ fun Navigation(
                         isReady = htuiState.isReady,
                         tts = tts,
                         onLaunchOneOfAction = {
-                            when(it[0].type){
-                                ActionDataLaunchType.LauncherActivity -> {
-                                    try{
-                                        if(it[0].action.isNotEmpty()) {
-                                            startApplication(
-                                                context = context,
-                                                pm = pm,
-                                                what = it[0].action
-                                            )
-                                        }
-                                    } catch (e:Exception) {
-                                        coroutineScope.launch {
-                                            snackbarHostState.showSnackbar("WERROR 404! Launcher Activity undefined")
-                                        }
-                                        e.printStackTrace()
-                                    } catch (e: ActivityNotFoundException){
-                                        coroutineScope.launch {
-                                            snackbarHostState.showSnackbar("WERROR 404! Launcher Activity undefined")
-                                        }
-                                        e.printStackTrace()
-                                    }
-                                }
-                                else -> {}
-                            }
-
+                            onLaunchAction(
+                                data = it,
+                                context = context,
+                                coroutineScope = coroutineScope,
+                                pm = pm,
+                                snackbarHostState = snackbarHostState,
+                                contentResolver = saveDirResolver,
+                                navController = navController,
+                            )
                         }
                     )
 
@@ -822,15 +817,17 @@ fun Navigation(
                     val areYouSureChangeSaveDir = remember { mutableStateOf(false) }
                     LaunchedEffect(htuiState.editingLevel) {
                         if(htuiState.editingLevel){
-                            anViewModel.preloadFiles(
-                                context = context,
-                                contentResolver = saveDirResolver,
-                                uiStating = htuiState,
-                                listOfFolder = listOfFolder,
-                                folders = folders,
-                                json = json,
-                                force = true,
-                            )
+                            coroutineScope.launch {
+                                anViewModel.preloadFiles(
+                                    context = context,
+                                    contentResolver = saveDirResolver,
+                                    uiStating = htuiState,
+                                    listOfFolder = listOfFolder,
+                                    folders = folders,
+                                    json = json,
+                                    force = true,
+                                )
+                            }
                             coroutineScope.launch {
                                 snackbarHostState.showSnackbar(
                                     message = context.resources.getString(R.string.reloading_save)
@@ -845,6 +842,7 @@ fun Navigation(
                         pm = pm,
                         saveDirResult = htuiState.selectedSaveDir,
                         onSelectedConfigMenu = { configSelect ->
+                            view.playSoundEffect(SoundEffectConstants.CLICK)
                             when(configSelect){
                                 ConfigSelected.Donation -> TODO()
                                 ConfigSelected.LevelEditor -> {
@@ -855,22 +853,28 @@ fun Navigation(
                             }
                         },
                         onSelectedSaveDir = {
+                            view.playSoundEffect(SoundEffectConstants.CLICK)
 //                            anViewModel.selectSaveDirUri(it)
                         },
                         onChooseSaveDir = {
+                            view.playSoundEffect(SoundEffectConstants.CLICK)
 //                            areYouSureChangeSaveDir.value = true
                             attemptChangeSaveDir.value = true
                         },
-                        onOpenTextFile = {
-                            uri, contentResolver -> openATextFile(uri = uri, contentResolver =  contentResolver)
+                        onOpenTextFile = { uri, contentResolver ->
+                            view.playSoundEffect(SoundEffectConstants.CLICK)
+                            openATextFile(uri = uri, contentResolver =  contentResolver)
                         },
                         onChooseTextFile = {
+                            view.playSoundEffect(SoundEffectConstants.CLICK)
                             testFileLauncher.launch(arrayOf<String>("",""))
                         },
                         onCheckPermission = {
+                            view.playSoundEffect(SoundEffectConstants.CLICK)
                             attemptPermission.value = true
                         },
                         onClickVersion = {
+                            view.playSoundEffect(SoundEffectConstants.CLICK)
                             navController.navigate(Screen.AboutScreen.name)
                         },
                         testTextResult = htuiState.testResult,
@@ -1430,6 +1434,49 @@ public fun setStatusBarVisibility(into:Boolean, systemUiController: SystemUiCont
 //    }
 //    return nowUri
 //}
+
+fun onLaunchAction(
+    data:List<ActionData>,
+    context: Context,
+    coroutineScope: CoroutineScope,
+    contentResolver: ContentResolver = context.contentResolver,
+    pm: PackageManager = context.packageManager,
+    snackbarHostState:SnackbarHostState,
+    navController: NavHostController,
+){
+    when(data[0].type){
+        ActionDataLaunchType.LauncherActivity -> {
+            try{
+                if(data[0].action.isNotEmpty()) {
+                    startApplication(
+                        context = context,
+                        pm = pm,
+                        what = data[0].action
+                    )
+                }
+            } catch (e:Exception) {
+                coroutineScope.launch {
+                    snackbarHostState.showSnackbar("WERROR 404! Launcher Activity undefined")
+                }
+                e.printStackTrace()
+            } catch (e: ActivityNotFoundException){
+                coroutineScope.launch {
+                    snackbarHostState.showSnackbar("WERROR 404! Launcher Activity undefined")
+                }
+                e.printStackTrace()
+            }
+        }
+        ActionDataLaunchType.Internal -> {
+            when(data[0].action){
+                context.resources.getString(ActionInternalCommand.AllApps.id)->{
+                    navController.navigate(Screen.AllAppsScreen.name)
+                }
+                else -> {}
+            }
+        }
+        else -> {}
+    }
+}
 
 @PreviewFontScale
 @PreviewLightDark

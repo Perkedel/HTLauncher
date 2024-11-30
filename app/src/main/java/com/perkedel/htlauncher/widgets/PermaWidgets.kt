@@ -3,6 +3,8 @@ package com.perkedel.htlauncher.widgets
 import android.content.res.Configuration
 import android.os.Build
 import android.os.SystemClock
+import android.view.SoundEffectConstants
+import android.view.View
 import android.widget.TextClock
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Arrangement
@@ -31,6 +33,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewDynamicColors
@@ -58,6 +61,7 @@ fun FirstPageCard(
     configuration: Configuration = LocalConfiguration.current,
     isCompact: Boolean = windowInfo.screenWidthInfo is WindowInfo.WindowType.Compact,
     isOrientation: Int = configuration.orientation,
+    view: View = LocalView.current,
 ){
 //    val mediumPadding = dimensionResource(R.dimen.padding_medium)
 
@@ -107,7 +111,10 @@ fun FirstPageCard(
                     // bottom the more menu?
                 }
                 IconButton(
-                    onClick = onMoreMenuButton,
+                    onClick = {
+                        view.playSoundEffect(SoundEffectConstants.CLICK)
+                        onMoreMenuButton()
+                    },
                     modifier = Modifier
 
                 ) {
@@ -140,7 +147,10 @@ fun FirstPageCard(
                     title = "Menu",
                     leftIcon = Icons.Default.MoreVert,
                     buttonType = ButtonTypes.TextButton,
-                    onClick = onMoreMenuButton
+                    onClick = {
+                        view.playSoundEffect(SoundEffectConstants.CLICK)
+                        onMoreMenuButton()
+                    }
                 )
             }
         }

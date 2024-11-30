@@ -24,7 +24,9 @@ import com.perkedel.htlauncher.data.PageData
 import com.perkedel.htlauncher.data.SearchableApps
 import com.perkedel.htlauncher.data.TestJsonData
 import com.perkedel.htlauncher.enumerations.EditWhich
+import com.perkedel.htlauncher.func.AsyncService
 import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
@@ -36,7 +38,10 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
 
-class HTViewModel : ViewModel() {
+@OptIn(FlowPreview::class)
+class HTViewModel(
+    private val asyncService: AsyncService = AsyncService()
+) : ViewModel() {
     // https://developer.android.com/codelabs/basic-android-kotlin-compose-viewmodel-and-state#11
     private val _uiState = MutableStateFlow(HTUIState())
     val uiState : StateFlow<HTUIState> = _uiState.asStateFlow()
@@ -49,7 +54,6 @@ class HTViewModel : ViewModel() {
     val _appSearchActive = MutableStateFlow(false)
     val appSearchActive = _appSearchActive.asStateFlow()
 
-//    val _appPackageManager:MutableStateFlow<PackageManager>
 
     val _appAll = MutableStateFlow(listOf<SearchableApps>())
     val appAll = appSearchText
@@ -60,7 +64,8 @@ class HTViewModel : ViewModel() {
                 apps
             } else {
                 apps.filter {
-                    it.packageName.contains(text)
+//                    it.packageName.contains(text)
+                    it.doesMatchSearchQuery(text)
                 }
             }
         }
@@ -79,16 +84,38 @@ class HTViewModel : ViewModel() {
     fun updateAppSearchText(with: String){
         _appSearchText.value = with
     }
+    fun installAllApps(with:List<PackageInfo>, packageManager: PackageManager){
+        updateAppAll(
+            with.map {
+                SearchableApps(
+                    packageName = it.packageName,
+                    label = it.applicationInfo?.loadLabel(packageManager).toString()
+                )
+            }
+        )
+    }
+    fun initializeAllApps(with:List<PackageInfo>, packageManager: PackageManager){
+        viewModelScope.launch {
+//            installAllApps(with,packageManager)
+            _appAll.value = asyncService.getSearchableApps(with,packageManager)
+        }
+    }
+    fun getSearchableApps(){
+
+    }
+
 
     suspend fun preloadFiles(context: Context, contentResolver: ContentResolver, uiStating:HTUIState, listOfFolder:List<String>, folders: MutableMap<String,Uri>, json: Json, force:Boolean = false){
         // https://programmingheadache.com/2024/02/13/effortless-loading-screen-with-state-flows-and-jetpack-compose-just-4-easy-steps/
-        setIsReady(into = false)
 
-        if(force){
-            // clear everything
-            uiStating.pageList.clear()
-            uiStating.itemList.clear()
-        }
+
+        viewModelScope.launch {
+            setIsReady(into = false)
+            if(force){
+                // clear everything
+                uiStating.pageList.clear()
+                uiStating.itemList.clear()
+            }
 
 //        val launch = viewModelScope.launch {
 
@@ -236,6 +263,8 @@ class HTViewModel : ViewModel() {
             }
             setIsReady(into = true)
 //        }
+        }
+
     }
 
     fun dissmissPermissionDialog(){

@@ -133,6 +133,7 @@ dependencies {
     // https://github.com/coil-kt/coil
     implementation(libs.coil.compose)
     implementation(libs.coil.network.okhttp)
+    implementation(libs.coil.svg)
 
     // https://jitpack.io
     implementation(libs.kryptoprefs) // https://github.com/rumboalla/KryptoPrefs
@@ -174,6 +175,9 @@ dependencies {
     // https://github.com/saket/cascade
 //    implementation(libs.cascade)
 //    implementation(libs.cascade.compose) // INCOMPATIBLE with API < 23
+
+    // https://insert-koin.io/docs/setup/koin
+    implementation(libs.koin.androidx.compose)
 }
 
 //composeCompiler {

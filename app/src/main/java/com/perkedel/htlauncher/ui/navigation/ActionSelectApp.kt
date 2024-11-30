@@ -30,7 +30,9 @@ import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -47,11 +49,14 @@ import coil3.compose.AsyncImage
 import com.google.accompanist.systemuicontroller.SystemUiController
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.perkedel.htlauncher.R
+import com.perkedel.htlauncher.data.viewmodels.ItemEditorViewModel
 import com.perkedel.htlauncher.modules.rememberTextToSpeech
 import com.perkedel.htlauncher.ui.previews.HTPreviewAnnotations
 import com.perkedel.htlauncher.ui.theme.HTLauncherTheme
 import com.perkedel.htlauncher.ui.theme.rememberColorScheme
+import com.perkedel.htlauncher.widgets.HTSearchBar
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import me.zhanghai.compose.preference.Preference
 import me.zhanghai.compose.preference.ProvidePreferenceLocals
 
@@ -69,44 +74,35 @@ fun ActionSelectApp(
     tts: MutableState<TextToSpeech?> = rememberTextToSpeech(),
     onSelectedApp: (ApplicationInfo) -> Unit = {},
     searchTerm: MutableState<String> = remember{mutableStateOf("")},
+    viewModel: ItemEditorViewModel = ItemEditorViewModel(),
 ){
     val packList = pm.getInstalledPackages(0)
     val appList = pm.getInstalledApplications(0)
+    LaunchedEffect(true) {
+        coroutineScope.launch {
+            viewModel.initializeAllApps(packList,pm)
+        }
+    }
+
 //    val recombination:List<String> = lis
     var searchT:String by searchTerm
-    var appFilter:List<PackageInfo> = emptyList()
-    appFilter = if(packList != null && searchT.isNotEmpty()) packList.filter { it.applicationInfo?.loadLabel(pm).toString().contains(searchT,true) || it.packageName.contains(searchT,true) || searchT.isEmpty() } else packList
+    viewModel.updateAppSearchText(searchT)
+    viewModel.updateAppSearchActive(searchT.isNotBlank())
+//    var appFilter:List<PackageInfo> = emptyList()
+//    appFilter = if(packList != null && searchT.isNotEmpty()) packList.filter { it.applicationInfo?.loadLabel(pm).toString().contains(searchT,true) || it.packageName.contains(searchT,true) || searchT.isEmpty() } else packList
+    val appFilter by viewModel.appAll.collectAsState()
 
     ProvidePreferenceLocals {
         LazyColumn {
             item{
-                Card(
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Column {
-                        Text("Select an App")
-                        OutlinedTextField(
-                            modifier = Modifier.fillMaxWidth(),
-                            value = searchT,
-                            label = { Text("Search") },
-                            onValueChange = {
-                                searchT = it
-                            },
-                            leadingIcon = {
-                                Icon(Icons.Default.Search,"")
-                            },
-                            trailingIcon = {
-                                if(searchT.isNotEmpty() || LocalInspectionMode.current){
-                                    IconButton(
-                                        onClick = {
-                                            searchT = ""
-                                        }
-                                    ) { Icon(Icons.AutoMirrored.Default.Backspace, "") }
-                                }
-                            }
-                        )
-                    }
-                }
+                HTSearchBar(
+                    value = searchT,
+                    onValueChange = {
+                        searchT = it
+                    },
+                    megaTitle = "Select an App"
+                )
+                
             }
             items(
 //                count = appList.size
@@ -116,7 +112,8 @@ fun ActionSelectApp(
 //                val ddawe = pm.getApplicationIcon(appList[it].packageName)
                 val ddawe = pm.getApplicationIcon(it.packageName)
 //                val ddlabel:String = it.loadLabel(pm).toString()
-                val ddlabel:String = it.applicationInfo?.loadLabel(pm).toString()
+//                val ddlabel:String = it.applicationInfo?.loadLabel(pm).toString()
+                val ddlabel:String = it.label
                 Preference(
                     icon = {
                         AsyncImage(
@@ -145,8 +142,9 @@ fun ActionSelectApp(
                     onClick = {
 //                        onSelectedApp(appList[it])
 //                        onSelectedApp(it)
-                        if(it.applicationInfo != null)
-                            onSelectedApp(it.applicationInfo!!)
+//                        if(it.applicationInfo != null)
+//                            onSelectedApp(it.applicationInfo!!)
+                        onSelectedApp(pm.getApplicationInfo(it.packageName,0))
                     }
                 )
             }

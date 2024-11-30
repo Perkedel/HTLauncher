@@ -16,6 +16,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Backspace
 import androidx.compose.material.icons.filled.Search
@@ -31,6 +33,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -42,6 +45,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewDynamicColors
 import androidx.compose.ui.tooling.preview.PreviewFontScale
@@ -62,6 +67,7 @@ import com.perkedel.htlauncher.startApplication
 import com.perkedel.htlauncher.ui.previews.HTPreviewAnnotations
 import com.perkedel.htlauncher.ui.theme.HTLauncherTheme
 import com.perkedel.htlauncher.ui.theme.rememberColorScheme
+import com.perkedel.htlauncher.widgets.HTSearchBar
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import me.zhanghai.compose.preference.Preference
@@ -119,6 +125,13 @@ fun AllAppsScreen(
     val packList = pm.getInstalledPackages(0)
 //    val packList = pm.getInstalledApplications(0)
     val appList = pm.getInstalledApplications(0)
+    LaunchedEffect(true) {
+        coroutineScope.launch {
+            anViewModel.initializeAllApps(packList,pm)
+        }
+    }
+
+//    anViewModel.installAllApps(packList,pm)
 //    val searchableApps: MutableList<SearchableApps> = emptyList<SearchableApps>().toMutableList()
 //    for (i in appList){
 //        searchableApps.add(
@@ -152,6 +165,8 @@ fun AllAppsScreen(
 
 //    var searchT:String by searchTerm
     var searchT:String by remember{mutableStateOf("")}
+    anViewModel.updateAppSearchText(searchT)
+    anViewModel.updateAppSearchActive(searchT.isNotBlank())
 //    val appFilter = if(appList != null && searchT.isNotEmpty()) appList.filter {
 ////        it.loadLabel(pm).contains(searchT, true)
 //                it.packageName.contains(searchT, true)
@@ -168,13 +183,13 @@ fun AllAppsScreen(
 //    anViewModel.updateAppAll(packList)
 //    anViewModel.updateAppAll()
 //    anViewModel.appSearchActive.value = searchT.isNotBlank()
-    var appFilter:List<PackageInfo> = emptyList()
-    LaunchedEffect(
-        true
-    ) {}
-
-    appFilter = if(packList != null && searchT.isNotEmpty()) packList.filter { it.applicationInfo?.loadLabel(pm).toString().contains(searchT,true) || it.packageName.contains(searchT,true) || searchT.isEmpty() } else packList
-
+//    var appFilter:List<PackageInfo> = emptyList()
+//    LaunchedEffect(
+//        true
+//    ) {}
+//
+//    appFilter = if(packList != null && searchT.isNotEmpty()) packList.filter { it.applicationInfo?.loadLabel(pm).toString().contains(searchT,true) || it.packageName.contains(searchT,true) || searchT.isEmpty() } else packList
+    val appFilter by anViewModel.appAll.collectAsState()
 
     Box(
         modifier = Modifier
@@ -184,34 +199,12 @@ fun AllAppsScreen(
                 verticalArrangement = Arrangement.spacedBy(16.dp),
             ) {
                 item{
-                    Card(
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Column {
-//                            Text("Select an App")
-                            OutlinedTextField(
-                                modifier = Modifier.fillMaxWidth(),
-                                value = searchT,
-                                label = { Text("Search") },
-                                onValueChange = {
-                                    searchT = it
-                                },
-                                leadingIcon = {
-                                    Icon(Icons.Default.Search,"")
-                                },
-                                trailingIcon = {
-                                    if(searchT.isNotEmpty() || LocalInspectionMode.current){
-                                        IconButton(
-                                            onClick = {
-                                                searchT = ""
-                                            }
-                                        ) { Icon(Icons.AutoMirrored.Default.Backspace, "") }
-                                    }
-                                },
-                                singleLine = true,
-                            )
+                    HTSearchBar(
+                        value = searchT,
+                        onValueChange = {
+                            searchT = it
                         }
-                    }
+                    )
                 }
                 items(
 //                    count = appList.size
@@ -224,8 +217,8 @@ fun AllAppsScreen(
 //                    val ddawe = pm.getApplicationIcon(appList[it].packageName)
                     val ddawe = pm.getApplicationIcon(it.packageName)
 //                    val ddlabel:String = it.loadLabel(pm).toString()
-//                    val ddlabel:String = it.label
-                    val ddlabel:String = it.applicationInfo?.loadLabel(pm).toString()
+                    val ddlabel:String = it.label
+//                    val ddlabel:String = it.applicationInfo?.loadLabel(pm).toString()
                     Preference(
                         icon = {
 
@@ -258,9 +251,10 @@ fun AllAppsScreen(
 
                         onClick = {
 //                            onLaunchApp(appList[it])
-//                            onLaunchApp(pm.getApplicationInfo(it.packageName,0))
-                            if(it.applicationInfo != null)
-                                onLaunchApp(it.applicationInfo!!)
+                            onLaunchApp(pm.getApplicationInfo(it.packageName,0))
+//                            if(it.applicationInfo != null)
+//                                onLaunchApp(it.applicationInfo!!)
+
 
                         }
                     )

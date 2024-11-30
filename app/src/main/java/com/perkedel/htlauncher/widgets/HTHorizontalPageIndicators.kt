@@ -2,6 +2,8 @@
 
 package com.perkedel.htlauncher.widgets
 
+import android.view.SoundEffectConstants
+import android.view.View
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.focusable
@@ -27,6 +29,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.semantics.invisibleToUser
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.Dp
@@ -50,6 +53,7 @@ fun HTHorizontalPageIndicators(
     indicatorCornerRadius: Dp = 2.dp,
     indicatorPadding: Dp = 2.dp,
     onSetPage: (Int) -> Unit = {},
+    view: View = LocalView.current,
 ){
     // https://medium.com/@domen.lanisnik/exploring-the-official-pager-in-compose-8c2698c49a98 yoink!!
     // https://stackoverflow.com/a/75771001/9079640
@@ -110,6 +114,7 @@ fun HTHorizontalPageIndicators(
                     .clickable(
                         onClick = {
                             onSetPage(page)
+                            view.playSoundEffect(SoundEffectConstants.CLICK)
                         },
                     )
 

@@ -2,6 +2,8 @@
 
 package com.perkedel.htlauncher.widgets
 
+import android.view.SoundEffectConstants
+import android.view.View
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
@@ -28,6 +30,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import com.perkedel.htlauncher.enumerations.ButtonTypes
@@ -98,6 +101,8 @@ fun HTButton(
 
     onLongClickLabel:String? = null,
 
+    view: View = LocalView.current,
+
     content: @Composable() (RowScope.() -> Unit) = {
         if (leadingIcon != null) {
             leadingIcon()
@@ -111,6 +116,7 @@ fun HTButton(
     // https://youtu.be/nCd02GTBbIM?si=ygaiFektH1vXio_B Philipp Lackner Button UI Preview
     // https://stackoverflow.com/a/65850523/9079640
     // https://proandroiddev.com/using-previewparameters-and-providing-composables-to-jetpack-compose-previews-5b1f5a8fe192
+    // https://stackoverflow.com/a/76075029/9079640
 //    val longClickModifier:Modifier = if (onLongClick != null) combinedClickable (
 //        onClick = {},
 //        onLongClick = onLongClick,
@@ -129,7 +135,10 @@ fun HTButton(
             border = border,
             contentPadding = contentPadding,
             interactionSource = interactionSource,
-            onClick = onClick,
+            onClick = {
+                onClick()
+                view.playSoundEffect(SoundEffectConstants.CLICK)
+            },
             content = content,
         )
         ButtonTypes.TextButton-> TextButton(
@@ -161,7 +170,10 @@ fun HTButton(
             colors = iconButtonColors,
 
             interactionSource = interactionSource,
-            onClick = onClick,
+            onClick = {
+                onClick()
+                view.playSoundEffect(SoundEffectConstants.CLICK)
+            },
             content = {
                 if(leadingIcon != null){
                     leadingIcon()
@@ -190,7 +202,10 @@ fun HTButton(
             border = border,
             contentPadding = contentPadding,
             interactionSource = interactionSource,
-            onClick = onClick,
+            onClick = {
+                onClick()
+                view.playSoundEffect(SoundEffectConstants.CLICK)
+            },
             content = content,
         )
     }

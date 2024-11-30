@@ -278,6 +278,10 @@
     <string name="unit_version_number">iteration</string>
     <string name="iteration">iteration</string>
 
+    <!--  Internal Commmands  -->
+    <string name="internal_commands_all_apps" translatable="false">AllApps</string>
+    <string name="internal_commands_all_apps_label" translatable="true">All Apps</string>
+
     <!--  filetype  -->
     <string name="text_plain_type" translatable="false">text/plain</string>
     <string name="text_all_type" translatable="false">text/*</string>

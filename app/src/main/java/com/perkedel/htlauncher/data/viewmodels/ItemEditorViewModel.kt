@@ -4,6 +4,8 @@ package com.perkedel.htlauncher.data.viewmodels
 
 import android.content.ClipData.Item
 import android.content.pm.ApplicationInfo
+import android.content.pm.PackageInfo
+import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Message
 import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
@@ -12,16 +14,30 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.perkedel.htlauncher.data.ActionData
 import com.perkedel.htlauncher.data.HomepagesWeHave
 import com.perkedel.htlauncher.data.ItemData
 import com.perkedel.htlauncher.data.PageData
+import com.perkedel.htlauncher.data.SearchableApps
 import com.perkedel.htlauncher.enumerations.EditWhich
 import com.perkedel.htlauncher.enumerations.ItemExtraPaneNavigate
+import com.perkedel.htlauncher.func.AsyncService
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.encodeToJsonElement
 
-class ItemEditorViewModel:ViewModel() {
+class ItemEditorViewModel(
+    private val asyncService: AsyncService = AsyncService()
+):ViewModel() {
     var uri: Uri? by mutableStateOf(null)
         private set
 
@@ -165,5 +181,58 @@ class ItemEditorViewModel:ViewModel() {
     fun updateError(into: Boolean = false, message: String = ""){
         this.errorMessage = message.ifEmpty { this.errorMessage }
         this.errorOccured = into
+    }
+
+    val _appSearchText = MutableStateFlow("")
+    val appSearchText = _appSearchText.asStateFlow()
+
+    val _appSearchActive = MutableStateFlow(false)
+    val appSearchActive = _appSearchActive.asStateFlow()
+
+
+    val _appAll = MutableStateFlow(listOf<SearchableApps>())
+    val appAll = appSearchText
+        .debounce(1500L)
+        .onEach { _appSearchActive.update { true } }
+        .combine(_appAll){ text, apps ->
+            if(text.isBlank()){
+                apps
+            } else {
+                apps.filter {
+//                    it.packageName.contains(text)
+                    it.doesMatchSearchQuery(text)
+                }
+            }
+        }
+        .stateIn(
+            viewModelScope,
+            SharingStarted.WhileSubscribed(5000L),
+            _appAll.value
+        )
+
+    fun updateAppAll(with:List<SearchableApps>){
+        _appAll.value = with
+    }
+    fun updateAppSearchActive(with:Boolean){
+        _appSearchActive.value = with
+    }
+    fun updateAppSearchText(with: String){
+        _appSearchText.value = with
+    }
+    fun installAllApps(with:List<PackageInfo>, packageManager: PackageManager){
+        updateAppAll(
+            with.map {
+                SearchableApps(
+                    packageName = it.packageName,
+                    label = it.applicationInfo?.loadLabel(packageManager).toString()
+                )
+            }
+        )
+    }
+    fun initializeAllApps(with:List<PackageInfo>, packageManager: PackageManager){
+        viewModelScope.launch {
+//            installAllApps(with,packageManager)
+            _appAll.value = asyncService.getSearchableApps(with,packageManager)
+        }
     }
 }

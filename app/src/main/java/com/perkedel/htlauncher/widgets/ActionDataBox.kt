@@ -2,6 +2,9 @@
 
 package com.perkedel.htlauncher.widgets
 
+import android.content.Context
+import android.content.pm.PackageManager
+import android.graphics.drawable.Drawable
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
@@ -23,6 +26,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -36,6 +41,8 @@ import com.perkedel.htlauncher.ui.theme.HTLauncherTheme
 @Composable
 fun ActionDataBox(
     modifier: Modifier = Modifier,
+    context: Context = LocalContext.current,
+    pm: PackageManager = context.packageManager,
     actionData: ActionData = ActionData(),
     onClick: () -> Unit = {},
     onLongClick: (() -> Unit)? = null,
@@ -43,7 +50,11 @@ fun ActionDataBox(
     id:Int = 0,
 ){
 //    val name by remember { mutableStateOf(actionData.name ?: "anAction") }
-
+//    val icon:Drawable? = when(actionData.type){
+//        ActionDataLaunchType.LauncherActivity -> pm.getApplicationIcon(actionData.action)
+//        ActionDataLaunchType.Activity -> pm.getApplicationIcon(actionData.action)
+//        else -> pm.getApplicationIcon(actionData.action)
+//    }
     Card(
         modifier = Modifier.fillMaxWidth().combinedClickable (
             onClick = onClick,
@@ -60,9 +71,11 @@ fun ActionDataBox(
             ){
                 AsyncImage(
                     modifier = Modifier,
+//                    model = if(!LocalInspectionMode.current) icon else null,
                     model = null,
                     contentDescription = "",
-                    error = painterResource(R.drawable.mavrickle)
+                    error = painterResource(R.drawable.mavrickle),
+                    placeholder = painterResource(R.drawable.mavrickle),
                 )
             }
 
@@ -80,6 +93,9 @@ fun ActionDataBox(
                     }
                     ActionDataLaunchType.Activity -> {
                         Text("execute ${actionData.action} activity ${actionData.args[0]}")
+                    }
+                    ActionDataLaunchType.Internal -> {
+                        Text("Internal Command ${actionData.action}")
                     }
                     else -> {}
                 }

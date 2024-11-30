@@ -1,5 +1,6 @@
 @file:OptIn(ExperimentalFoundationApi::class, ExperimentalFoundationApi::class,
-    ExperimentalFoundationApi::class, ExperimentalFoundationApi::class
+    ExperimentalFoundationApi::class, ExperimentalFoundationApi::class,
+    ExperimentalFoundationApi::class
 )
 
 package com.perkedel.htlauncher.ui.navigation
@@ -12,12 +13,8 @@ import android.speech.tts.TextToSpeech
 import android.widget.Toast
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Accessibility
@@ -28,18 +25,19 @@ import androidx.compose.material.icons.filled.DisplaySettings
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Error
 import androidx.compose.material.icons.filled.Folder
+import androidx.compose.material.icons.filled.Functions
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Pages
 import androidx.compose.material.icons.filled.Phone
 import androidx.compose.material.icons.filled.Restore
 import androidx.compose.material.icons.filled.Security
+import androidx.compose.material.icons.filled.SettingsApplications
 import androidx.compose.material.icons.filled.SettingsInputComponent
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material.icons.filled.Sms
 import androidx.compose.material.icons.filled.Sos
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.Translate
-import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -51,7 +49,6 @@ import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.google.accompanist.systemuicontroller.SystemUiController
@@ -62,9 +59,11 @@ import com.perkedel.htlauncher.R
 import com.perkedel.htlauncher.enumerations.ConfigSelected
 import com.perkedel.htlauncher.modules.rememberTextToSpeech
 import com.perkedel.htlauncher.modules.ttsSpeak
+import com.perkedel.htlauncher.modules.ttsSpeakOrStop
 import com.perkedel.htlauncher.ui.previews.HTPreviewAnnotations
 import com.perkedel.htlauncher.ui.theme.HTLauncherTheme
 import com.perkedel.htlauncher.ui.theme.rememberColorScheme
+import com.perkedel.htlauncher.widgets.SettingCategoryBar
 import me.zhanghai.compose.preference.ProvidePreferenceLocals
 import me.zhanghai.compose.preference.footerPreference
 import me.zhanghai.compose.preference.listPreference
@@ -257,7 +256,8 @@ fun Configurationing(
 //                    modifier = Modifier.padding(vertical = 12.dp)
 //                )
                 SettingCategoryBar(
-                    title = stringResource(R.string.category_type_pages)
+                    title = stringResource(R.string.category_type_pages),
+                    icon = { Icon(Icons.Default.Pages,"") },
                 )
             }
             preference(
@@ -309,6 +309,7 @@ fun Configurationing(
 //                )
                 SettingCategoryBar(
                     title = stringResource(R.string.category_type_functions),
+                    icon = { Icon(Icons.Default.Functions,"") },
                 )
             }
             preference(
@@ -418,7 +419,8 @@ fun Configurationing(
 //                    modifier = Modifier.padding(vertical = 12.dp)
 //                )
                 SettingCategoryBar(
-                    title = stringResource(R.string.category_type_standards)
+                    title = stringResource(R.string.category_type_standards),
+                    icon = { Icon(Icons.Default.SettingsApplications,"") },
                 )
             }
             preference(
@@ -567,12 +569,14 @@ fun Configurationing(
                     .combinedClickable(
                         onClick = onClickVersion,
                         onLongClick = {
-                            ttsSpeak(
+                            val readout = context.resources.getString(R.string.About_version_readout, versionName, versionNumber)
+                            ttsSpeakOrStop(
                                 handover = tts,
-                                message = context.resources.getString(R.string.About_version_readout, versionName, versionNumber)
+                                message = readout
                             )
                             haptic.performHapticFeedback(HapticFeedbackType.LongPress)
 //                            Toast.makeText(context,"HELLO A", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(context,readout, Toast.LENGTH_SHORT).show()
                         },
                         onLongClickLabel = context.resources.getString(R.string.About_version_readout, versionName, versionNumber)
                     )
@@ -595,54 +599,6 @@ fun Configurationing(
 //    // filter the zhanghai preference item
 //
 //}
-
-@Composable
-fun SettingCategoryBar(
-    title:String = "",
-    modifier: Modifier = Modifier,
-    haptic: HapticFeedback = LocalHapticFeedback.current,
-    context: Context = LocalContext.current,
-    tts: MutableState<TextToSpeech?> = rememberTextToSpeech(),
-    icon: @Composable() (() -> Unit?)? = null,
-){
-    val readout:String = stringResource(R.string.category_bar_fill, title)
-
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .combinedClickable(
-                onClick = {
-
-                },
-                onLongClick = {
-                    // DONE: Talkback read this title!
-                    ttsSpeak(
-                        handover = tts,
-                        message = readout
-                    )
-                    Toast.makeText(context,readout,Toast.LENGTH_SHORT)
-                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                },
-                onClickLabel = readout
-            )
-        ,
-    ) {
-        if(icon != null){
-            // ikr? just eval `(icon)` does not work unlike in most game engines. What a
-            Box(
-                modifier = Modifier.padding(25.dp)
-            ){
-                icon()
-            }
-        }
-        Text(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(20.dp),
-            text = title
-        )
-    }
-}
 
 @HTPreviewAnnotations
 @Composable

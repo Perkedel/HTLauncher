@@ -41,10 +41,12 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
 import com.perkedel.htlauncher.func.DATA_STORE_FILE_NAME
 import com.perkedel.htlauncher.func.createDataStore
+import com.perkedel.htlauncher.ui.previews.HTPreviewAnnotations
 import com.perkedel.htlauncher.ui.theme.HTLauncherTheme
 import kotlinx.coroutines.flow.map
 
@@ -119,12 +121,12 @@ class MainActivity : ComponentActivity() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeGreeting(
-
     context: Context = LocalContext.current,
     permissionRequests: Array<String> = arrayOf(""),
     activityHandOver: ComponentActivity = ComponentActivity(),
     dataStorePrefs: DataStore<Preferences> = createDataStore(context),
     prefs: DataStore<Preferences> = remember { dataStorePrefs },
+    anViewModel: HTViewModel = viewModel(),
 ){
     HTLauncherTheme {
         Navigation(
@@ -133,6 +135,7 @@ fun HomeGreeting(
             activityHandOver = activityHandOver,
             dataStorePrefs = dataStorePrefs,
             prefs = prefs,
+            anViewModel = anViewModel,
         )
     }
 }
@@ -145,18 +148,17 @@ fun Greeting(name: String, modifier: Modifier = Modifier) {
     )
 }
 
-@PreviewFontScale
-@PreviewLightDark
-@PreviewScreenSizes
-@PreviewDynamicColors
-@Preview(showBackground = true)
+@HTPreviewAnnotations
 @Composable
 fun GreetingPreview() {
 //    HTLauncherTheme {
 ////        Greeting("Android")
 //
 //    }
-    HomeGreeting(
-//        prefs = remember { createDataStore(applicationContext) }
-    )
+//    HomeGreeting(
+////        prefs = remember { createDataStore(applicationContext) }
+//    )
+    HTLauncherTheme {
+        HomeGreeting()
+    }
 }
