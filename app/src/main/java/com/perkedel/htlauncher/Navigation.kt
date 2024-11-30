@@ -787,7 +787,8 @@ fun Navigation(
                                     snackbarHostState.showSnackbar("WERROR 404! Launcher Activity undefined")
                                 }
                             }
-                        }
+                        },
+                        anViewModel = anViewModel
                     )
                 }
                 composable(route = Screen.ConfigurationScreen.name,

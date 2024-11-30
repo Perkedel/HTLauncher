@@ -12,8 +12,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalInspectionMode
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.perkedel.htlauncher.R
+import com.perkedel.htlauncher.ui.theme.HTLauncherTheme
 import java.util.Locale
 
 // https://serge-hulne.medium.com/how-to-do-text-to-speech-the-easy-way-with-android-kotlin-compose-2024-628015d4c5c2
@@ -24,17 +27,19 @@ fun rememberTextToSpeech(
 ): MutableState<TextToSpeech?> {
     val context = LocalContext.current
     val tts = remember { mutableStateOf<TextToSpeech?>(null) }
-    DisposableEffect(context) {
-        val textToSpeech = TextToSpeech(context) { status ->
-            if (status == TextToSpeech.SUCCESS) {
-                tts.value?.language = locale
+    if(!LocalInspectionMode.current) {
+        DisposableEffect(context) {
+            val textToSpeech = TextToSpeech(context) { status ->
+                if (status == TextToSpeech.SUCCESS) {
+                    tts.value?.language = locale
+                }
             }
-        }
-        tts.value = textToSpeech
+            tts.value = textToSpeech
 
-        onDispose {
-            textToSpeech.stop()
-            textToSpeech.shutdown()
+            onDispose {
+                textToSpeech.stop()
+                textToSpeech.shutdown()
+            }
         }
     }
     return tts
@@ -55,5 +60,13 @@ fun ttsSpeakOrStop(handover:MutableState<TextToSpeech?>, message:String = "",que
             params = params,
             utteranceId = utteranceId,
         )
+    }
+}
+
+@Preview
+@Composable
+fun RememberTextToSpeechPreview(){
+    HTLauncherTheme {
+        rememberTextToSpeech()
     }
 }

@@ -1,7 +1,11 @@
+@file:OptIn(FlowPreview::class)
+
 package com.perkedel.htlauncher
 
 import android.content.ContentResolver
 import android.content.Context
+import android.content.pm.PackageInfo
+import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import android.util.Log
@@ -17,8 +21,15 @@ import androidx.lifecycle.viewModelScope
 import com.perkedel.htlauncher.data.HomepagesWeHave
 import com.perkedel.htlauncher.data.ItemData
 import com.perkedel.htlauncher.data.PageData
+import com.perkedel.htlauncher.data.SearchableApps
 import com.perkedel.htlauncher.data.TestJsonData
 import com.perkedel.htlauncher.enumerations.EditWhich
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.serialization.encodeToString
@@ -31,6 +42,43 @@ class HTViewModel : ViewModel() {
     val uiState : StateFlow<HTUIState> = _uiState.asStateFlow()
 
     val visiblePermissionDialogQueue = mutableStateListOf<String>()
+
+    val _appSearchText = MutableStateFlow("")
+    val appSearchText = _appSearchText.asStateFlow()
+
+    val _appSearchActive = MutableStateFlow(false)
+    val appSearchActive = _appSearchActive.asStateFlow()
+
+//    val _appPackageManager:MutableStateFlow<PackageManager>
+
+    val _appAll = MutableStateFlow(listOf<SearchableApps>())
+    val appAll = appSearchText
+        .debounce(1500L)
+        .onEach { _appSearchActive.update { true } }
+        .combine(_appAll){ text, apps ->
+            if(text.isBlank()){
+                apps
+            } else {
+                apps.filter {
+                    it.packageName.contains(text)
+                }
+            }
+        }
+        .stateIn(
+            viewModelScope,
+            SharingStarted.WhileSubscribed(5000L),
+            _appAll.value
+        )
+
+    fun updateAppAll(with:List<SearchableApps>){
+        _appAll.value = with
+    }
+    fun updateAppSearchActive(with:Boolean){
+        _appSearchActive.value = with
+    }
+    fun updateAppSearchText(with: String){
+        _appSearchText.value = with
+    }
 
     suspend fun preloadFiles(context: Context, contentResolver: ContentResolver, uiStating:HTUIState, listOfFolder:List<String>, folders: MutableMap<String,Uri>, json: Json, force:Boolean = false){
         // https://programmingheadache.com/2024/02/13/effortless-loading-screen-with-state-flows-and-jetpack-compose-just-4-easy-steps/

@@ -1,6 +1,7 @@
 package com.perkedel.htlauncher
 
 import android.content.ClipData.Item
+import android.content.pm.PackageInfo
 import android.net.Uri
 import com.perkedel.htlauncher.data.HomepagesWeHave
 import com.perkedel.htlauncher.data.ItemData
@@ -35,5 +36,6 @@ data class HTUIState(
     val itemList:MutableMap<String,ItemData> = LinkedHashMap<String,ItemData>(),
 //    val themesList:MutableMap<String,ItemData> = LinkedHashMap<String,ItemData>(),
     // TODO: Medias, Shortcuts
+    val installedPackageInfo: MutableList<PackageInfo> = emptyList<PackageInfo>().toMutableList()
 ) {
 }

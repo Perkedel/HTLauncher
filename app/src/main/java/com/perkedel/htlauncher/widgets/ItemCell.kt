@@ -31,6 +31,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -81,7 +82,7 @@ import com.perkedel.htlauncher.ui.theme.rememberColorScheme
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
-@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class,
+@OptIn(ExperimentalFoundationApi::class,
     ExperimentalComposeUiApi::class
 )
 @Composable
@@ -103,12 +104,13 @@ fun ItemCell(
     },
     tts: MutableState<TextToSpeech?> = rememberTextToSpeech(),
     onClick: ((List<ActionData>)->Unit)? = {},
-    onLongClick: (()->Unit)? = {},
-    windowInfo: WindowInfo = rememberWindowInfo(),
-    configuration: Configuration = LocalConfiguration.current,
-    isCompact: Boolean = windowInfo.screenWidthInfo is WindowInfo.WindowType.Compact,
-    isOrientation: Int = configuration.orientation,
+    onLongClick: ((List<ActionData>)->Unit)? = {},
+//    windowInfo: WindowInfo = rememberWindowInfo(),
+//    configuration: Configuration = LocalConfiguration.current,
+//    isCompact: Boolean = windowInfo.screenWidthInfo is WindowInfo.WindowType.Compact,
+//    isOrientation: Int = configuration.orientation,
 ){
+//    val tts by rememberTextToSpeech()
     // Load file
     var itemFolder = Uri.parse("")
     var itemUri:Uri = Uri.parse("")
@@ -116,42 +118,8 @@ fun ItemCell(
     var itemOfIt:ItemData = ItemData(
         name = readTheItemFile
     )
-    LaunchedEffect(true) {
-//        Log.d("ItemCell", "Eval filename = ${readTheItemFile}")
-//        Log.d("ItemCell", "Eval selected save = ${uiState.selectedSaveDir}")
 
-        if(readTheItemData != null){
-            itemOfIt = readTheItemData
-        } else {
-            if (uiState.itemList.contains(readTheItemFile) && uiState.itemList[readTheItemFile] != null) {
-                itemOfIt = uiState.itemList[readTheItemFile]!!
-            } else {
-//            if (readTheItemFile.isNotEmpty() && uiState.selectedSaveDir != null && uiState.selectedSaveDir.toString()
-//                    .isNotEmpty()
-//            ) {
-//                itemFolder = getADirectory(
-//                    dirUri = uiState.selectedSaveDir,
-//                    context = context,
-//                    dirName = context.resources.getString(R.string.items_folder)
-//                )
-//                itemUri = getATextFile(
-//                    dirUri = itemFolder,
-//                    context = context,
-//                    fileName = "${readTheItemFile}.json",
-//                    initData = Json.encodeToString<ItemData>(ItemData()),
-//                    hardOverwrite = false,
-//                )
-//                Log.d("ItemCell", "Eval Item Folder ${itemFolder}")
-//                Log.d("ItemCell", "Eval Item Uri ${itemUri}")
-//                itemOfIt = Json.decodeFromString<ItemData>(openATextFile(itemUri, contentResolver))
-//                Log.d("ItemCell", "an Item ${readTheItemFile} has:\n${itemOfIt}")
-//            } else {
-//                Log.d("ItemCell", "(EMPTY) an Item ${readTheItemFile} has:\n${itemOfIt}")
-//            }
-//            uiState.itemList[readTheItemFile] = itemOfIt
-            }
-        }
-    }
+    // DONE:
     if(readTheItemData != null){
         itemOfIt = readTheItemData
     } else {
@@ -159,6 +127,7 @@ fun ItemCell(
             itemOfIt = uiState.itemList[readTheItemFile]!!
         }
     }
+
     if(uiState.selectedSaveDir != null){
 //        mediaFolder = getADirectory(
 //            dirUri = uiState.selectedSaveDir,
@@ -171,6 +140,8 @@ fun ItemCell(
 //            dirName = stringResource(R.string.items_folder)
 //        )
     }
+
+    // Done:
     var selectImage:Any = itemOfIt.imagePath
     var selectLabel:String = if(itemOfIt.label.isNotEmpty()) itemOfIt.label else handoverText
     if(LocalInspectionMode.current){
@@ -203,14 +174,15 @@ fun ItemCell(
             e.printStackTrace()
         }
     }
-    var selectCompartmentType:String = when(itemOfIt.action[0].type){
+    val selectCompartmentType:String = when(itemOfIt.action[0].type){
         ActionDataLaunchType.LauncherActivity -> stringResource(R.string.aria_label_LauncherActivity,selectLabel)
         ActionDataLaunchType.ShellOpen -> stringResource(R.string.aria_label_ShellOpen,selectLabel)
         ActionDataLaunchType.Activity -> stringResource(R.string.aria_label_Activity,selectLabel)
         else -> selectLabel
     }
-    var selectAria:String = if(itemOfIt.useAria && itemOfIt.aria.isNotEmpty()) itemOfIt.aria else selectCompartmentType
+    val selectAria:String = if(itemOfIt.useAria && itemOfIt.aria.isNotEmpty()) itemOfIt.aria else selectCompartmentType
 
+    // DONE:
     Surface(
         modifier = modifier
             .combinedClickable(
@@ -236,19 +208,22 @@ fun ItemCell(
                     ttsSpeakOrStop(
                         handover = tts,
                         message = selectAria,
+//                        message = itemOfIt.aria,
                     )
                     haptic.performHapticFeedback(HapticFeedbackType.LongPress)
                     Toast
                         .makeText(
                             context,
                             selectAria,
+//                            itemOfIt.aria,
                             Toast.LENGTH_SHORT
                         )
                         .show()
                     if (onLongClick != null) {
-                        onLongClick()
+                        onLongClick(itemOfIt.action)
                     }
                 },
+//                onClickLabel = selectAria,
                 onClickLabel = selectAria,
             )
             .padding(8.dp)
@@ -260,7 +235,6 @@ fun ItemCell(
     ) {
         Box(
             modifier = Modifier
-
             ,
         ){
 //            Image(
@@ -276,7 +250,7 @@ fun ItemCell(
                 // https://stackoverflow.com/a/68727678/9079640
 //                model = itemOfIt.imagePath, // TODO: load image from Medias folder
                 model = selectImage,
-                contentDescription = itemOfIt.aria,
+                contentDescription = selectAria,
                 modifier = Modifier.fillMaxSize(),
                 error = painterResource(id = R.drawable.mavrickle),
             )
@@ -287,6 +261,7 @@ fun ItemCell(
 //                    .fillMaxWidth()
                         .align(Alignment.BottomCenter),
                     text = selectLabel,
+//                    text = itemOfIt.aria,
 //                text = if(uiState.itemList[readTheItemFile] != null && uiState.itemList[readTheItemFile]!!.label.isNotEmpty()) uiState.itemList[readTheItemFile]!!.label else handoverText,
                     textAlign = TextAlign.Center,
 //                color = rememberColorScheme().primary,
@@ -312,11 +287,11 @@ fun ItemCell(
             }
 
         }
-
     }
 }
 
-@HTPreviewAnnotations
+//@HTPreviewAnnotations
+@Preview
 @Composable
 fun ItemCellPreview(){
     HTLauncherTheme {
