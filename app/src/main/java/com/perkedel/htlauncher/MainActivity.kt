@@ -65,6 +65,8 @@ class MainActivity : ComponentActivity() {
         )
     }
 
+    val htViewModel:HTViewModel = HTViewModel()
+
 //    lateinit var dataStorePrefs: DataStore<Preferences> = createDataStore(applicationContext)
     companion object{
 //        val dataStorePrefs: DataStore<Preferences> by preferencesDataStore(name = DATA_STORE_FILE_NAME)
@@ -105,6 +107,8 @@ class MainActivity : ComponentActivity() {
             )
         }
 
+
+
         setContent {
             HomeGreeting(
 //                prefs = remember { createDataStore(applicationContext) }
@@ -112,6 +116,7 @@ class MainActivity : ComponentActivity() {
                 activityHandOver = this,
                 dataStorePrefs = dataStorePrefs,
                 prefs = remember { dataStorePrefs },
+                anViewModel = htViewModel,
             )
         }
 

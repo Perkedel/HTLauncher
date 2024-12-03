@@ -24,6 +24,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AcUnit
@@ -185,12 +186,29 @@ fun ItemCell(
 //        selectImage = ActionInternalCommand.valueOf(itemOfIt.action[0].action).icon
 //        selectLabel = stringResource(ActionInternalCommand.valueOf(itemOfIt.action[0].action).label)
         selectImage = when(itemOfIt.action[0].action){
-            stringResource(ActionInternalCommand.AllApps.id) -> ""
-            else -> ""
+            // https://stackoverflow.com/questions/68932422/loading-local-drawables-with-coil-compose
+            stringResource(ActionInternalCommand.AllApps.id) -> R.drawable.all_apps
+            stringResource(ActionInternalCommand.Camera.id) -> R.drawable.camera
+            stringResource(ActionInternalCommand.Telephone.id) -> R.drawable.telephone
+            stringResource(ActionInternalCommand.Gallery.id) -> R.drawable.gallery
+            stringResource(ActionInternalCommand.Clock.id) -> R.drawable.clock
+            stringResource(ActionInternalCommand.Contacts.id) -> R.drawable.contacts
+            stringResource(ActionInternalCommand.Messages.id) -> R.drawable.messages
+            stringResource(ActionInternalCommand.Emergency.id) -> R.drawable.emergency
+            stringResource(ActionInternalCommand.Settings.id) -> R.drawable.settings
+            else -> R.drawable.placeholder
         }
         selectLabel = when(itemOfIt.action[0].action){
             stringResource(ActionInternalCommand.AllApps.id)-> stringResource(ActionInternalCommand.AllApps.label)
-            else -> ""
+            stringResource(ActionInternalCommand.Camera.id)-> stringResource(ActionInternalCommand.Camera.label)
+            stringResource(ActionInternalCommand.Telephone.id)-> stringResource(ActionInternalCommand.Telephone.label)
+            stringResource(ActionInternalCommand.Clock.id)-> stringResource(ActionInternalCommand.Clock.label)
+            stringResource(ActionInternalCommand.Messages.id)-> stringResource(ActionInternalCommand.Messages.label)
+            stringResource(ActionInternalCommand.Emergency.id)-> stringResource(ActionInternalCommand.Emergency.label)
+            stringResource(ActionInternalCommand.Gallery.id)-> stringResource(ActionInternalCommand.Gallery.label)
+            stringResource(ActionInternalCommand.Settings.id)-> stringResource(ActionInternalCommand.Settings.label)
+            stringResource(ActionInternalCommand.Contacts.id)-> stringResource(ActionInternalCommand.Contacts.label)
+            else -> itemOfIt.action[0].action
         }
     }
     val selectCompartmentType:String = when(itemOfIt.action[0].type){
@@ -213,7 +231,7 @@ fun ItemCell(
 //            }
             when(itemOfIt.action[0].action){
                 stringResource(ActionInternalCommand.AllApps.id)-> stringResource(ActionInternalCommand.AllApps.label)
-                else -> ""
+                else -> selectLabel
             }
         }
 
@@ -294,7 +312,7 @@ fun ItemCell(
                 contentDescription = selectAria,
                 modifier = Modifier.fillMaxSize(),
                 error = painterResource(id = R.drawable.mavrickle),
-                placeholder = painterResource(id = R.drawable.mavrickle),
+                placeholder = painterResource(id = R.drawable.placeholder),
             )
 
             if(itemOfIt.showLabel) {
@@ -349,7 +367,24 @@ fun ItemCellPreview(){
                 )
 
             }
-            item {
+//            item {
+//                ItemCell(
+//                    handoverText = "HALLOa",
+//                    readTheItemData = ItemData(
+//                        name = "ALLAPP",
+//                        label = "ALLAPP",
+//                        action = listOf(
+//                            ActionData(
+//                                type = ActionDataLaunchType.Internal,
+//                                action = stringResource(ActionInternalCommand.AllApps.id)
+//                            )
+//                        )
+//                    )
+//                )
+//            }
+            items(
+                items = ActionInternalCommand.entries.toList()
+            ){
                 ItemCell(
                     handoverText = "HALLOa",
                     readTheItemData = ItemData(
@@ -358,7 +393,7 @@ fun ItemCellPreview(){
                         action = listOf(
                             ActionData(
                                 type = ActionDataLaunchType.Internal,
-                                action = stringResource(ActionInternalCommand.AllApps.id)
+                                action = stringResource(it.id)
                             )
                         )
                     )

@@ -34,6 +34,8 @@
     <!--  Home Screen  -->
     <string name="home_screen">Home</string>
     <string name="all_apps">All Apps</string>
+    <string name="whole_apps">Whole Apps</string>
+    <string name="recent_apps">Recent Apps</string>
     <string name="configuration_screen">Configuration</string>
     <string name="about_screen">About</string>
     <string name="editor_screen">Editor</string>
@@ -115,6 +117,17 @@
     <string name="medias_folder" translatable="false">Medias</string>
     <string name="misc_folder" translatable="false">Miscellaneous</string>
     <string name="shortcuts_folder" translatable="false">Shortcuts</string>
+    <string name="all_apps_item_file" translatable="false">AllApps</string>
+    <string name="camera_item_file" translatable="false">Camera</string>
+    <string name="gallery_item_file" translatable="false">Gallery</string>
+    <string name="telephone_item_file" translatable="false">Telephone</string>
+    <string name="contacts_item_file" translatable="false">Contacts</string>
+    <string name="settings_item_file" translatable="false">Settings</string>
+    <string name="clock_item_file" translatable="false">Clock</string>
+    <string name="messages_item_file" translatable="false">Messages</string>
+    <string name="file_manager_item_file" translatable="false">File_Manager</string>
+    <string name="emergency_item_file" translatable="false">SOS</string>
+    <string name="home_screen_page_file" translatable="false">Home</string>
 
     <!--  Filename & Directory label  -->
     <string name="home_screen_file_label">Home Screen</string>
@@ -280,7 +293,30 @@
 
     <!--  Internal Commmands  -->
     <string name="internal_commands_all_apps" translatable="false">AllApps</string>
+    <string name="internal_commands_settings" translatable="false">Settings</string>
+    <string name="internal_commands_emergency" translatable="false">SOS</string>
+    <string name="internal_commands_messages" translatable="false">Messages</string>
+    <string name="internal_commands_telephone" translatable="false">Telephone</string>
+    <string name="internal_commands_contacts" translatable="false">Contacts</string>
+    <string name="internal_commands_clock" translatable="false">Clock</string>
+    <string name="internal_commands_go_home" translatable="false">GoHome</string>
+    <string name="internal_commands_camera" translatable="false">Camera</string>
+    <string name="internal_commands_gallery" translatable="false">Gallery</string>
+    <string name="internal_commands_GoToPage" translatable="false">GoToPage</string>
+    <string name="internal_commands_OpenAPage" translatable="false">OpenAPage</string>
+    <string name="internal_commands_aria" translatable="false">Aria</string>
     <string name="internal_commands_all_apps_label" translatable="true">All Apps</string>
+    <string name="internal_commands_camera_label" translatable="true">Camera</string>
+    <string name="internal_commands_gallery_label" translatable="true">Gallery</string>
+    <string name="internal_commands_emergency_label" translatable="true">SOS</string>
+    <string name="internal_commands_messages_label" translatable="true">SMS</string>
+    <string name="internal_commands_telephone_label" translatable="true">Telephone</string>
+    <string name="internal_commands_contacts_label" translatable="true">Contacts</string>
+    <string name="internal_commands_aria_label" translatable="true">Read Aloud</string>
+    <string name="internal_commands_GoToPage_label" translatable="true">Go to Page</string>
+    <string name="internal_commands_OpenAPage_label" translatable="true">Open a Page</string>
+    <string name="internal_commands_settings_label" translatable="true">Settings</string>
+    <string name="internal_commands_clock_label" translatable="true">Clock</string>
 
     <!--  filetype  -->
     <string name="text_plain_type" translatable="false">text/plain</string>

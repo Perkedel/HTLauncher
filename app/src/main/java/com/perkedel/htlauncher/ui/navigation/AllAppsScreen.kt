@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -20,6 +21,8 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Backspace
+import androidx.compose.material.icons.filled.Apps
+import androidx.compose.material.icons.filled.Restore
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Card
 import androidx.compose.material3.ColorScheme
@@ -39,12 +42,14 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.hapticfeedback.HapticFeedback
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
@@ -68,6 +73,7 @@ import com.perkedel.htlauncher.ui.previews.HTPreviewAnnotations
 import com.perkedel.htlauncher.ui.theme.HTLauncherTheme
 import com.perkedel.htlauncher.ui.theme.rememberColorScheme
 import com.perkedel.htlauncher.widgets.HTSearchBar
+import com.perkedel.htlauncher.widgets.SettingCategoryBar
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import me.zhanghai.compose.preference.Preference
@@ -206,59 +212,92 @@ fun AllAppsScreen(
                         }
                     )
                 }
-                items(
+                item{
+                    SettingCategoryBar(
+                        title = stringResource(R.string.recent_apps),
+                        icon = {
+                            Icon(Icons.Default.Restore,"")
+                        },
+                    )
+                }
+                item{
+                    SettingCategoryBar(
+                        title = stringResource(R.string.whole_apps),
+                        icon = {
+                            Icon(Icons.Default.Apps,"")
+                        },
+                    )
+                }
+                if(appFilter.isNotEmpty()){
+                    items(
 //                    count = appList.size
 //                    items = appList.filter { it.loadLabel(pm).contains(searchT, true) || it.packageName.contains(searchT, true) || searchT.isEmpty() }
 //                    items = appList
-                    items = appFilter
+                        items = appFilter
 //                    items = packList.filter { it.applicationInfo?.loadLabel(pm).toString().contains(searchT,true) || it.packageName.contains(searchT,true) || searchT.isEmpty() }
-                ) {
+                    ) {
 //                    val ddawe = pm.getApplicationIcon(packList[it].packageName)
 //                    val ddawe = pm.getApplicationIcon(appList[it].packageName)
-                    val ddawe = pm.getApplicationIcon(it.packageName)
+                        val ddawe = pm.getApplicationIcon(it.packageName)
 //                    val ddlabel:String = it.loadLabel(pm).toString()
-                    val ddlabel:String = it.label
+                        val ddlabel:String = it.label
 //                    val ddlabel:String = it.applicationInfo?.loadLabel(pm).toString()
-                    Preference(
-                        icon = {
+                        Preference(
+                            icon = {
 
-                            AsyncImage(
-                                model = ddawe,
-                                contentDescription = "",
-                                modifier = Modifier
-                                    .size(75.dp),
-                                error = painterResource(id = R.drawable.mavrickle),
-                                placeholder = painterResource(id = R.drawable.mavrickle),
-                            )
-                        },
+                                AsyncImage(
+                                    model = ddawe,
+                                    contentDescription = "",
+                                    modifier = Modifier
+                                        .size(75.dp),
+                                    error = painterResource(id = R.drawable.mavrickle),
+                                    placeholder = painterResource(id = R.drawable.mavrickle),
+                                )
+                            },
 //                        title = { Text("${packList[it].applicationInfo.loadLabel(pm)}") },
-                        title = { Text(ddlabel) },
+                            title = { Text(ddlabel) },
 //                    summary = {Text("${packList.get(it).applicationInfo.loadDescription(pm)}")},
-                        summary = {
-                            Text(
+                            summary = {
+                                Text(
 //                                packList[it].packageName,
 //                                appList[it].packageName,
-                                text = it.packageName,
-                                modifier = Modifier.basicMarquee(
-                                    // https://medium.com/@theAndroidDeveloper/jetpack-compose-gets-official-support-for-marquee-heres-how-to-use-it-1f678aecb851
-                                    // https://composables.com/foundation/basicmarquee
-                                    spacing = MarqueeSpacing(20.dp),
-                                    iterations = Int.MAX_VALUE,
-                                    animationMode = MarqueeAnimationMode.Immediately
+                                    text = it.packageName,
+                                    modifier = Modifier.basicMarquee(
+                                        // https://medium.com/@theAndroidDeveloper/jetpack-compose-gets-official-support-for-marquee-heres-how-to-use-it-1f678aecb851
+                                        // https://composables.com/foundation/basicmarquee
+                                        spacing = MarqueeSpacing(20.dp),
+                                        iterations = Int.MAX_VALUE,
+                                        animationMode = MarqueeAnimationMode.Immediately
+                                    )
                                 )
-                            )
-                        },
+                            },
 
-                        onClick = {
+                            onClick = {
 //                            onLaunchApp(appList[it])
-                            onLaunchApp(pm.getApplicationInfo(it.packageName,0))
+                                onLaunchApp(pm.getApplicationInfo(it.packageName,0))
 //                            if(it.applicationInfo != null)
 //                                onLaunchApp(it.applicationInfo!!)
 
 
+                            }
+                        )
+                    }
+                } else {
+                    item{
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp)
+                            ,
+                            contentAlignment = Alignment.Center
+                        ){
+                            Text(
+                                "EMPTY"
+                            )
                         }
-                    )
+                    }
                 }
+
             }
         }
     }

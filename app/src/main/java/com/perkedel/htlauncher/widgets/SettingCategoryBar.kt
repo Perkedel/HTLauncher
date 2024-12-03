@@ -25,6 +25,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.hapticfeedback.HapticFeedback
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
@@ -74,7 +75,9 @@ fun SettingCategoryBar(
             Text(
                 modifier = Modifier
                     .weight(1f)
-                    .padding(20.dp),
+                    .padding(20.dp)
+                    .align(Alignment.CenterVertically)
+                ,
                 text = title
             )
             if (icon != null) {

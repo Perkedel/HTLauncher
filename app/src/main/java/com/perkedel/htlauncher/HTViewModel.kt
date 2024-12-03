@@ -2,6 +2,7 @@
 
 package com.perkedel.htlauncher
 
+import android.content.ClipData.Item
 import android.content.ContentResolver
 import android.content.Context
 import android.content.pm.PackageInfo
@@ -17,12 +18,17 @@ import kotlinx.coroutines.flow.asStateFlow
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.viewModelScope
+import com.perkedel.htlauncher.data.ActionData
 import com.perkedel.htlauncher.data.HomepagesWeHave
 import com.perkedel.htlauncher.data.ItemData
 import com.perkedel.htlauncher.data.PageData
 import com.perkedel.htlauncher.data.SearchableApps
 import com.perkedel.htlauncher.data.TestJsonData
+import com.perkedel.htlauncher.data.hardcodes.HTLauncherHardcodes
+import com.perkedel.htlauncher.enumerations.ActionDataLaunchType
+import com.perkedel.htlauncher.enumerations.ActionInternalCommand
 import com.perkedel.htlauncher.enumerations.EditWhich
 import com.perkedel.htlauncher.func.AsyncService
 import kotlinx.coroutines.FlowPreview
@@ -104,10 +110,15 @@ class HTViewModel(
 
     }
 
-
+    suspend fun preloadApps(context: Context, packageManager: PackageManager){
+//        _uiState.update {
+//            currentState -> currentState.copy(
+//                installedPackageInfo =
+//            )
+//        }
+    }
     suspend fun preloadFiles(context: Context, contentResolver: ContentResolver, uiStating:HTUIState, listOfFolder:List<String>, folders: MutableMap<String,Uri>, json: Json, force:Boolean = false){
         // https://programmingheadache.com/2024/02/13/effortless-loading-screen-with-state-flows-and-jetpack-compose-just-4-easy-steps/
-
 
         viewModelScope.launch {
             setIsReady(into = false)
@@ -124,7 +135,7 @@ class HTViewModel(
 //        systemUiController.isStatusBarVisible = false
 
             // You must Folders!!
-            val homeSafData:HomepagesWeHave = HomepagesWeHave()
+            val homeSafData:HomepagesWeHave = HTLauncherHardcodes.HOMESCREEN_FILE
             if(uiStating.selectedSaveDir != null && uiStating.selectedSaveDir.toString().isNotEmpty()){
                 for(a in listOfFolder){
                     folders[a] = getADirectory(uiStating.selectedSaveDir!!, context, a)
@@ -197,6 +208,13 @@ class HTViewModel(
                     Log.d("PageLoader","Eval resource name ${context.resources.getString(R.string.pages_folder)}")
                     Log.d("PageLoader","Eval dirUri ${folders[context.resources.getString(R.string.pages_folder)]}")
 
+                    val predeterminedPage: PageData = when(i){
+                        context.resources.getString(R.string.home_screen_page_file) -> HTLauncherHardcodes.HOMEPAGE_FILE
+                        else -> PageData(
+                            name = i,
+                            isHome = i.contains("Home")
+                        )
+                    }
                     var aPage: PageData = PageData()
 
                     if(uiStating.pageList.contains(i) && uiStating.pageList[i] != null){
@@ -206,10 +224,7 @@ class HTViewModel(
                         val aPageUri: Uri = getATextFile(
                             dirUri = folders[context.resources.getString(R.string.pages_folder)]!!,
                             context = context,
-                            initData = json.encodeToString<PageData>(PageData(
-                                name = i,
-                                isHome = i.contains("Home")
-                            )),
+                            initData = json.encodeToString<PageData>(predeterminedPage),
                             fileName = "$i.json",
                             hardOverwrite = false,
                         )
@@ -232,7 +247,36 @@ class HTViewModel(
                     // item
                     for (j in aPage.items) {
                         Log.d("ItemLoader", "Checking item ${j}")
+
+                        val itemIsInternalCommand:Boolean =
+                            j.contains(ActionInternalCommand.AllApps.name) ||
+                            j.contains(ActionInternalCommand.Camera.name) ||
+                            j.contains(ActionInternalCommand.Telephone.name) ||
+                            j.contains(ActionInternalCommand.GoToPage.name) ||
+                            j.contains(ActionInternalCommand.Gallery.name) ||
+                            j.contains(ActionInternalCommand.Clock.name) ||
+                            j.contains(ActionInternalCommand.Contacts.name) ||
+                            j.contains(ActionInternalCommand.Emergency.name) ||
+                            j.contains(context.resources.getString(ActionInternalCommand.Emergency.id)) ||
+                            j.contains("SOS", true) ||
+                            j.contains(ActionInternalCommand.Messages.name) ||
+                            j.contains(ActionInternalCommand.Settings.name)
+                        val predeterminedItem: ItemData = when{
+                            itemIsInternalCommand -> ItemData(
+                                name = j,
+                                label = j,
+                                action = listOf(
+                                    ActionData(
+                                        name = j,
+                                        action = j,
+                                        type = ActionDataLaunchType.Internal,
+                                    )
+                                ),
+                            )
+                            else -> ItemData()
+                        }
                         var aItem: ItemData = ItemData()
+
                         if (uiStating.itemList.contains(j) && uiStating.itemList[j] != null) {
                             Log.d("ItemLoader", "Already Exist ${uiStating.itemList[j]}")
                             aItem = uiStating.itemList[j]!!
@@ -240,7 +284,7 @@ class HTViewModel(
                             val aItemUri: Uri = getATextFile(
                                 dirUri = folders[context.resources.getString(R.string.items_folder)]!!,
                                 context = context,
-                                initData = json.encodeToString<ItemData>(ItemData()),
+                                initData = json.encodeToString<ItemData>(predeterminedItem),
                                 fileName = "$j.json",
                                 hardOverwrite = true,
                             )

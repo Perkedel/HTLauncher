@@ -15,6 +15,7 @@ import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
@@ -161,7 +162,7 @@ fun BasePage(
     // https://youtu.be/HmXgVBys7BU?si=u6nsssd2LeP48TED
     val lazyListState = rememberLazyGridState()
     Column(
-        modifier.fillMaxSize()
+        modifier = modifier
     ) {
 //        val windowInfo = rememberWindowInfo()
 //        val isCompact = windowInfo.screenWidthInfo is WindowInfo.WindowType.Compact
@@ -212,18 +213,23 @@ fun BasePage(
             // anything else
             Row(
                 modifier = Modifier
-
                 ,
             ) {
                 // Permanent Card on first page
                 if(isFirstPage || pageOfIt.isHome){
-                    FirstPageCard(
-                        handoverText = pageOfIt.name,
-                        isCompact = isCompact,
-                        isOnNumberWhat = isOnNumberWhat,
-                        modifier = Modifier,
-                        onMoreMenuButton = onMoreMenuButtonClicked,
-                    )
+                    Column(){
+                        FirstPageCard(
+                            handoverText = pageOfIt.name,
+                            isCompact = isCompact,
+                            isOnNumberWhat = isOnNumberWhat,
+                            modifier = Modifier.weight(1f),
+                            onMoreMenuButton = onMoreMenuButtonClicked,
+                        )
+//                        Spacer(
+//                            modifier = Modifier
+//                                .weight(.05f)
+//                        )
+                    }
                 }
                 LazyVerticalGrid(
                     columns = when(pageOfIt.gridType){

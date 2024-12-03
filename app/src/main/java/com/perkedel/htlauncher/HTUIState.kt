@@ -6,6 +6,7 @@ import android.net.Uri
 import com.perkedel.htlauncher.data.HomepagesWeHave
 import com.perkedel.htlauncher.data.ItemData
 import com.perkedel.htlauncher.data.PageData
+import com.perkedel.htlauncher.data.SearchableApps
 import com.perkedel.htlauncher.data.TestJsonData
 import com.perkedel.htlauncher.enumerations.EditWhich
 import kotlinx.serialization.json.Json
@@ -36,6 +37,7 @@ data class HTUIState(
     val itemList:MutableMap<String,ItemData> = LinkedHashMap<String,ItemData>(),
 //    val themesList:MutableMap<String,ItemData> = LinkedHashMap<String,ItemData>(),
     // TODO: Medias, Shortcuts
-    val installedPackageInfo: MutableList<PackageInfo> = emptyList<PackageInfo>().toMutableList()
+//    val installedPackageInfo: MutableList<PackageInfo> = emptyList<PackageInfo>().toMutableList()
+    val installedPackageInfo: MutableMap<String,SearchableApps> = LinkedHashMap<String,SearchableApps>()
 ) {
 }

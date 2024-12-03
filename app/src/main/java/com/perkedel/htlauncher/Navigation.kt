@@ -15,11 +15,15 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import android.content.Context
 import android.content.Intent
+import android.content.pm.ActivityInfo
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
+import android.content.pm.PackageManager.NameNotFoundException
 import android.content.res.Configuration
+import android.graphics.Camera
 import android.net.Uri
 import android.os.Build
+import android.provider.AlarmClock
 import android.provider.Settings
 import android.speech.tts.TextToSpeech
 import android.util.Log
@@ -79,6 +83,7 @@ import com.google.accompanist.systemuicontroller.SystemUiController
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.perkedel.htlauncher.data.ActionData
 import com.perkedel.htlauncher.data.TestJsonData
+import com.perkedel.htlauncher.data.hardcodes.HTLauncherHardcodes
 import com.perkedel.htlauncher.enumerations.ActionDataLaunchType
 import com.perkedel.htlauncher.enumerations.ActionInternalCommand
 import com.perkedel.htlauncher.enumerations.ConfigSelected
@@ -1444,37 +1449,91 @@ fun onLaunchAction(
     snackbarHostState:SnackbarHostState,
     navController: NavHostController,
 ){
-    when(data[0].type){
-        ActionDataLaunchType.LauncherActivity -> {
-            try{
-                if(data[0].action.isNotEmpty()) {
-                    startApplication(
-                        context = context,
-                        pm = pm,
-                        what = data[0].action
-                    )
+    coroutineScope.launch {
+        when(data[0].type){
+            ActionDataLaunchType.LauncherActivity -> {
+                try{
+                    if(data[0].action.isNotEmpty()) {
+                        startApplication(
+                            context = context,
+                            pm = pm,
+                            what = data[0].action
+                        )
+                    }
+                } catch (e:Exception) {
+                    coroutineScope.launch {
+                        snackbarHostState.showSnackbar("WERROR 404! Launcher Activity undefined")
+                    }
+                    e.printStackTrace()
+                } catch (e: ActivityNotFoundException){
+                    coroutineScope.launch {
+                        snackbarHostState.showSnackbar("WERROR 404! Launcher Activity undefined")
+                    }
+                    e.printStackTrace()
                 }
-            } catch (e:Exception) {
-                coroutineScope.launch {
-                    snackbarHostState.showSnackbar("WERROR 404! Launcher Activity undefined")
-                }
-                e.printStackTrace()
-            } catch (e: ActivityNotFoundException){
-                coroutineScope.launch {
-                    snackbarHostState.showSnackbar("WERROR 404! Launcher Activity undefined")
-                }
-                e.printStackTrace()
             }
-        }
-        ActionDataLaunchType.Internal -> {
-            when(data[0].action){
-                context.resources.getString(ActionInternalCommand.AllApps.id)->{
-                    navController.navigate(Screen.AllAppsScreen.name)
+            ActionDataLaunchType.Internal -> {
+                try {
+                    when(data[0].action){
+                        context.resources.getString(ActionInternalCommand.AllApps.id)->{
+                            navController.navigate(Screen.AllAppsScreen.name)
+                        }
+                        context.resources.getString(ActionInternalCommand.Camera.id)->{
+                            // https://stackoverflow.com/a/13977619/9079640
+                            // https://developer.android.com/guide/components/intents-common#CameraStill
+                            startIntent(
+                                context = context,
+                                what = Intent(
+                                    "android.media.action.STILL_IMAGE_CAMERA"
+                                )
+                            )
+                        }
+                        context.resources.getString(ActionInternalCommand.Clock.id) -> {
+                            // https://stackoverflow.com/a/4281243/9079640
+//                            startIntent(
+//                                context = context,
+//                                what = Intent(AlarmClock.ACTION_SHOW_ALARMS)
+////                                what = Intent("android.intent.action.SHOW_ALARMS")
+//                            )
+//                            startApplication(
+//                                context = context,
+//                                what = "com.android.deskclock",
+//                                pm = pm,
+//                            )
+                            var foundApp:Boolean = false
+                            var targetApp:PackageInfo = PackageInfo()
+                            for(i in HTLauncherHardcodes.ALARM_APP_IMPLEMENTATIONS){
+                                try {
+                                    targetApp = pm.getPackageInfo(i.value.packageName,0)
+                                    foundApp = true
+                                    break
+                                } catch (e:NameNotFoundException){
+//                                    e.printStackTrace()
+                                    foundApp = false
+                                } catch (e:Exception){
+//                                    e.printStackTrace()
+                                }
+                            }
+                            if(foundApp){
+                                startApplication(
+                                    context = context,
+                                    pm = pm,
+                                    what = targetApp.packageName
+                                )
+                            } else {
+                                snackbarHostState.showSnackbar(message = "WERROR 404! Clock App Not Found")
+                            }
+                        }
+                        else -> {}
+                    }
+                } catch (e:Exception){
+                    e.printStackTrace()
+                } catch (e:ActivityNotFoundException){
+                    e.printStackTrace()
                 }
-                else -> {}
             }
+            else -> {}
         }
-        else -> {}
     }
 }
 

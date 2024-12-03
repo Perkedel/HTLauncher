@@ -63,6 +63,20 @@ fun ttsSpeakOrStop(handover:MutableState<TextToSpeech?>, message:String = "",que
     }
 }
 
+fun ttsSpeakInterupt(handover:MutableState<TextToSpeech?>, message:String = "",queueMode: Int = TextToSpeech.QUEUE_FLUSH, params:Bundle? = null, utteranceId:String = ""){
+    // If the TTS is speaking, it stops then speak the new one
+    if(handover.value?.isSpeaking == true){
+        handover.value?.stop()
+    }
+    ttsSpeak(
+        handover = handover,
+        message = message,
+        queueMode = queueMode,
+        params = params,
+        utteranceId = utteranceId,
+    )
+}
+
 @Preview
 @Composable
 fun RememberTextToSpeechPreview(){

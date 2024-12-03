@@ -23,6 +23,7 @@
     <!-- tools:ignore="ScopedStorage" /> -->
     <uses-permission android:name="android.permission.BIND_APPWIDGET"
         tools:ignore="ProtectedPermissions" />
+    <uses-permission android:name="com.android.alarm.permission.SET_ALARM"/>
 
 
     <uses-feature
