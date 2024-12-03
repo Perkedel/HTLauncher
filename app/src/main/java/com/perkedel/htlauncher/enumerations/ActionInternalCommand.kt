@@ -8,6 +8,7 @@ import androidx.compose.material.icons.automirrored.filled.Message
 import androidx.compose.material.icons.filled.AccessTime
 import androidx.compose.material.icons.filled.Accessibility
 import androidx.compose.material.icons.filled.Apps
+import androidx.compose.material.icons.filled.Build
 import androidx.compose.material.icons.filled.Camera
 import androidx.compose.material.icons.filled.Contacts
 import androidx.compose.material.icons.filled.Emergency
@@ -23,6 +24,7 @@ import com.perkedel.htlauncher.R
 enum class ActionInternalCommand(@StringRes val id:Int = 0, @StringRes val label:Int = 0, val icon:ImageVector){
     AllApps(id = R.string.internal_commands_all_apps, label = R.string.internal_commands_all_apps_label, icon = Icons.Default.Apps),
     Settings(id = R.string.internal_commands_settings, label = R.string.internal_commands_settings_label, icon = Icons.Default.Settings),
+    Preferences(id = R.string.internal_commands_preferences, label = R.string.internal_commands_preferences_label, icon = Icons.Default.Build),
     Camera(id = R.string.internal_commands_camera, label = R.string.internal_commands_camera_label, icon = Icons.Default.Camera),
     Gallery(id = R.string.internal_commands_gallery, label = R.string.internal_commands_gallery_label, icon = Icons.Default.Image),
     Telephone(id = R.string.internal_commands_telephone, label = R.string.internal_commands_telephone_label, icon = Icons.Default.Phone),

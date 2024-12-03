@@ -260,6 +260,7 @@
     <!--  Internal Commmands  -->
     <string name="internal_commands_all_apps_label" translatable="true">Semua Aplikasi</string>
     <string name="internal_commands_settings_label" translatable="true">Pengaturan</string>
+    <string name="internal_commands_preferences_label" translatable="true">Preferensi</string>
     <string name="internal_commands_camera_label" translatable="true">Kamera</string>
     <string name="internal_commands_gallery_label" translatable="true">Galeri</string>
     <string name="internal_commands_emergency_label" translatable="true">SOS</string>

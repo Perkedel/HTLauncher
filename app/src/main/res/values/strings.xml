@@ -294,6 +294,7 @@
     <!--  Internal Commmands  -->
     <string name="internal_commands_all_apps" translatable="false">AllApps</string>
     <string name="internal_commands_settings" translatable="false">Settings</string>
+    <string name="internal_commands_preferences" translatable="false">Preferences</string>
     <string name="internal_commands_emergency" translatable="false">SOS</string>
     <string name="internal_commands_messages" translatable="false">Messages</string>
     <string name="internal_commands_telephone" translatable="false">Telephone</string>
@@ -316,6 +317,7 @@
     <string name="internal_commands_GoToPage_label" translatable="true">Go to Page</string>
     <string name="internal_commands_OpenAPage_label" translatable="true">Open a Page</string>
     <string name="internal_commands_settings_label" translatable="true">Settings</string>
+    <string name="internal_commands_preferences_label" translatable="true">Preferences</string>
     <string name="internal_commands_clock_label" translatable="true">Clock</string>
 
     <!--  filetype  -->

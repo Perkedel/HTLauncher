@@ -196,6 +196,7 @@ fun ItemCell(
             stringResource(ActionInternalCommand.Messages.id) -> R.drawable.messages
             stringResource(ActionInternalCommand.Emergency.id) -> R.drawable.emergency
             stringResource(ActionInternalCommand.Settings.id) -> R.drawable.settings
+            stringResource(ActionInternalCommand.Preferences.id) -> R.drawable.preferences
             else -> R.drawable.placeholder
         }
         selectLabel = when(itemOfIt.action[0].action){
@@ -207,6 +208,7 @@ fun ItemCell(
             stringResource(ActionInternalCommand.Emergency.id)-> stringResource(ActionInternalCommand.Emergency.label)
             stringResource(ActionInternalCommand.Gallery.id)-> stringResource(ActionInternalCommand.Gallery.label)
             stringResource(ActionInternalCommand.Settings.id)-> stringResource(ActionInternalCommand.Settings.label)
+            stringResource(ActionInternalCommand.Preferences.id)-> stringResource(ActionInternalCommand.Preferences.label)
             stringResource(ActionInternalCommand.Contacts.id)-> stringResource(ActionInternalCommand.Contacts.label)
             else -> itemOfIt.action[0].action
         }

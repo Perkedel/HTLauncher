@@ -24,6 +24,7 @@ import android.graphics.Camera
 import android.net.Uri
 import android.os.Build
 import android.provider.AlarmClock
+import android.provider.ContactsContract.Contacts
 import android.provider.Settings
 import android.speech.tts.TextToSpeech
 import android.util.Log
@@ -1523,6 +1524,42 @@ fun onLaunchAction(
                             } else {
                                 snackbarHostState.showSnackbar(message = "WERROR 404! Clock App Not Found")
                             }
+                        }
+                        context.resources.getString(ActionInternalCommand.Settings.id) -> {
+                            startIntent(
+                                context = context,
+                                what = Intent(Settings.ACTION_SETTINGS)
+                            )
+                        }
+                        context.resources.getString(ActionInternalCommand.Contacts.id) -> {
+//                            startIntent(
+//                                context = context,
+//                                what = Intent(Contacts.)
+//                            )
+                        }
+                        context.resources.getString(ActionInternalCommand.Preferences.id) -> {
+                            navController.navigate(Screen.ConfigurationScreen.name)
+                        }
+                        context.resources.getString(ActionInternalCommand.Emergency.id) -> {
+
+                        }
+                        context.resources.getString(ActionInternalCommand.Messages.id) -> {
+
+                        }
+                        context.resources.getString(ActionInternalCommand.Telephone.id) -> {
+
+                        }
+                        context.resources.getString(ActionInternalCommand.Gallery.id) -> {
+
+                        }
+                        context.resources.getString(ActionInternalCommand.GoToPage.id) -> {
+
+                        }
+                        context.resources.getString(ActionInternalCommand.OpenAPage.id) -> {
+
+                        }
+                        context.resources.getString(ActionInternalCommand.Aria.id) -> {
+
                         }
                         else -> {}
                     }
