@@ -133,10 +133,26 @@ fun HomeScreen(
                 ,
                 size = 30.dp,
                 hasFirstLastButton = !isCompact,
-                onLastPage = {},
-                onFirstPage = {},
-                onLeftPage = {},
-                onRightPage = {},
+                onLastPage = {
+                    coroutineScope.launch {
+                        handoverPagerState.animateScrollToPage(0)
+                    }
+                },
+                onFirstPage = {
+                    coroutineScope.launch {
+                        handoverPagerState.animateScrollToPage(page = handoverPagerState.pageCount-1)
+                    }
+                },
+                onLeftPage = {
+                    coroutineScope.launch {
+                        handoverPagerState.animateScrollToPage(page = handoverPagerState.currentPage-1)
+                    }
+                },
+                onRightPage = {
+                    coroutineScope.launch {
+                        handoverPagerState.animateScrollToPage(page = handoverPagerState.currentPage+1)
+                    }
+                },
             ){
                 HTHorizontalPageIndicators(
                     pageCount = handoverPagerState.pageCount,

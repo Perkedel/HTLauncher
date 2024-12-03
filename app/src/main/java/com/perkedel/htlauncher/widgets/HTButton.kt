@@ -154,7 +154,10 @@ fun HTButton(
             border = border,
             contentPadding = contentPadding,
             interactionSource = interactionSource,
-            onClick = onClick,
+            onClick = {
+                onClick()
+                view.playSoundEffect(SoundEffectConstants.CLICK)
+            },
             content = content,
         )
         ButtonTypes.IconButton -> IconButton(

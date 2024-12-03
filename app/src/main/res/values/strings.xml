@@ -317,7 +317,7 @@
     <string name="internal_commands_GoToPage_label" translatable="true">Go to Page</string>
     <string name="internal_commands_OpenAPage_label" translatable="true">Open a Page</string>
     <string name="internal_commands_settings_label" translatable="true">Settings</string>
-    <string name="internal_commands_preferences_label" translatable="true">Preferences</string>
+    <string name="internal_commands_preferences_label" translatable="true">Launcher Configs</string>
     <string name="internal_commands_clock_label" translatable="true">Clock</string>
 
     <!--  filetype  -->
