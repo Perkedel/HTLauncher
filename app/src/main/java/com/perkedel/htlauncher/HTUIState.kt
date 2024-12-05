@@ -16,6 +16,7 @@ import kotlinx.serialization.json.encodeToJsonElement
 data class HTUIState(
     val currentPage: Int = 0,
     val openMoreMenu: Boolean = false,
+    val openCreateNewFile: Boolean = false,
     val selectedSaveDir: Uri? = null,
     val readAloudHoldClick: Boolean = false,
     val toastAloudHoldClick: Boolean = false,

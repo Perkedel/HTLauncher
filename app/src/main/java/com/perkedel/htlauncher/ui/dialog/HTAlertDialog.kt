@@ -87,12 +87,18 @@ fun HTAlertDialog(
     confirmButtonDismiss:Boolean = false,
     hideIcon:Boolean = false,
     dismissButton:Boolean = true,
+    enableDismissButton:Boolean = true,
+    enableThirdButton:Boolean = true,
+    enableConfirmButton:Boolean = true,
+    leftSpaceApart:Boolean = false, // add spacer push-off between left & middle button
+    rightSpaceApart:Boolean = false, // add spacer push-off between middle & right button
 
     onDismissRequest: () -> Unit = {},
     onConfirm: () -> Unit = {},
     onThirdButton: () -> Unit = {}, // onSecondThought
 
     tts: MutableState<TextToSpeech?> = rememberTextToSpeech(),
+    isRTL:Boolean = false,
 
     content: @Composable () -> Unit = {},
 ){
@@ -167,7 +173,8 @@ fun HTAlertDialog(
                             HTButton(
                                 title = thirdText,
                                 onClick = onThirdButton,
-                                buttonType = ButtonTypes.TextButton
+                                buttonType = ButtonTypes.TextButton,
+                                enabled = enableThirdButton,
                             )
                         }
 
@@ -176,7 +183,8 @@ fun HTAlertDialog(
                                 HTButton(
                                     title = confirmText,
                                     onClick = if(!confirmButtonDismiss) onConfirm else onDismissRequest,
-                                    buttonType = ButtonTypes.TextButton
+                                    buttonType = ButtonTypes.TextButton,
+                                    enabled = enableConfirmButton,
                                 )
                             }
                         } else {
@@ -184,16 +192,32 @@ fun HTAlertDialog(
                                 HTButton(
                                     title = dismissText,
                                     onClick = onDismissRequest,
-                                    buttonType = ButtonTypes.TextButton
+                                    buttonType = ButtonTypes.TextButton,
+                                    enabled = enableDismissButton,
                                 )
                             }
+                        }
+
+                        if(leftSpaceApart) {
+                            Spacer(
+                                modifier = Modifier
+                                    .weight(1f)
+                            )
                         }
 
                         if(thirdButton && thirdButtonPosition == ThirdButtonPosition.Middle){
                             HTButton(
                                 title = thirdText,
                                 onClick = onThirdButton,
-                                buttonType = ButtonTypes.TextButton
+                                buttonType = ButtonTypes.TextButton,
+                                enabled = enableThirdButton,
+                            )
+                        }
+
+                        if(rightSpaceApart) {
+                            Spacer(
+                                modifier = Modifier
+                                    .weight(1f)
                             )
                         }
 
@@ -202,7 +226,8 @@ fun HTAlertDialog(
                                 HTButton(
                                     title = dismissText,
                                     onClick = onDismissRequest,
-                                    buttonType = ButtonTypes.TextButton
+                                    buttonType = ButtonTypes.TextButton,
+                                    enabled = enableDismissButton,
                                 )
                             }
                         }
@@ -211,7 +236,8 @@ fun HTAlertDialog(
                                 HTButton(
                                     title = confirmText,
                                     onClick = if(!confirmButtonDismiss) onConfirm else onDismissRequest,
-                                    buttonType = ButtonTypes.TextButton
+                                    buttonType = ButtonTypes.TextButton,
+                                    enabled = enableConfirmButton,
                                 )
                             }
                         }
@@ -220,7 +246,8 @@ fun HTAlertDialog(
                             HTButton(
                                 title = thirdText,
                                 onClick = onThirdButton,
-                                buttonType = ButtonTypes.TextButton
+                                buttonType = ButtonTypes.TextButton,
+                                enabled = enableThirdButton,
                             )
                         }
                     }

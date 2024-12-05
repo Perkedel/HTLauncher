@@ -82,7 +82,7 @@ fun EditActionData(
         // https://www.geeksforgeeks.org/drop-down-menu-in-android-using-jetpack-compose/
         // https://youtu.be/5h737wNN-qM stoffe dropdown
         // https://developer.android.com/reference/kotlin/androidx/compose/material/ExposedDropdownMenuBoxScope
-        Text("Action ${id}\n${data}")
+//        Text("Action ${id}\n${data}")
         var name:String by remember { mutableStateOf(data?.name ?: "Launcher") }
         var action:String by remember { mutableStateOf(data?.action ?: "") }
         var args:List<String> by remember { mutableStateOf(data?.args ?: emptyList<String>()) }

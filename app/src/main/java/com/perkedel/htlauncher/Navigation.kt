@@ -41,6 +41,8 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Create
 import androidx.compose.material.icons.filled.Folder
 import androidx.compose.material.icons.filled.Security
 import androidx.compose.material3.ColorScheme
@@ -83,10 +85,14 @@ import androidx.lifecycle.ViewModel
 import com.google.accompanist.systemuicontroller.SystemUiController
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.perkedel.htlauncher.data.ActionData
+import com.perkedel.htlauncher.data.HomepagesWeHave
+import com.perkedel.htlauncher.data.ItemData
+import com.perkedel.htlauncher.data.PageData
 import com.perkedel.htlauncher.data.TestJsonData
 import com.perkedel.htlauncher.data.hardcodes.HTLauncherHardcodes
 import com.perkedel.htlauncher.enumerations.ActionDataLaunchType
 import com.perkedel.htlauncher.enumerations.ActionInternalCommand
+import com.perkedel.htlauncher.enumerations.ButtonTypes
 import com.perkedel.htlauncher.enumerations.ConfigSelected
 import com.perkedel.htlauncher.enumerations.EditWhich
 import com.perkedel.htlauncher.enumerations.Screen
@@ -102,6 +108,7 @@ import com.perkedel.htlauncher.ui.dialog.HTAlertDialog
 import com.perkedel.htlauncher.ui.dialog.PermissionDialog
 import com.perkedel.htlauncher.ui.dialog.PhoneCallPermissionTextProvider
 import com.perkedel.htlauncher.ui.dialog.RecordAudioPermissionTextProvider
+import com.perkedel.htlauncher.ui.dialog.TextInputDialog
 import com.perkedel.htlauncher.ui.navigation.AboutTerms
 import com.perkedel.htlauncher.ui.navigation.AllAppsScreen
 import com.perkedel.htlauncher.ui.navigation.Configurationing
@@ -109,6 +116,7 @@ import com.perkedel.htlauncher.ui.navigation.ItemsExplorer
 import com.perkedel.htlauncher.ui.navigation.LevelEditor
 import com.perkedel.htlauncher.ui.theme.HTLauncherTheme
 import com.perkedel.htlauncher.ui.theme.rememberColorScheme
+import com.perkedel.htlauncher.widgets.HTButton
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
@@ -601,6 +609,23 @@ fun Navigation(
                         Screen.HomeScreen -> false
                         else -> true
                     },
+                    actions = {
+                        when(currentScreen){
+                            Screen.HomeScreen -> {
+
+                            }
+                            Screen.ItemsExplorer -> {
+                                HTButton(
+                                    buttonType = ButtonTypes.IconButton,
+                                    leftIcon = Icons.Default.Add,
+                                    onClick = {
+                                        anViewModel.openCreateNewFile(true)
+                                    }
+                                )
+                            }
+                            else -> {}
+                        }
+                    },
                     onMoreMenu = {
                         when{
                             currentScreen == Screen.HomeScreen && !htuiState.isReady -> {
@@ -850,7 +875,9 @@ fun Navigation(
                         onSelectedConfigMenu = { configSelect ->
                             view.playSoundEffect(SoundEffectConstants.CLICK)
                             when(configSelect){
-                                ConfigSelected.Donation -> TODO()
+                                ConfigSelected.Donation -> {
+
+                                }
                                 ConfigSelected.LevelEditor -> {
                                     navController.navigate(Screen.LevelEditor.name)
                                 }
@@ -1242,6 +1269,19 @@ fun Navigation(
                                     ),
                                     context = context,
                                     fileName = "${filename}.json",
+                                    initData = when(editType){
+                                        EditWhich.Pages -> json.encodeToString<PageData>(PageData(
+                                            name = filename
+                                        ))
+                                        EditWhich.Items -> json.encodeToString<ItemData>(ItemData(
+                                            name = filename
+                                        ))
+                                        EditWhich.Home -> json.encodeToString<HomepagesWeHave>(
+                                            HomepagesWeHave()
+                                        )
+//                                        EditWhich.Themes -> json.encodeToString<Then>(HomepagesWeHave())
+                                        else -> ""
+                                    },
                                     mimeType = context.resources.getString(R.string.text_plain_type),
                                     hardOverwrite = false,
                                 )
@@ -1273,6 +1313,30 @@ fun Navigation(
                         exploreType = htuiState.toEditWhatFile,
                         tts = tts,
                     )
+
+                    if(htuiState.openCreateNewFile){
+                        TextInputDialog(
+                            title = stringResource(R.string.create_new_file_dialog_override,
+                                stringResource(htuiState.toEditWhatFile.label)
+                            ),
+                            selectIcon = Icons.Default.Create,
+                            onConfirmText = {
+                                anViewModel.createNewFileNow(
+                                    context = context,
+//                                    name = "$it${if(it.lastIndexOf(".json") < 0) ".json" else ""}",
+                                    name = it,
+                                    atWhere = htuiState.toEditWhatFile,
+                                    uiStating = htuiState,
+                                )
+                                anViewModel.openCreateNewFile(false)
+                            },
+                            placeholder = "anItem",
+                            mustBeFilled = true,
+                            onDismiss = {
+                                anViewModel.openCreateNewFile(false)
+                            }
+                        )
+                    }
                 }
             }
         }

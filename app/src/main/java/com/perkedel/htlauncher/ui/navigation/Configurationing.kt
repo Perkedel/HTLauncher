@@ -151,12 +151,12 @@ fun Configurationing(
                         onLongClickLabel = context.resources.getString(R.string.quick_start_option),
                     )
                 ,
-                key = "Activation_License",
+                key = "activation_license",
                 title = { Text(text = stringResource(R.string.donation_option) ) },
                 icon = { Icon(imageVector = Icons.Default.ShoppingCart, contentDescription = null) },
                 summary = { Text(text = stringResource(R.string.donation_option_desc)) },
                 onClick = {
-
+                    onSelectedConfigMenu(ConfigSelected.Donation)
                 }
             )
             preference(

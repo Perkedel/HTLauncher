@@ -39,6 +39,7 @@
     <string name="Home_more_all_apps">Semua Aplikasi</string>
 
     <!--  Configurations  -->
+    <string name="default_button">Default</string>
     <string name="dismiss_button">Tutup</string>
     <string name="confirm_button">Konfirmasi</string>
     <string name="third_button">Ketiga</string>
@@ -115,6 +116,7 @@
     <string name="action_settings">Pengaturan</string>
     <string name="value_null"><i>null</i></string>
     <string name="value_unselected"><i>tidak terpilih</i></string>
+    <string name="textfield_cannot_empty">Tidak boleh kosong</string>
 
     <string name="reloading_save">Konfigurasi Dimuat Ulang</string>
     <string name="save_error">Galat Menyimpan</string>
@@ -125,6 +127,8 @@
     <string name="menu_gallery">Gallery</string>
     <string name="menu_slideshow">Slideshow</string>
     <string name="title_activity_all_apps">AllApps</string>
+    <string name="create_new_file_dialog">Buat File Baru</string>
+    <string name="create_new_file_dialog_override">Buat %s Baru</string>
     <string name="large_text">
         "Material is the metaphor.\n\n"
 
@@ -271,4 +275,17 @@
     <string name="internal_commands_GoToPage_label" translatable="true">Pergi ke Halaman</string>
     <string name="internal_commands_OpenAPage_label" translatable="true">Buka Halaman</string>
     <string name="internal_commands_clock_label" translatable="true">Jam</string>
+
+    <!--  Editor  -->
+    <string name="editor_page_reorder_item">Urutkan Item</string>
+    <string name="editor_page_reorder_item_count">terdapat %d item</string>
+
+    <!--  Purchase  -->
+    <string name="purchase_offer_title">Tawaran</string>
+    <string name="purchase_pro_title">VERSI PENUH</string>
+    <string name="purchase_cost_changeable">Rp 2.000,00</string>
+    <string name="purchase_unlocks_all_say">Membuka seluruh fungsi</string>
+    <string name="purchase_not_yet_say">BELI SEKARANG</string>
+    <string name="purchase_done_now_say">DIMILIKI</string>
+    <string name="purchase_contact">Silahkan hubungi kami di %s jika Anda mengalami kendala lisensi.</string>
 </resources>

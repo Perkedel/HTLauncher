@@ -55,6 +55,9 @@ import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.compose.ui.unit.dp
+import androidx.tv.foundation.PivotOffsets
+import androidx.tv.foundation.lazy.grid.TvLazyGridScope
+import androidx.tv.foundation.lazy.grid.TvLazyVerticalGrid
 import com.perkedel.htlauncher.HTUIState
 import com.perkedel.htlauncher.HTViewModel
 import com.perkedel.htlauncher.R
@@ -170,6 +173,7 @@ fun BasePage(
 //        val isOrientation:Int = configuration.orientation // This doesn't seems to work
         if(isCompact){
             // if screen is compact
+//            PivotOffsets()
             LazyVerticalGrid(
                 modifier = Modifier,
                 columns = when(pageOfIt.gridType){
@@ -204,6 +208,13 @@ fun BasePage(
                             viewModel = viewModel,
                             tts = tts,
                             onClick = onLaunchOneOfAction,
+                        )
+                    }
+                    item{
+                        Spacer(
+                            modifier = Modifier
+                                .padding(16.dp)
+                            ,
                         )
                     }
 
@@ -250,6 +261,13 @@ fun BasePage(
                                 viewModel = viewModel,
                                 tts = tts,
                                 onClick = onLaunchOneOfAction,
+                            )
+                        }
+                        item{
+                            Spacer(
+                                modifier = Modifier
+                                    .padding(16.dp)
+                                ,
                             )
                         }
                     }

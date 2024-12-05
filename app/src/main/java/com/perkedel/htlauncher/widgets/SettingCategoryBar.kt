@@ -1,4 +1,4 @@
-@file:OptIn(ExperimentalFoundationApi::class)
+@file:OptIn(ExperimentalFoundationApi::class, ExperimentalFoundationApi::class)
 
 package com.perkedel.htlauncher.widgets
 
@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyItemScope
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Circle
 import androidx.compose.material3.Card
@@ -92,6 +93,27 @@ fun SettingCategoryBar(
     }
 }
 
+@Composable
+fun LazyItemScope.settingCategoryBar(
+    title:String = "",
+    modifier: Modifier = Modifier,
+    haptic: HapticFeedback = LocalHapticFeedback.current,
+    context: Context = LocalContext.current,
+    tts: MutableState<TextToSpeech?> = rememberTextToSpeech(),
+    icon: @Composable() (() -> Unit?)? = null,
+    view: View = LocalView.current,
+){
+    SettingCategoryBar(
+        title = title,
+        modifier = modifier,
+        haptic = haptic,
+        context = context,
+        tts = tts,
+        icon = icon,
+        view = view,
+    )
+}
+
 @HTPreviewAnnotations
 @Composable
 fun SettingCategoryBarPreview(){
@@ -112,3 +134,4 @@ fun SettingCategoryBarPreview(){
         }
     }
 }
+

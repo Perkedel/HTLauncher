@@ -15,6 +15,7 @@ import android.view.View
 import android.widget.Toast
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.aspectRatio
@@ -321,7 +322,9 @@ fun ItemCell(
                 OutlinedText(
                     modifier = Modifier
 //                    .fillMaxWidth()
-                        .align(Alignment.BottomCenter),
+                        .align(Alignment.BottomCenter)
+                        .basicMarquee()
+                    ,
                     text = selectLabel,
 //                    text = itemOfIt.aria,
 //                text = if(uiState.itemList[readTheItemFile] != null && uiState.itemList[readTheItemFile]!!.label.isNotEmpty()) uiState.itemList[readTheItemFile]!!.label else handoverText,
@@ -364,7 +367,8 @@ fun ItemCellPreview(){
                 ItemCell(
                     handoverText = "HALLO",
                     readTheItemData = ItemData(
-
+                        label = "HALLO AAAAAAAAAAAAAAAAAAAAAA",
+                        useLabel = true,
                     )
                 )
 

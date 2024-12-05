@@ -76,7 +76,9 @@ fun HTButton(
     colors: ButtonColors = when(buttonType){
         ButtonTypes.OutlineButton -> ButtonDefaults.outlinedButtonColors()
         ButtonTypes.TextButton -> ButtonDefaults.textButtonColors()
-        else -> ButtonDefaults.buttonColors()
+        else -> ButtonDefaults.buttonColors(
+
+        )
     },
     elevation: ButtonElevation? = when(buttonType){
         ButtonTypes.OutlineButton -> ButtonDefaults.buttonElevation()

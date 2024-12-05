@@ -1,25 +1,5 @@
-package com.perkedel.htlauncher.ui.theme
-
+package com.example.compose
 import androidx.compose.ui.graphics.Color
-
-val Purple80 = Color(0xFFD0BCFF)
-val PurpleGrey80 = Color(0xFFCCC2DC)
-val Pink80 = Color(0xFFEFB8C8)
-
-val Purple40 = Color(0xFF6650a4)
-val PurpleGrey40 = Color(0xFF625b71)
-val Pink40 = Color(0xFF7D5260)
-
-val Orange80 = Color(0xFFD0BCFF)
-val OrangeGrey80 = Color(0xFFCCC2DC)
-val Yellow80 = Color(0xFFEFB8C8)
-
-val Orange40 = Color(0xFF6650a4)
-val OrangeGrey40 = Color(0xFF625b71)
-val Yellow40 = Color(0xFF7D5260)
-
-// INCOMING MATERIAL DESIGN GENERATOR!!!
-// http://material-foundation.github.io?primary=%230052EB&bodyFont=Ubuntu&displayFont=Ubuntu&colorMatch=true
 
 val primaryLight = Color(0xFF0040BB)
 val onPrimaryLight = Color(0xFFFFFFFF)
@@ -236,3 +216,10 @@ val surfaceContainerLowDarkHighContrast = Color(0xFF191B24)
 val surfaceContainerDarkHighContrast = Color(0xFF1D1F28)
 val surfaceContainerHighDarkHighContrast = Color(0xFF282A33)
 val surfaceContainerHighestDarkHighContrast = Color(0xFF32343E)
+
+
+
+
+
+
+

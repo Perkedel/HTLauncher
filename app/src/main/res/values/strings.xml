@@ -53,6 +53,7 @@
     <string name="Home_more_all_apps">All Apps</string>
 
     <!--  Configurations  -->
+    <string name="default_button">Default</string>
     <string name="dismiss_button">Dismiss</string>
     <string name="confirm_button">Confirm</string>
     <string name="third_button">Third</string>
@@ -97,7 +98,7 @@
     <string name="save_dir_option">Change Configuration Folder Location</string>
     <string name="debug_test_option">[DEBUG] Test Json</string>
     <string name="About_option">About</string>
-    <string name="About_version_readout">HTLauncher is currently on %s iteration %d</string>
+    <string name="About_version_readout">HTLauncher is currently on %s iteration No. %d</string>
     <string name="iteration_option">Iteration</string>
     <string name="emergency_option">SOS</string>
     <string name="permissions_option">Check Permissions</string>
@@ -156,11 +157,14 @@
     <string name="save_error_description">Werror when saving</string>
     <string name="save_success">Saved</string>
     <string name="error_unknown_reason">idk why</string>
+    <string name="textfield_cannot_empty">Cannot be empty</string>
 
     <string name="menu_home">Home</string>
     <string name="menu_gallery">Gallery</string>
     <string name="menu_slideshow">Slideshow</string>
     <string name="title_activity_all_apps">AllApps</string>
+    <string name="create_new_file_dialog">Create New File</string>
+    <string name="create_new_file_dialog_override">Create New %s</string>
     <string name="large_text">
         "Material is the metaphor.\n\n"
 
@@ -320,6 +324,10 @@
     <string name="internal_commands_preferences_label" translatable="true">Launcher Configs</string>
     <string name="internal_commands_clock_label" translatable="true">Clock</string>
 
+    <!--  Editor  -->
+    <string name="editor_page_reorder_item">Reorder Items</string>
+    <string name="editor_page_reorder_item_count">There are %d items</string>
+
     <!--  filetype  -->
     <string name="text_plain_type" translatable="false">text/plain</string>
     <string name="text_all_type" translatable="false">text/*</string>
@@ -328,4 +336,13 @@
 
     <!--  Activity  -->
     <string name="title_activity_item_editor">ItemEditorActivity</string>
+
+    <!--  Purchase  -->
+    <string name="purchase_offer_title">Offers</string>
+    <string name="purchase_pro_title">FULL VERSION</string>
+    <string name="purchase_cost_changeable">US$ 1.50</string>
+    <string name="purchase_unlocks_all_say">This unlocks all functions</string>
+    <string name="purchase_not_yet_say">BUY NOW</string>
+    <string name="purchase_done_now_say">BOUGHT</string>
+    <string name="purchase_contact">Please contact us at %s if you encounter difficulties with licensing.</string>
 </resources>

@@ -100,6 +100,7 @@ import com.perkedel.htlauncher.func.rememberWindowInfo
 import com.perkedel.htlauncher.ui.dialog.HTAlertDialog
 import com.perkedel.htlauncher.ui.navigation.ActionSelectApp
 import com.perkedel.htlauncher.ui.navigation.EditActionData
+import com.perkedel.htlauncher.ui.navigation.EditPageData
 import com.perkedel.htlauncher.widgets.HTButton
 import com.perkedel.htlauncher.widgets.ItemCell
 import com.perkedel.htlauncher.writeATextFile
@@ -464,6 +465,28 @@ fun ItemEditorGreeting(
                         modifier = Modifier,
                         viewModel = viewModel,
                         data = viewModel.itemData,
+                        onEditActionData = { actionData, idOf ->
+                            viewModel.updateActionDataId(idOf)
+                            viewModel.updateActionData(actionData)
+                            viewModel.setOpenActionData(true)
+                            navigator.navigateTo(
+                                pane = ListDetailPaneScaffoldRole.Detail,
+                                content = "Action ${idOf} ${viewModel.actionEdit}"
+                            )
+                        },
+                        onRebuildItem = {
+                            viewModel.updateItemData(it)
+                            viewModel.updateRawContent(json.encodeToString<ItemData>(it))
+                        }
+                    )
+                    EditWhich.Pages -> EditPageData(
+                        modifier = Modifier,
+                        viewModel = viewModel,
+                        data = viewModel.pageData,
+                        onRebuildItem = {
+                            viewModel.updatePageData(it)
+                            viewModel.updateRawContent(json.encodeToString<PageData>(it))
+                        },
                         onEditActionData = { actionData, idOf ->
                             viewModel.updateActionDataId(idOf)
                             viewModel.updateActionData(actionData)

@@ -10,8 +10,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import android.Manifest
 import android.speech.tts.TextToSpeech
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.MutableState
 import com.perkedel.htlauncher.modules.rememberTextToSpeech
+import com.perkedel.htlauncher.ui.previews.HTPreviewAnnotations
+import com.perkedel.htlauncher.ui.theme.HTLauncherTheme
 
 @Composable
 fun PermissionDialog(
@@ -102,4 +108,21 @@ class PhoneCallPermissionTextProvider: PermissionTextProvider {
                     "to your friends."
         }
     }
+}
+
+@HTPreviewAnnotations
+@Composable
+fun PermissionDialogPreview(){
+    HTLauncherTheme {
+        Surface(
+            modifier = Modifier.fillMaxSize().statusBarsPadding().navigationBarsPadding(),
+
+        ) {
+            PermissionDialog(
+                permissionsTextProvider = BasePermissionTextProvider(),
+                isPermanentlyDeclined = false,
+            )
+        }
+    }
+
 }

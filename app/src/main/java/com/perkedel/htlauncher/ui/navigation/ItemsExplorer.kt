@@ -6,6 +6,7 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import android.speech.tts.TextToSpeech
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
@@ -22,15 +23,20 @@ import androidx.compose.ui.input.pointer.motionEventSpy
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.LocalInspectionMode
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import coil3.compose.AsyncImage
 import com.google.accompanist.systemuicontroller.SystemUiController
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.perkedel.htlauncher.HTUIState
 import com.perkedel.htlauncher.HTViewModel
 import com.perkedel.htlauncher.R
 import com.perkedel.htlauncher.data.ItemData
+import com.perkedel.htlauncher.data.hardcodes.HTLauncherHardcodes
+import com.perkedel.htlauncher.enumerations.ActionDataLaunchType
 import com.perkedel.htlauncher.enumerations.EditWhich
 import com.perkedel.htlauncher.modules.rememberTextToSpeech
 import com.perkedel.htlauncher.ui.previews.HTPreviewAnnotations
@@ -98,7 +104,22 @@ fun ItemsExplorer(
             ){
                 Preference(
                     title = { Text(text = editData[it] ) },
-                    icon = { Icon(imageVector = Icons.Default.Code, contentDescription = null) },
+                    icon = {
+                        when(exploreType){
+                            EditWhich.Items -> AsyncImage(
+                                modifier = Modifier.size(72.dp),
+                                placeholder = painterResource(R.drawable.placeholder),
+                                error = painterResource(R.drawable.mavrickle),
+                                model = when(uiState.itemList[editData[it]]?.action?.get(0)?.type){
+                                    ActionDataLaunchType.LauncherActivity -> if(uiState.itemList[editData[it]]?.action?.get(0)?.action?.isNotBlank() == true) pm.getApplicationIcon(uiState.itemList[editData[it]]?.action?.get(0)?.action ?: "") else R.drawable.all_apps
+                                    ActionDataLaunchType.Internal -> HTLauncherHardcodes.getInternalActionIcon(uiState.itemList[editData[it]]?.action?.get(0)?.action)
+                                    else -> R.drawable.placeholder
+                                },
+                                contentDescription = "",
+                            )
+                            else -> Icon(imageVector = Icons.Default.Code, contentDescription = null)
+                        }
+                    },
 //                    summary = { Text(text = "You are already FULL VERSION.") },
                     onClick = {
                         onEditWhat(exploreType,editData[it])

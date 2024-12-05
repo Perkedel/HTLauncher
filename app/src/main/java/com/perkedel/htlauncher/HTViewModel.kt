@@ -7,6 +7,7 @@ import android.content.ContentResolver
 import android.content.Context
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
+import android.graphics.pdf.PdfDocument.Page
 import android.net.Uri
 import android.os.Build
 import android.util.Log
@@ -19,6 +20,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.documentfile.provider.DocumentFile
 import androidx.lifecycle.viewModelScope
 import com.perkedel.htlauncher.data.ActionData
 import com.perkedel.htlauncher.data.HomepagesWeHave
@@ -117,7 +119,11 @@ class HTViewModel(
 //            )
 //        }
     }
-    suspend fun preloadFiles(context: Context, contentResolver: ContentResolver, uiStating:HTUIState, listOfFolder:List<String>, folders: MutableMap<String,Uri>, json: Json, force:Boolean = false){
+    suspend fun preloadFiles(context: Context, contentResolver: ContentResolver, uiStating:HTUIState = uiState.value, listOfFolder:List<String>, folders: MutableMap<String,Uri>, json: Json = Json{
+        // https://coldfusion-example.blogspot.com/2022/03/jetpack-compose-kotlinx-serialization_79.html
+        prettyPrint = true
+        encodeDefaults = true
+    }, force:Boolean = false){
         // https://programmingheadache.com/2024/02/13/effortless-loading-screen-with-state-flows-and-jetpack-compose-just-4-easy-steps/
 
         viewModelScope.launch {
@@ -202,7 +208,79 @@ class HTViewModel(
 
             // Load Pages & Items
             if(uiStating.testPreloadAll && uiStating.coreConfigJson != null && folders[context.resources.getString(R.string.pages_folder)] != null){
+                var pageFolder:Uri = getADirectory(
+                    dirUri = uiStating.selectedSaveDir!!,
+                    context = context,
+                    dirName = context.resources.getString(R.string.pages_folder)
+                )
+                val pageFiles:List<DocumentFile> = DocumentFile.fromTreeUri(context,pageFolder)?.listFiles()?.toList() ?: emptyList()
+                var pageFileNames:List<String> = pageFiles.map { it.name?.replaceAfterLast(".json","") ?: "" }.toList()
+//                var pageFileNames:List<String> = pageFiles.map { it.name ?: "" }.toList()
+
+                val itemFolder:Uri = getADirectory(
+                    dirUri = uiStating.selectedSaveDir!!,
+                    context = context,
+                    dirName = context.resources.getString(R.string.items_folder)
+                )
+                val itemFiles:List<DocumentFile> = DocumentFile.fromTreeUri(context,itemFolder)?.listFiles()?.toList() ?: emptyList()
+                val itemFileNames:List<String> = itemFiles.map { it.name?.replaceAfterLast(".json","") ?: "" }.toList()
+
+                // fill rest
+                Log.d("FolderQuery","Loading Rest of the items now!")
+                // https://medium.com/@cepv2010/how-to-easily-choose-files-in-android-compose-28f4637d1c21 not this
+                // https://medium.easyread.co/android-data-and-file-storage-cheatsheet-for-media-95f7f66080e3 not that
+                for(i in pageFiles){
+                    Log.d("PageQuery","Check $i")
+                    val pageingUri:Uri = getATextFile(
+                        dirUri = folders[context.resources.getString(R.string.pages_folder)]!!,
+                        context = context,
+                        initData = json.encodeToString<PageData>(PageData(
+                            name = i.name?.replaceAfterLast(".json","") ?: "anItem"
+                        )),
+                        fileName = i.name ?: "",
+//                            fileName = i,
+                        hardOverwrite = false,
+                    )
+                    try {
+                        val pageingData:PageData = json.decodeFromString<PageData>(
+                            openATextFile(
+                                uri = pageingUri,
+                                contentResolver = contentResolver,
+                            )
+                        )
+                        uiStating.pageList[pageingData.name] = pageingData
+                    } catch (e: Exception) {
+//                        Log.d("PageQuery","Error $e")
+                    }
+                }
+                for(i in itemFiles){
+                    Log.d("ItemQuery","Check $i")
+                    val itemingUri:Uri = getATextFile(
+                        dirUri = folders[context.resources.getString(R.string.items_folder)]!!,
+                        context = context,
+                        initData = json.encodeToString<ItemData>(ItemData(
+                            name = i.name?.replaceAfterLast(".json","") ?: "anItem"
+                        )),
+                        fileName = i.name ?: "",
+                        hardOverwrite = false,
+                    )
+                    try {
+                        val itemingData:ItemData = json.decodeFromString<ItemData>(
+                            openATextFile(
+                                uri = itemingUri,
+                                contentResolver = contentResolver,
+                            )
+                        )
+                        uiStating.itemList[itemingData.name] = itemingData
+                    } catch (e: Exception) {
+//                        Log.d("ItemQuery","Error $e")
+                    }
+                }
+
+                // in page
+                Log.d("OnQuery","Now checking files now!")
                 for(i in uiStating.coreConfigJson!!.pagesPath){
+//                for(i in pageFileNames){
                     Log.d("PageLoader","Checking page ${i}")
                     Log.d("PageLoader","Eval context ${context}")
                     Log.d("PageLoader","Eval resource name ${context.resources.getString(R.string.pages_folder)}")
@@ -226,6 +304,7 @@ class HTViewModel(
                             context = context,
                             initData = json.encodeToString<PageData>(predeterminedPage),
                             fileName = "$i.json",
+//                            fileName = i,
                             hardOverwrite = false,
                         )
                         Log.d("PageLoader", "Page URI in total ${aPageUri}")
@@ -246,6 +325,7 @@ class HTViewModel(
 
                     // item
                     for (j in aPage.items) {
+//                    for (j in itemFileNames) {
                         Log.d("ItemLoader", "Checking item ${j}")
 
                         val itemIsInternalCommand:Boolean =
@@ -286,6 +366,7 @@ class HTViewModel(
                                 context = context,
                                 initData = json.encodeToString<ItemData>(predeterminedItem),
                                 fileName = "$j.json",
+//                                fileName = j,
                                 hardOverwrite = true,
                             )
                             aItem = json.decodeFromString<ItemData>(
@@ -311,6 +392,74 @@ class HTViewModel(
 
     }
 
+    fun createNewFileNow(name:String="",atWhere:EditWhich = EditWhich.Items, context: Context, uiStating:HTUIState = uiState.value, json: Json = Json{
+        // https://coldfusion-example.blogspot.com/2022/03/jetpack-compose-kotlinx-serialization_79.html
+        prettyPrint = true
+        encodeDefaults = true
+    },){
+        viewModelScope.launch {
+            if(uiStating.selectedSaveDir != null) {
+                val selectFolder: Uri = getADirectory(
+                    dirUri = uiStating.selectedSaveDir,
+                    dirName = when(atWhere){
+                        EditWhich.Items -> context.resources.getString(R.string.items_folder)
+                        EditWhich.Pages -> context.resources.getString(R.string.pages_folder)
+                        else -> context.resources.getString(R.string.misc_folder)
+                    },
+                    context = context
+                )
+
+                when(atWhere){
+                    EditWhich.Items -> {
+                        val predeterminedItem:ItemData = ItemData(
+                            name = name,
+                            label = name,
+                        )
+                        val aItemUri: Uri = getATextFile(
+                            dirUri = selectFolder,
+                            context = context,
+                            initData = json.encodeToString<ItemData>(predeterminedItem),
+                            fileName = "$name.json",
+                            hardOverwrite = true,
+                        )
+                        val aItem:ItemData = json.decodeFromString<ItemData>(
+                            openATextFile(
+                                uri = aItemUri,
+                                contentResolver = context.contentResolver,
+                            )
+                        )
+                        Log.d("CreateNewFile","New Item $name")
+                        uiStating.itemList[name] = aItem
+                    }
+                    EditWhich.Pages -> {
+                        val predeterminedPage: PageData = PageData(
+                            name = name,
+                        )
+                        val aPageUri: Uri = getATextFile(
+                            dirUri = selectFolder,
+                            context = context,
+                            initData = json.encodeToString<PageData>(predeterminedPage),
+                            fileName = "$name.json",
+                            hardOverwrite = false,
+                        )
+                        val aPage = json.decodeFromString<PageData>(
+                            openATextFile(
+                                uri = aPageUri,
+                                contentResolver = context.contentResolver,
+                            )
+                        )
+                        Log.d("CreateNewFile","New Page $name")
+                        uiStating.pageList[name] = aPage
+                    }
+                    else -> {
+
+                    }
+                }
+            }
+        }
+
+    }
+
     fun dissmissPermissionDialog(){
         if(Build.VERSION.SDK_INT >= 35)
             visiblePermissionDialogQueue.removeLast()
@@ -332,6 +481,22 @@ class HTViewModel(
         _uiState.update {
             currentState -> currentState.copy(
                 openMoreMenu = opened
+            )
+        }
+    }
+
+    fun openCreateNewFile(opened: Boolean = true){
+        _uiState.update {
+            currentState -> currentState.copy(
+                openCreateNewFile = opened
+            )
+        }
+    }
+
+    fun openCreateNewFile(){
+        _uiState.update { currentState ->
+            currentState.copy(
+                openCreateNewFile = !_uiState.value.openCreateNewFile
             )
         }
     }

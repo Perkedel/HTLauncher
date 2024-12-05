@@ -71,6 +71,7 @@ android {
 }
 
 dependencies {
+//    implementation(libs.androidx.ui.text.google.fonts) // NON-FREE?
     val nav_version = "2.8.3"
     val viewModel_version = "2.6.1"
     val retrofit_version = "2.11.0" // https://github.com/square/retrofit
