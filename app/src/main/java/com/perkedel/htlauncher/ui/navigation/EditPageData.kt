@@ -13,13 +13,20 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ViewList
+import androidx.compose.material.icons.filled.GridView
 import androidx.compose.material.icons.filled.Reorder
 import androidx.compose.material.icons.filled.ShoppingCart
+import androidx.compose.material.icons.filled.ViewList
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.hapticfeedback.HapticFeedback
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
@@ -34,13 +41,16 @@ import com.perkedel.htlauncher.data.ItemData
 import com.perkedel.htlauncher.data.PageData
 import com.perkedel.htlauncher.data.viewmodels.ItemEditorViewModel
 import com.perkedel.htlauncher.enumerations.ConfigSelected
+import com.perkedel.htlauncher.enumerations.PageViewStyle
 import com.perkedel.htlauncher.func.WindowInfo
 import com.perkedel.htlauncher.func.rememberWindowInfo
 import com.perkedel.htlauncher.modules.rememberTextToSpeech
 import com.perkedel.htlauncher.modules.ttsSpeak
 import com.perkedel.htlauncher.ui.previews.HTPreviewAnnotations
 import com.perkedel.htlauncher.ui.theme.HTLauncherTheme
+import me.zhanghai.compose.preference.ListPreference
 import me.zhanghai.compose.preference.ProvidePreferenceLocals
+import me.zhanghai.compose.preference.listPreference
 import me.zhanghai.compose.preference.preference
 
 @Composable
@@ -61,6 +71,8 @@ fun EditPageData(
     tts: MutableState<TextToSpeech?> = rememberTextToSpeech(),
     onSelectedKey: (String)->Unit = {}
 ){
+    var pageViewStyle:PageViewStyle by remember { mutableStateOf(data?.viewStyle ?: PageViewStyle.Default) }
+
     // https://youtu.be/6dRwaXH2cYA
     // https://youtu.be/E00-PHw90X0
     ProvidePreferenceLocals {
@@ -91,6 +103,37 @@ fun EditPageData(
 
                 }
             )
+            item {
+                ListPreference<PageViewStyle>(
+                    value = pageViewStyle,
+                    modifier = Modifier,
+                    values = PageViewStyle.entries,
+//                defaultValue = PageViewStyle.Grid,
+                    summary = { Text(text = data?.viewStyle.toString()) },
+                    title = { Text(text = stringResource(R.string.editor_page_view_style)) },
+                    onValueChange = {
+                        pageViewStyle = it
+                    },
+                    icon = {
+                        Icon(when(pageViewStyle){
+                            PageViewStyle.Default -> Icons.Default.GridView
+                            PageViewStyle.Grid -> Icons.Default.GridView
+                            PageViewStyle.Column -> Icons.AutoMirrored.Default.ViewList
+                            else -> Icons.Default.GridView
+                        },"")
+                    }
+                )
+            }
+//            listPreference(
+//                modifier = Modifier,
+//                key = "view_style",
+//                defaultValue = PageViewStyle.Grid,
+//                values = PageViewStyle.entries,
+//                title = { Text(text = stringResource(R.string.editor_page_view_style) ) },
+//                summary = { Text(text = data?.viewStyle.toString()) },
+////                onValueChange = { onSelectedKey("view_style") },
+//            )
+//
         }
     }
 }
@@ -100,7 +143,10 @@ fun EditPageData(
 fun EditPageDataPreview(){
     HTLauncherTheme {
         Surface(
-            modifier = Modifier.fillMaxSize().navigationBarsPadding().statusBarsPadding()
+            modifier = Modifier
+                .fillMaxSize()
+                .navigationBarsPadding()
+                .statusBarsPadding()
         ) {
             EditPageData()
         }

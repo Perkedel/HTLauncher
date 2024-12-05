@@ -297,7 +297,7 @@
 
     <!--  Internal Commmands  -->
     <string name="internal_commands_all_apps" translatable="false">AllApps</string>
-    <string name="internal_commands_settings" translatable="false">Settings</string>
+    <string name="internal_commands_settings" translatable="false">System Settings</string>
     <string name="internal_commands_preferences" translatable="false">Preferences</string>
     <string name="internal_commands_emergency" translatable="false">SOS</string>
     <string name="internal_commands_messages" translatable="false">Messages</string>
@@ -327,6 +327,10 @@
     <!--  Editor  -->
     <string name="editor_page_reorder_item">Reorder Items</string>
     <string name="editor_page_reorder_item_count">There are %d items</string>
+    <string name="editor_page_view_style">View Style</string>
+    <string name="editor_page_view_style_default">Default</string>
+    <string name="editor_page_view_style_grid">Grid</string>
+    <string name="editor_page_view_style_column">Column</string>
 
     <!--  filetype  -->
     <string name="text_plain_type" translatable="false">text/plain</string>

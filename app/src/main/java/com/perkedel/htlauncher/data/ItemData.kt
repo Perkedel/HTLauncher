@@ -17,6 +17,7 @@ data class ItemData(
     ), // What should this item do?
 
     // Customize
+    var isCategory:Boolean = false, // turn this item into a category bar
     var showLabel:Boolean = true, // Show the label
     var useLabel:Boolean = false, // Use Custom Label
     var useAria:Boolean = false, // Use Custom Aria

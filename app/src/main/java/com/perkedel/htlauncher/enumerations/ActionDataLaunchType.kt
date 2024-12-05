@@ -8,5 +8,6 @@ enum class ActionDataLaunchType(val type:String = "") {
     GoToPage(type = "GoToPage"), // Scroll your homescreen to page filename existed where in an order
     Glance(type = "Glance"), // The item is a homescreen widget
     Internal(type = "Internal"), // Internal command for this app.
-    Category(type = "Category"), // turn the item into Category bar
+//    Category(type = "Category"), // turn the item into Category bar
+    None(type = "None"), // do nothing
 }

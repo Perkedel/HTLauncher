@@ -78,6 +78,7 @@ import com.perkedel.htlauncher.data.ItemData
 import com.perkedel.htlauncher.data.PageData
 import com.perkedel.htlauncher.enumerations.ActionDataLaunchType
 import com.perkedel.htlauncher.enumerations.ActionInternalCommand
+import com.perkedel.htlauncher.enumerations.PageViewStyle
 import com.perkedel.htlauncher.enumerations.ShowWhichIcon
 import com.perkedel.htlauncher.func.WindowInfo
 import com.perkedel.htlauncher.func.rememberWindowInfo
@@ -91,6 +92,7 @@ import com.perkedel.htlauncher.ui.theme.HTLauncherTheme
 import com.perkedel.htlauncher.ui.theme.rememberColorScheme
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import me.zhanghai.compose.preference.Preference
 
 @OptIn(ExperimentalFoundationApi::class,
     ExperimentalComposeUiApi::class
@@ -100,6 +102,7 @@ fun ItemCell(
     readTheItemData: ItemData? = null,
     readTheItemFile: String = "",
     handoverText:String = "",
+    viewStyle: PageViewStyle = PageViewStyle.Default,
     modifier: Modifier = Modifier,
     context: Context = LocalContext.current,
     pm : PackageManager = context.packageManager,
@@ -196,8 +199,11 @@ fun ItemCell(
             stringResource(ActionInternalCommand.Contacts.id) -> R.drawable.contacts
             stringResource(ActionInternalCommand.Messages.id) -> R.drawable.messages
             stringResource(ActionInternalCommand.Emergency.id) -> R.drawable.emergency
-            stringResource(ActionInternalCommand.Settings.id) -> R.drawable.settings
+            stringResource(ActionInternalCommand.Settings.id) -> R.drawable.settings_gear
             stringResource(ActionInternalCommand.Preferences.id) -> R.drawable.preferences
+            stringResource(ActionInternalCommand.GoToPage.id) -> R.drawable.go_to_page
+            stringResource(ActionInternalCommand.OpenAPage.id) -> R.drawable.open_a_page
+            stringResource(ActionInternalCommand.Aria.id) -> R.drawable.aria
             else -> R.drawable.placeholder
         }
         selectLabel = when(itemOfIt.action[0].action){
@@ -242,62 +248,62 @@ fun ItemCell(
     }
     val selectAria:String = if(itemOfIt.useAria && itemOfIt.aria.isNotEmpty()) itemOfIt.aria else selectCompartmentType
 
-    // DONE:
-    Surface(
-        modifier = modifier
-            .combinedClickable(
-                // https://gist.github.com/dovahkiin98/95157e662daacddfbc1b60e0fb8bb7c0
-                // https://developer.android.com/develop/ui/compose/touch-input/pointer-input/tap-and-press
-                // https://stackoverflow.com/questions/65835642/button-long-press-listener-in-android-jetpack-compose
-                onClick = {
-                    haptic.performHapticFeedback(
-                        HapticFeedbackType.LongPress
-                    )
+    val gridViewStyle: @Composable ()->Unit = {
+        Surface(
+            modifier = modifier
+                .combinedClickable(
+                    // https://gist.github.com/dovahkiin98/95157e662daacddfbc1b60e0fb8bb7c0
+                    // https://developer.android.com/develop/ui/compose/touch-input/pointer-input/tap-and-press
+                    // https://stackoverflow.com/questions/65835642/button-long-press-listener-in-android-jetpack-compose
+                    onClick = {
+                        haptic.performHapticFeedback(
+                            HapticFeedbackType.LongPress
+                        )
 //                    Toast
 //                        .makeText(context, "Click ${handoverText}", Toast.LENGTH_SHORT)
 //                        .show()
-                    view.playSoundEffect(SoundEffectConstants.CLICK)
-                    Log.d("ItemCell","Click ${handoverText}\n${uiState.itemList[readTheItemFile]}")
-                    if (onClick != null) {
-                        onClick(
-                            itemOfIt.action
-                        )
-                    }
-                },
-                onLongClick = {
+                        view.playSoundEffect(SoundEffectConstants.CLICK)
+                        Log.d("ItemCell","Click ${handoverText}\n${uiState.itemList[readTheItemFile]}")
+                        if (onClick != null) {
+                            onClick(
+                                itemOfIt.action
+                            )
+                        }
+                    },
+                    onLongClick = {
 //                    val readout:String = if(itemOfIt.useAria && itemOfIt.aria.isNotEmpty()) itemOfIt.aria else itemOfIt.label
-                    ttsSpeakOrStop(
-                        handover = tts,
-                        message = selectAria,
+                        ttsSpeakOrStop(
+                            handover = tts,
+                            message = selectAria,
 //                        message = itemOfIt.aria,
-                    )
-                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                    Toast
-                        .makeText(
-                            context,
-                            selectAria,
-//                            itemOfIt.aria,
-                            Toast.LENGTH_SHORT
                         )
-                        .show()
-                    if (onLongClick != null) {
-                        onLongClick(itemOfIt.action)
-                    }
-                },
+                        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                        Toast
+                            .makeText(
+                                context,
+                                selectAria,
+//                            itemOfIt.aria,
+                                Toast.LENGTH_SHORT
+                            )
+                            .show()
+                        if (onLongClick != null) {
+                            onLongClick(itemOfIt.action)
+                        }
+                    },
 //                onClickLabel = selectAria,
-                onClickLabel = selectAria,
-            )
-            .padding(8.dp)
-            .aspectRatio(1f)
+                    onClickLabel = selectAria,
+                )
+                .padding(8.dp)
+                .aspectRatio(1f)
 //                                .background(Color.Transparent)
-            .clip(RoundedCornerShape(10.dp))
-        ,
-        color = Color.Transparent,
-    ) {
-        Box(
-            modifier = Modifier
+                .clip(RoundedCornerShape(10.dp))
             ,
-        ){
+            color = Color.Transparent,
+        ) {
+            Box(
+                modifier = Modifier
+                ,
+            ){
 //            Image(
 //                // https://developer.android.com/develop/ui/compose/graphics/images/loading
 //                painter = painterResource(id = R.drawable.mavrickle),
@@ -306,29 +312,29 @@ fun ItemCell(
 //                modifier = Modifier.fillMaxSize(),
 //            )
 
-            AsyncImage(
-                // https://stackoverflow.com/a/73197578/9079640
-                // https://stackoverflow.com/a/68727678/9079640
+                AsyncImage(
+                    // https://stackoverflow.com/a/73197578/9079640
+                    // https://stackoverflow.com/a/68727678/9079640
 //                model = itemOfIt.imagePath, // TODO: load image from Medias folder
-                model = selectImage,
+                    model = selectImage,
 //                model = Drawable.cre,
-                contentDescription = selectAria,
-                modifier = Modifier.fillMaxSize(),
-                error = painterResource(id = R.drawable.mavrickle),
-                placeholder = painterResource(id = R.drawable.placeholder),
-            )
+                    contentDescription = selectAria,
+                    modifier = Modifier.fillMaxSize(),
+                    error = painterResource(id = R.drawable.mavrickle),
+                    placeholder = painterResource(id = R.drawable.placeholder),
+                )
 
-            if(itemOfIt.showLabel) {
-                OutlinedText(
-                    modifier = Modifier
+                if(itemOfIt.showLabel) {
+                    OutlinedText(
+                        modifier = Modifier
 //                    .fillMaxWidth()
-                        .align(Alignment.BottomCenter)
-                        .basicMarquee()
-                    ,
-                    text = selectLabel,
+                            .align(Alignment.BottomCenter)
+                            .basicMarquee()
+                        ,
+                        text = selectLabel,
 //                    text = itemOfIt.aria,
 //                text = if(uiState.itemList[readTheItemFile] != null && uiState.itemList[readTheItemFile]!!.label.isNotEmpty()) uiState.itemList[readTheItemFile]!!.label else handoverText,
-                    textAlign = TextAlign.Center,
+                        textAlign = TextAlign.Center,
 //                color = rememberColorScheme().primary,
 //                style = TextStyle.Default.copy(
 //                    // https://stackoverflow.com/a/66958833/9079640
@@ -341,18 +347,72 @@ fun ItemCell(
 //                    ,
 //                    color = Color(0xFFF67C37)
 //                )
-                    fillColor = rememberColorScheme().onSurface,
-                    outlineColor = rememberColorScheme().surfaceBright,
-                    outlineDrawStyle = Stroke(
-                        width = 10f,
-                        miter = 5f,
-                        join = StrokeJoin.Round,
-                    ),
-                )
-            }
+                        fillColor = rememberColorScheme().onSurface,
+                        outlineColor = rememberColorScheme().surfaceBright,
+                        outlineDrawStyle = Stroke(
+                            width = 10f,
+                            miter = 5f,
+                            join = StrokeJoin.Round,
+                        ),
+                    )
+                }
 
+            }
         }
     }
+    val barViewStyle: @Composable ()->Unit = {
+        Preference(
+            modifier = modifier,
+            title = {
+                Text(
+                    text = selectLabel,
+                )
+            },
+            icon = {
+                AsyncImage(
+                    // https://stackoverflow.com/a/73197578/9079640
+                    // https://stackoverflow.com/a/68727678/9079640
+//                model = itemOfIt.imagePath, // TODO: load image from Medias folder
+                    model = selectImage,
+//                model = Drawable.cre,
+                    contentDescription = selectAria,
+                    modifier = Modifier.fillMaxSize(),
+                    error = painterResource(id = R.drawable.mavrickle),
+                    placeholder = painterResource(id = R.drawable.placeholder),
+                )
+            }
+        )
+    }
+    val categoryViewStyle: @Composable ()->Unit = {
+        SettingCategoryBar(
+            modifier = modifier,
+            title = selectLabel,
+            tts = tts,
+            context = context,
+            icon = {
+                AsyncImage(
+                    // https://stackoverflow.com/a/73197578/9079640
+                    // https://stackoverflow.com/a/68727678/9079640
+//                model = itemOfIt.imagePath, // TODO: load image from Medias folder
+                    model = selectImage,
+//                model = Drawable.cre,
+                    contentDescription = selectAria,
+                    modifier = Modifier.fillMaxSize(),
+                    error = painterResource(id = R.drawable.mavrickle),
+                    placeholder = painterResource(id = R.drawable.placeholder),
+                )
+            }
+        )
+    }
+
+    // DONE:
+    when{
+        itemOfIt.isCategory -> categoryViewStyle()
+        viewStyle == PageViewStyle.Column -> barViewStyle()
+        viewStyle == PageViewStyle.Default || viewStyle == PageViewStyle.Grid -> gridViewStyle()
+        else -> gridViewStyle()
+    }
+
 }
 
 @HTPreviewAnnotations
