@@ -40,6 +40,7 @@
     <string name="about_screen">About</string>
     <string name="editor_screen">Editor</string>
     <string name="items_explorer_screen">Editing</string>
+    <string name="open_page_screen">Page</string>
     <string name="back_button">Back</string>
     <string name="more_menu_button">Menu</string>
     <string name="aria_label_LauncherActivity">%s Application</string>
@@ -297,7 +298,8 @@
 
     <!--  Internal Commmands  -->
     <string name="internal_commands_all_apps" translatable="false">AllApps</string>
-    <string name="internal_commands_settings" translatable="false">System Settings</string>
+    <string name="internal_commands_settings" translatable="false">Settings</string>
+    <string name="internal_commands_system_settings" translatable="false">SettingsSystem</string>
     <string name="internal_commands_preferences" translatable="false">Preferences</string>
     <string name="internal_commands_emergency" translatable="false">SOS</string>
     <string name="internal_commands_messages" translatable="false">Messages</string>
@@ -321,8 +323,15 @@
     <string name="internal_commands_GoToPage_label" translatable="true">Go to Page</string>
     <string name="internal_commands_OpenAPage_label" translatable="true">Open a Page</string>
     <string name="internal_commands_settings_label" translatable="true">Settings</string>
+    <string name="internal_commands_system_settings_label" translatable="true">System Settings</string>
     <string name="internal_commands_preferences_label" translatable="true">Launcher Configs</string>
     <string name="internal_commands_clock_label" translatable="true">Clock</string>
+
+    <!--  Internal Categories  -->
+    <string name="internal_categories_settings_overall" translatable="false">CategorySettingsOverall</string>
+    <string name="internal_categories_settings_system" translatable="false">CategorySettingsSystem</string>
+    <string name="internal_categories_settings_overall_label" translatable="true">Overall Settings</string>
+    <string name="internal_categories_settings_system_label" translatable="true">System Settings</string>
 
     <!--  Editor  -->
     <string name="editor_page_reorder_item">Reorder Items</string>

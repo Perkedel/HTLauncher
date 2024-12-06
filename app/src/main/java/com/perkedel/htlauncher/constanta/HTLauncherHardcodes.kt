@@ -1,7 +1,5 @@
-package com.perkedel.htlauncher.data.hardcodes
+package com.perkedel.htlauncher.constanta
 
-import androidx.annotation.DrawableRes
-import androidx.datastore.preferences.protobuf.MapEntryLite
 import com.perkedel.htlauncher.R
 import com.perkedel.htlauncher.data.ActionData
 import com.perkedel.htlauncher.data.HomepagesWeHave
@@ -41,6 +39,19 @@ object HTLauncherHardcodes {
             "Clock",
         )
     )
+    val SETTINGS_PAGE_FILE:PageData = PageData(
+        name = "Settings",
+        isHome = false,
+        items = listOf(
+            "CategorySettingsOverall",
+            "SettingsSystem",
+            "Preferences",
+            "CategorySettingsSystem",
+            "SettingsLocation",
+        )
+    )
+
+
     val ALLAPPS_FILE:ItemData = ItemData(
         name = "AllApps",
         label = "All Apps",
@@ -65,6 +76,34 @@ object HTLauncherHardcodes {
             )
         )
     )
+    val CATEGORY_SETTINGS_OVERALL_FILE:ItemData = ItemData(
+        name = "CategorySettingsOverall",
+        label = "CategorySettingsOverall",
+        aria = "CategorySettingsOverall",
+        isCategory = true,
+        action = listOf(
+            ActionData(
+                name = "CategorySettingsOverall",
+                action = "CategorySettingsOverall",
+                type = ActionDataLaunchType.Category,
+            )
+        )
+    )
+    val CATEGORY_SETTINGS_SYSTEM_FILE:ItemData = ItemData(
+        name = "CategorySettingsSystem",
+        label = "CategorySettingsSystem",
+        aria = "CategorySettingsSystem",
+        isCategory = true,
+        action = listOf(
+            ActionData(
+                name = "CategorySettingsSystem",
+                action = "CategorySettingsSystem",
+                type = ActionDataLaunchType.Category,
+            )
+        )
+    )
+
+
     val ALARM_APP_IMPLEMENTATIONS:Map<String,SearchableApps> = mapOf(
         // https://stackoverflow.com/a/4281243/9079640
         Pair("HTC",SearchableApps(packageName = "com.htc.android.worldclock")),

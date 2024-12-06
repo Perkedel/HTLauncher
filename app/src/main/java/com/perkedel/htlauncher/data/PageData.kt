@@ -26,5 +26,6 @@ data class PageData( // And inside a page, there are:
     val cellCount:Int = 3, // Grid count for Fixed
     val cellCountLandscape:Int = 6, // Grid count for Fixed isCompact
     val showWhichIcon: ShowWhichIcon = ShowWhichIcon.Default,
-    val isHome:Boolean = true, // if this page is considered default page
+    val isHome:Boolean = false, // if this page is considered default page
+    val iconPath:String = "",
 )

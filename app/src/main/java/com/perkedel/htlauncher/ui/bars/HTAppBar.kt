@@ -41,8 +41,9 @@ import com.perkedel.htlauncher.ui.theme.HTLauncherTheme
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HTAppBar(
-    currentScreen: Screen = Screen.HomeScreen,
-    textTitle:String = stringResource(currentScreen.title),
+    currentScreen: String = Screen.HomeScreen.name,
+//    textTitle:String = stringResource(currentScreen.title),
+    textTitle:String = currentScreen,
     textDescription:String? = "",
     title: @Composable () -> Unit = {
         if(!textDescription.isNullOrEmpty()){
@@ -150,7 +151,7 @@ fun HTAppBarPreview(){
         Scaffold(
 
             topBar = { HTAppBar(
-                currentScreen = Screen.HomeScreen,
+                currentScreen = Screen.HomeScreen.name,
                 textTitle = "Hello",
                 textDescription = "World",
                 onMoreMenu = {},

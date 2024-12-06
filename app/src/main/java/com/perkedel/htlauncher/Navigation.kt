@@ -15,16 +15,12 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import android.content.Context
 import android.content.Intent
-import android.content.pm.ActivityInfo
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.content.pm.PackageManager.NameNotFoundException
 import android.content.res.Configuration
-import android.graphics.Camera
 import android.net.Uri
 import android.os.Build
-import android.provider.AlarmClock
-import android.provider.ContactsContract.Contacts
 import android.provider.Settings
 import android.speech.tts.TextToSpeech
 import android.util.Log
@@ -49,7 +45,6 @@ import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
@@ -82,6 +77,7 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.documentfile.provider.DocumentFile
 
 import androidx.lifecycle.ViewModel
+import androidx.navigation.toRoute
 import com.google.accompanist.systemuicontroller.SystemUiController
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.perkedel.htlauncher.data.ActionData
@@ -89,7 +85,7 @@ import com.perkedel.htlauncher.data.HomepagesWeHave
 import com.perkedel.htlauncher.data.ItemData
 import com.perkedel.htlauncher.data.PageData
 import com.perkedel.htlauncher.data.TestJsonData
-import com.perkedel.htlauncher.data.hardcodes.HTLauncherHardcodes
+import com.perkedel.htlauncher.constanta.HTLauncherHardcodes
 import com.perkedel.htlauncher.enumerations.ActionDataLaunchType
 import com.perkedel.htlauncher.enumerations.ActionInternalCommand
 import com.perkedel.htlauncher.enumerations.ButtonTypes
@@ -114,6 +110,7 @@ import com.perkedel.htlauncher.ui.navigation.AllAppsScreen
 import com.perkedel.htlauncher.ui.navigation.Configurationing
 import com.perkedel.htlauncher.ui.navigation.ItemsExplorer
 import com.perkedel.htlauncher.ui.navigation.LevelEditor
+import com.perkedel.htlauncher.ui.navigation.StandalonePageScreen
 import com.perkedel.htlauncher.ui.theme.HTLauncherTheme
 import com.perkedel.htlauncher.ui.theme.rememberColorScheme
 import com.perkedel.htlauncher.widgets.HTButton
@@ -192,9 +189,10 @@ fun Navigation(
     // https://www.tutorialspoint.com/how-to-get-the-build-version-number-of-an-android-application
     // https://medium.com/make-apps-simple/get-the-android-app-version-programmatically-5ba27d6a37fe
     val backStackEntry by navController.currentBackStackEntryAsState()
-    val currentScreen = Screen.valueOf(
-        backStackEntry?.destination?.route ?: Screen.HomeScreen.name
-    )
+//    val currentScreen = Screen.valueOf(
+//        backStackEntry?.destination?.route ?: Screen.HomeScreen.name
+//    )
+    val currentScreen:String = backStackEntry?.destination?.route ?: Screen.HomeScreen.name
     val hideTopBar:Boolean = false
     val htuiState : HTUIState by anViewModel.uiState.collectAsState()
 //    val context: Context = LocalContext.current
@@ -571,7 +569,7 @@ fun Navigation(
     Surface(
         modifier = Modifier,
         color = when (currentScreen){
-            Screen.HomeScreen -> Color.Transparent
+            Screen.HomeScreen.name -> Color.Transparent
             else -> colorScheme.background
         }
     ) {
@@ -580,20 +578,22 @@ fun Navigation(
             topBar = {
                 HTAppBar(
                     currentScreen = currentScreen,
-                    textTitle= when(currentScreen){
-                        Screen.HomeScreen -> stringResource(R.string.app_name)
-                        Screen.AllAppsScreen -> stringResource(R.string.all_apps)
-                        Screen.ConfigurationScreen -> stringResource(R.string.configuration_screen)
-                        Screen.AboutScreen -> stringResource(R.string.about_screen)
-                        Screen.LevelEditor -> stringResource(R.string.editor_screen)
-                        Screen.ItemsExplorer -> "${stringResource(R.string.items_explorer_screen)} ${stringResource(htuiState.toEditWhatFile.label)}"
-                        else -> currentScreen.name
+                    textTitle= when{
+                        // https://www.dhiwise.com/post/the-basics-of-kotlin-string-contains-a-beginners-guide
+                        currentScreen == Screen.HomeScreen.name -> stringResource(R.string.app_name)
+                        currentScreen == Screen.AllAppsScreen.name -> stringResource(R.string.all_apps)
+                        currentScreen == Screen.ConfigurationScreen.name -> stringResource(R.string.configuration_screen)
+                        currentScreen == Screen.AboutScreen.name -> stringResource(R.string.about_screen)
+                        currentScreen == Screen.LevelEditor.name -> stringResource(R.string.editor_screen)
+                        currentScreen == Screen.ItemsExplorer.name -> "${stringResource(R.string.items_explorer_screen)} ${stringResource(htuiState.toEditWhatFile.label)}"
+                        currentScreen.startsWith("${context.packageName}.data.PageData") -> backStackEntry?.toRoute<PageData>()?.name ?: PageData().name
+                        else -> currentScreen
                     },
                     textDescription = when(currentScreen){
-                        Screen.HomeScreen -> null
-                        Screen.AllAppsScreen -> "${pm.getInstalledApplications(0).size} ${stringResource(R.string.unit_packages_installed)}"
-                        Screen.ConfigurationScreen -> "${stringResource(R.string.version_option)} ${versionName} (${stringResource(R.string.iteration)} ${versionNumber})"
-                        Screen.AboutScreen -> "${stringResource(R.string.version_option)} ${versionName} (${stringResource(R.string.iteration)} ${versionNumber})"
+                        Screen.HomeScreen.name -> null
+                        Screen.AllAppsScreen.name -> "${pm.getInstalledApplications(0).size} ${stringResource(R.string.unit_packages_installed)}"
+                        Screen.ConfigurationScreen.name -> "${stringResource(R.string.version_option)} ${versionName} (${stringResource(R.string.iteration)} ${versionNumber})"
+                        Screen.AboutScreen.name -> "${stringResource(R.string.version_option)} ${versionName} (${stringResource(R.string.iteration)} ${versionNumber})"
                         else -> null
                     },
                     canNavigateBack = navController.previousBackStackEntry != null,
@@ -606,15 +606,15 @@ fun Navigation(
                     //                hideIt = hideTopBar
                     hideIt = navController.previousBackStackEntry == null && htuiState.isReady,
                     hideMenuButton = when(currentScreen){
-                        Screen.HomeScreen -> false
+                        Screen.HomeScreen.name -> false
                         else -> true
                     },
                     actions = {
                         when(currentScreen){
-                            Screen.HomeScreen -> {
+                            Screen.HomeScreen.name -> {
 
                             }
-                            Screen.ItemsExplorer -> {
+                            Screen.ItemsExplorer.name -> {
                                 HTButton(
                                     buttonType = ButtonTypes.IconButton,
                                     leftIcon = Icons.Default.Add,
@@ -628,7 +628,7 @@ fun Navigation(
                     },
                     onMoreMenu = {
                         when{
-                            currentScreen == Screen.HomeScreen && !htuiState.isReady -> {
+                            currentScreen == Screen.HomeScreen.name && !htuiState.isReady -> {
                                 anViewModel.openTheMoreMenu(true)
                             }
 
@@ -715,6 +715,8 @@ fun Navigation(
                                 snackbarHostState = snackbarHostState,
                                 contentResolver = saveDirResolver,
                                 navController = navController,
+                                viewModel = anViewModel,
+                                uiState = htuiState,
                             )
                         }
                     )
@@ -767,6 +769,50 @@ fun Navigation(
                             }
                         )
                     }
+                }
+                composable<PageData>(
+//                composable(
+//                    route = "${Screen.OpenAPage.name}/{name}"
+                ) { pagingData ->
+                    // https://youtu.be/AIC_OFQ1r3k
+                    Log.d("OpenAPage","Page Opened $currentScreen")
+                    val args = pagingData.toRoute<PageData>()
+                    StandalonePageScreen(
+                        pageData = args,
+                        onAllAppButtonClicked = {
+                            navController.navigate(Screen.AllAppsScreen.name)
+                        },
+                        onMoreMenuButtonClicked = {
+                            anViewModel.openTheMoreMenu(true)
+
+                        },
+                        context = context,
+                        configuration = configuration,
+                        colorScheme = colorScheme,
+                        haptic = haptic,
+                        // DONE: handover the homescreen file json
+                        configFile = htuiState.coreConfigJson,
+                        viewModel = anViewModel,
+                        contentResolver = saveDirResolver,
+                        systemUiController = systemUiController,
+                        uiState = htuiState,
+                        coroutineScope = coroutineScope,
+                        isReady = htuiState.isReady,
+                        tts = tts,
+                        onLaunchOneOfAction = {
+                            onLaunchAction(
+                                data = it,
+                                context = context,
+                                coroutineScope = coroutineScope,
+                                pm = pm,
+                                snackbarHostState = snackbarHostState,
+                                contentResolver = saveDirResolver,
+                                navController = navController,
+                                viewModel = anViewModel,
+                                uiState = htuiState,
+                            )
+                        }
+                    )
                 }
                 composable(route = Screen.AllAppsScreen.name,
                     enterTransition = {
@@ -1157,7 +1203,7 @@ fun Navigation(
                                 navController.navigate(Screen.ItemsExplorer.name)
                             } else {
                                 if(htuiState.selectedSaveDir != null) {
-                                    if (!htuiState.editingLevel && currentScreen == Screen.LevelEditor) {
+                                    if (!htuiState.editingLevel && currentScreen == Screen.LevelEditor.name) {
 
                                         anViewModel.setEditingLevel(true)
                                     }
@@ -1254,7 +1300,7 @@ fun Navigation(
                             // https://youtu.be/2hIY1xuImuQ
                             Log.d("ItemExplorer", "To Edit ${editType.name} ${filename}")
                             if(htuiState.selectedSaveDir != null) {
-                                if (!htuiState.editingLevel && currentScreen == Screen.ItemsExplorer) {
+                                if (!htuiState.editingLevel && currentScreen == Screen.ItemsExplorer.name) {
 
                                     anViewModel.setEditingLevel(true)
                                 }
@@ -1513,18 +1559,30 @@ fun onLaunchAction(
     pm: PackageManager = context.packageManager,
     snackbarHostState:SnackbarHostState,
     navController: NavHostController,
+    viewModel:HTViewModel,
+    uiState:HTUIState,
 ){
     coroutineScope.launch {
         when(data[0].type){
             ActionDataLaunchType.LauncherActivity -> {
-                try{
-                    if(data[0].action.isNotEmpty()) {
+                try {
+                    if (data[0].action.isNotEmpty()) {
                         startApplication(
                             context = context,
                             pm = pm,
                             what = data[0].action
                         )
+                    } else {
+                        throw IllegalArgumentException(
+                            "Action command cannot be empty",
+                            IllegalStateException("Action LauncherActivity ${data[0].action}")
+                        )
                     }
+                } catch (e:IllegalArgumentException) {
+                    coroutineScope.launch {
+                        snackbarHostState.showSnackbar("WERROR 300! Action LauncherActivity blank")
+                    }
+                    e.printStackTrace()
                 } catch (e:Exception) {
                     coroutineScope.launch {
                         snackbarHostState.showSnackbar("WERROR 404! Launcher Activity undefined")
@@ -1590,6 +1648,19 @@ fun onLaunchAction(
                             }
                         }
                         context.resources.getString(ActionInternalCommand.Settings.id) -> {
+//                            startIntent(
+//                                context = context,
+//                                what = Intent(Settings.ACTION_SETTINGS)
+//                            )
+                            navController.navigate<PageData>(
+                                viewModel.getPageData(
+                                    of = "Settings",
+                                    context = context
+                                )
+                            )
+//                            navController.navigate(Screen.OpenAPage.name, navigatorExtras = )
+                        }
+                        context.resources.getString(ActionInternalCommand.SystemSettings.id) -> {
                             startIntent(
                                 context = context,
                                 what = Intent(Settings.ACTION_SETTINGS)
@@ -1620,7 +1691,17 @@ fun onLaunchAction(
 
                         }
                         context.resources.getString(ActionInternalCommand.OpenAPage.id) -> {
-
+                            if(data[0].args[0].isNotBlank()) {
+                                navController.navigate<PageData>(
+                                    viewModel.getPageData(
+                                        of = data[0].args[0],
+                                        context = context
+                                    )
+                                )
+                            } else {
+                                // https://kotlinlang.org/docs/exceptions.html#throw-exceptions-with-precondition-functions
+                                throw IllegalArgumentException("Argument 0 cannot be empty", IllegalStateException("Action ${data[0].action}: Empty Argument 0: ${data[0].args[0]}"))
+                            }
                         }
                         context.resources.getString(ActionInternalCommand.Aria.id) -> {
 

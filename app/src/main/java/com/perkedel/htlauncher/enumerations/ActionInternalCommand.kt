@@ -19,12 +19,14 @@ import androidx.compose.material.icons.filled.Message
 import androidx.compose.material.icons.filled.Pages
 import androidx.compose.material.icons.filled.Phone
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.SettingsApplications
 import androidx.compose.ui.graphics.vector.ImageVector
 import com.perkedel.htlauncher.R
 
 enum class ActionInternalCommand(@StringRes val id:Int = 0, @StringRes val label:Int = 0, @DrawableRes val image:Int = 0, val icon:ImageVector){
     AllApps(id = R.string.internal_commands_all_apps, label = R.string.internal_commands_all_apps_label, image = R.drawable.all_apps, icon = Icons.Default.Apps),
-    Settings(id = R.string.internal_commands_settings, label = R.string.internal_commands_settings_label, image = R.drawable.settings_gear, icon = Icons.Default.Settings),
+    Settings(id = R.string.internal_commands_settings, label = R.string.internal_commands_settings_label, image = R.drawable.settings, icon = Icons.Default.SettingsApplications),
+    SystemSettings(id = R.string.internal_commands_system_settings, label = R.string.internal_commands_system_settings_label, image = R.drawable.settings_gear, icon = Icons.Default.Settings),
     Preferences(id = R.string.internal_commands_preferences, label = R.string.internal_commands_preferences_label, image = R.drawable.preferences, icon = Icons.Default.Build),
     Camera(id = R.string.internal_commands_camera, label = R.string.internal_commands_camera_label, image = R.drawable.camera, icon = Icons.Default.Camera),
     Gallery(id = R.string.internal_commands_gallery, label = R.string.internal_commands_gallery_label, image = R.drawable.gallery, icon = Icons.Default.Image),

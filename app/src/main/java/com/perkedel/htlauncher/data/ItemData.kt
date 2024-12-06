@@ -2,6 +2,7 @@ package com.perkedel.htlauncher.data
 
 import android.graphics.Color
 import com.perkedel.htlauncher.enumerations.ShowWhichIcon
+import com.perkedel.htlauncher.interfaces.Nameable
 import com.perkedel.htlauncher.ui.theme.rememberColorScheme
 import kotlinx.serialization.Serializable
 

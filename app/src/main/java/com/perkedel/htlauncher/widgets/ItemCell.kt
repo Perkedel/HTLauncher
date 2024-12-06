@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalLayoutApi::class)
+
 package com.perkedel.htlauncher.widgets
 
 import android.content.ContentResolver
@@ -17,15 +19,28 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.GridItemSpan
+import androidx.compose.foundation.lazy.grid.LazyHorizontalGrid
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.staggeredgrid.LazyHorizontalStaggeredGrid
+import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
+import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
+import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridItemSpan
+import androidx.compose.foundation.lazy.staggeredgrid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AcUnit
@@ -78,6 +93,7 @@ import com.perkedel.htlauncher.data.ItemData
 import com.perkedel.htlauncher.data.PageData
 import com.perkedel.htlauncher.enumerations.ActionDataLaunchType
 import com.perkedel.htlauncher.enumerations.ActionInternalCommand
+import com.perkedel.htlauncher.enumerations.InternalCategories
 import com.perkedel.htlauncher.enumerations.PageViewStyle
 import com.perkedel.htlauncher.enumerations.ShowWhichIcon
 import com.perkedel.htlauncher.func.WindowInfo
@@ -93,6 +109,7 @@ import com.perkedel.htlauncher.ui.theme.rememberColorScheme
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import me.zhanghai.compose.preference.Preference
+import org.jetbrains.annotations.ApiStatus.Internal
 
 @OptIn(ExperimentalFoundationApi::class,
     ExperimentalComposeUiApi::class
@@ -135,10 +152,21 @@ fun ItemCell(
 
     // DONE:
     if(readTheItemData != null){
+        Log.d("ItemCell", "Injecting ${readTheItemData}")
         itemOfIt = readTheItemData
     } else {
+        Log.d("ItemCell", "Instead File $readTheItemFile")
         if (uiState.itemList.contains(readTheItemFile) && uiState.itemList[readTheItemFile] != null) {
-            itemOfIt = uiState.itemList[readTheItemFile]!!
+//        if (uiState.itemList.contains(readTheItemFile) && uiState.itemList[readTheItemFile] != null) {
+//        if(uiState.selectedSaveDir != null){
+//            itemOfIt = uiState.itemList[readTheItemFile]!!
+            Log.d("ItemCell", "Reading ${readTheItemFile}")
+            itemOfIt = viewModel.getItemData(
+                readTheItemFile,
+                json = json,
+                context = context,
+                ignoreFile = false,
+            )
         }
     }
 
@@ -158,7 +186,7 @@ fun ItemCell(
     // Done:
     var selectImage:Any = itemOfIt.imagePath
     var selectLabel:String = if(itemOfIt.label.isNotEmpty()) itemOfIt.label else handoverText
-    if(itemOfIt.action[0].type != ActionDataLaunchType.Internal) {
+    if(itemOfIt.action[0].type != ActionDataLaunchType.Internal && itemOfIt.action[0].type != ActionDataLaunchType.Category) {
         try {
             selectImage = when (itemOfIt.showWhichIcon) {
                 ShowWhichIcon.Default -> if (itemOfIt.action[0].action.isNotEmpty()) pm.getApplicationIcon(
@@ -182,7 +210,7 @@ fun ItemCell(
                 }
             }
         } catch (e: Exception) {
-            selectLabel = if (itemOfIt.label.isNotEmpty()) itemOfIt.label else handoverText
+            selectLabel = itemOfIt.label.ifEmpty { handoverText }
             e.printStackTrace()
         }
     } else {
@@ -191,19 +219,22 @@ fun ItemCell(
 //        selectLabel = stringResource(ActionInternalCommand.valueOf(itemOfIt.action[0].action).label)
         selectImage = when(itemOfIt.action[0].action){
             // https://stackoverflow.com/questions/68932422/loading-local-drawables-with-coil-compose
-            stringResource(ActionInternalCommand.AllApps.id) -> R.drawable.all_apps
-            stringResource(ActionInternalCommand.Camera.id) -> R.drawable.camera
-            stringResource(ActionInternalCommand.Telephone.id) -> R.drawable.telephone
-            stringResource(ActionInternalCommand.Gallery.id) -> R.drawable.gallery
-            stringResource(ActionInternalCommand.Clock.id) -> R.drawable.clock
-            stringResource(ActionInternalCommand.Contacts.id) -> R.drawable.contacts
-            stringResource(ActionInternalCommand.Messages.id) -> R.drawable.messages
-            stringResource(ActionInternalCommand.Emergency.id) -> R.drawable.emergency
-            stringResource(ActionInternalCommand.Settings.id) -> R.drawable.settings_gear
-            stringResource(ActionInternalCommand.Preferences.id) -> R.drawable.preferences
-            stringResource(ActionInternalCommand.GoToPage.id) -> R.drawable.go_to_page
-            stringResource(ActionInternalCommand.OpenAPage.id) -> R.drawable.open_a_page
-            stringResource(ActionInternalCommand.Aria.id) -> R.drawable.aria
+            // WOW Codeium you got it!! (Result these to refer ActionInternalCommand.???.image as the first two)
+            stringResource(ActionInternalCommand.AllApps.id) -> ActionInternalCommand.AllApps.image
+            stringResource(ActionInternalCommand.Camera.id) -> ActionInternalCommand.Camera.image
+            stringResource(ActionInternalCommand.Telephone.id) -> ActionInternalCommand.Telephone.image
+            stringResource(ActionInternalCommand.Gallery.id) -> ActionInternalCommand.Gallery.image
+            stringResource(ActionInternalCommand.Clock.id) -> ActionInternalCommand.Clock.image
+            stringResource(ActionInternalCommand.Contacts.id) -> ActionInternalCommand.Contacts.image
+            stringResource(ActionInternalCommand.Messages.id) -> ActionInternalCommand.Messages.image
+            stringResource(ActionInternalCommand.Emergency.id) -> ActionInternalCommand.Emergency.image
+            stringResource(ActionInternalCommand.Settings.id) -> ActionInternalCommand.Settings.image
+            stringResource(ActionInternalCommand.Preferences.id) -> ActionInternalCommand.Preferences.image
+            stringResource(ActionInternalCommand.GoToPage.id) -> ActionInternalCommand.GoToPage.image
+            stringResource(ActionInternalCommand.OpenAPage.id) -> ActionInternalCommand.OpenAPage.image
+            stringResource(ActionInternalCommand.Aria.id) -> ActionInternalCommand.Aria.image
+            stringResource(InternalCategories.SettingsSystem.id) -> InternalCategories.SettingsSystem.image
+            stringResource(InternalCategories.SettingsOverall.id) -> InternalCategories.SettingsOverall.image
             else -> R.drawable.placeholder
         }
         selectLabel = when(itemOfIt.action[0].action){
@@ -217,6 +248,8 @@ fun ItemCell(
             stringResource(ActionInternalCommand.Settings.id)-> stringResource(ActionInternalCommand.Settings.label)
             stringResource(ActionInternalCommand.Preferences.id)-> stringResource(ActionInternalCommand.Preferences.label)
             stringResource(ActionInternalCommand.Contacts.id)-> stringResource(ActionInternalCommand.Contacts.label)
+            stringResource(InternalCategories.SettingsSystem.id) -> stringResource(InternalCategories.SettingsSystem.label)
+            stringResource(InternalCategories.SettingsOverall.id) -> stringResource(InternalCategories.SettingsOverall.label)
             else -> itemOfIt.action[0].action
         }
     }
@@ -263,7 +296,10 @@ fun ItemCell(
 //                        .makeText(context, "Click ${handoverText}", Toast.LENGTH_SHORT)
 //                        .show()
                         view.playSoundEffect(SoundEffectConstants.CLICK)
-                        Log.d("ItemCell","Click ${handoverText}\n${uiState.itemList[readTheItemFile]}")
+                        Log.d(
+                            "ItemCell",
+                            "Click ${handoverText}\n${uiState.itemList[readTheItemFile]}"
+                        )
                         if (onClick != null) {
                             onClick(
                                 itemOfIt.action
@@ -397,7 +433,7 @@ fun ItemCell(
                     model = selectImage,
 //                model = Drawable.cre,
                     contentDescription = selectAria,
-                    modifier = Modifier.fillMaxSize(),
+                    modifier = Modifier,
                     error = painterResource(id = R.drawable.mavrickle),
                     placeholder = painterResource(id = R.drawable.placeholder),
                 )
@@ -419,53 +455,101 @@ fun ItemCell(
 //@Preview
 @Composable
 fun ItemCellPreview(){
+    // https://youtu.be/EMJ_Py1mcj4
+    // https://youtube.com/watch?v=EMJ_Py1mcj4
+    // https://youtu.be/bTgyDqBoZ_o
+    // https://youtu.be/m41dDoa0f5w
+    // https://github.com/masterscoding/compose-learning
+    // https://youtu.be/XfYlRn_Jy1g
+    // https://thengoding.com/2024/05/16/jetpack-compose-lazyverticalgrid
+    // https://medium.com/@kathankraithatha/grids-in-jetpack-compose-59d99551ec58
+    // https://stackoverflow.com/a/75782959/9079640
+    // https://www.valueof.io/blog/lazy-grids-gridcells-fixed-adaptive-custom-compose
+    // no such solution! we want category bar spans whole width while item is grid
+    // wait nvm we found it
+    // https://www.valueof.io/blog/lazy-grids-gridcells-fixed-adaptive-custom-compose
     HTLauncherTheme {
-        LazyVerticalGrid(
-            columns = GridCells.Fixed(3)
-        ) {
-            item {
-                ItemCell(
-                    handoverText = "HALLO",
-                    readTheItemData = ItemData(
-                        label = "HALLO AAAAAAAAAAAAAAAAAAAAAA",
-                        useLabel = true,
-                    )
-                )
-
-            }
-//            item {
+        Column {
+//            FlowRow(
+//                modifier = Modifier,
+//                horizontalArrangement = Arrangement.spacedBy(16.dp)
+//            ) {
 //                ItemCell(
-//                    handoverText = "HALLOa",
+//                    handoverText = "HALLO",
 //                    readTheItemData = ItemData(
-//                        name = "ALLAPP",
-//                        label = "ALLAPP",
-//                        action = listOf(
-//                            ActionData(
-//                                type = ActionDataLaunchType.Internal,
-//                                action = stringResource(ActionInternalCommand.AllApps.id)
-//                            )
-//                        )
-//                    )
+//                        label = "HALLO AAAAAAAAAAAAAAAAAAAAAA",
+//                        useLabel = true,
+//                        isCategory = true,
+//                    ),
+//                    modifier = Modifier
+//                )
+//                ItemCell(
+//                    handoverText = "aALLO",
+//                    readTheItemData = ItemData(
+//                        label = "EEEEEEAAAAAAAAAAAAAAAAAAAAA",
+//                        useLabel = true,
+//                    ),
+//                    modifier = Modifier.size(100.dp)
+//                )
+//                ItemCell(
+//                    handoverText = "HALLO",
+//                    readTheItemData = ItemData(
+//                        label = "HALLO AAAAAAAAAAAAAAAAAAAAAA",
+//                        useLabel = true,
+//                    ),
+//                    modifier = Modifier.size(100.dp)
 //                )
 //            }
-            items(
-                items = ActionInternalCommand.entries.toList()
-            ){
-                ItemCell(
-                    handoverText = "HALLOa",
-                    readTheItemData = ItemData(
-                        name = "ALLAPP",
-                        label = "ALLAPP",
-                        action = listOf(
-                            ActionData(
-                                type = ActionDataLaunchType.Internal,
-                                action = stringResource(it.id)
+            LazyVerticalGrid(
+                columns = GridCells.Fixed(3)
+//            rows = GridCells.Fixed(3)
+//                columns = StaggeredGridCells.Fixed(3)
+//                columns = StaggeredGridCells.Adaptive(100.dp),
+//                rows = StaggeredGridCells.Fixed(3)
+            ) {
+                item(
+//                    span = StaggeredGridItemSpan.FullLine
+                    span = {GridItemSpan(this.maxLineSpan)}
+                ) {
+                    ItemCell(
+                        handoverText = "HALLO",
+                        readTheItemData = ItemData(
+                            label = "HALLO Awwwwwwwwwwwwwwwwwwwwwwwwwwwwww",
+                            useLabel = true,
+                            isCategory = true,
+                        ),
+                        modifier = Modifier
+                    )
+
+                }
+                item {
+                    ItemCell(
+                        handoverText = "HALLO",
+                        readTheItemData = ItemData(
+                            label = "HALLO AAAAAAAAAAAAAAAAAAAAAA",
+                            useLabel = true,
+                        )
+                    )
+
+                }
+                items(
+                    items = ActionInternalCommand.entries.toList()
+                ){
+                    ItemCell(
+                        handoverText = "HALLOa",
+                        readTheItemData = ItemData(
+                            name = "ALLAPP",
+                            label = "ALLAPP",
+                            action = listOf(
+                                ActionData(
+                                    type = ActionDataLaunchType.Internal,
+                                    action = stringResource(it.id)
+                                )
                             )
                         )
                     )
-                )
+                }
             }
         }
-
     }
 }

@@ -29,8 +29,8 @@ data class HTUIState(
     val testJsonElement:TestJsonData = TestJsonData(),
     val testPreloadAll:Boolean = true,
     val editingLevel:Boolean = false,
-    val coreConfig:Uri? = null,
-    val coreConfigJson:HomepagesWeHave? = null,
+    var coreConfig:Uri? = null,
+    var coreConfigJson:HomepagesWeHave? = null,
     // https://www.baeldung.com/kotlin/maps
     // https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-map/
     val folders:MutableMap<String,Uri> = LinkedHashMap<String,Uri>(),

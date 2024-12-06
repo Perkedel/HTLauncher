@@ -76,31 +76,43 @@ fun EditItemData(
     var useLabel:Boolean by remember { mutableStateOf(data?.useLabel ?: false) }
 
     val rebuildNow: ()->Unit = {
-        rebuildItemData(
-            with = ItemData(
-                name = name,
-                label = label,
-                aria = aria,
-                imagePath = imagePath,
-                action = action,
-                showLabel = showLabel,
-                showWhichIcon = showWhichIcon,
-                useAria = useAria,
-            ),
-            viewModel = viewModel
-        )
-        onRebuildItem(
-            ItemData(
-                name = name,
-                label = label,
-                aria = aria,
-                imagePath = imagePath,
-                action = action,
-                showLabel = showLabel,
-                showWhichIcon = showWhichIcon,
-                useAria = useAria,
-            )
-        )
+        data?.copy(
+            name = name,
+            label = label,
+            aria = aria,
+            imagePath = imagePath,
+            action = action,
+            showLabel = showLabel,
+            showWhichIcon = showWhichIcon,
+            useAria = useAria
+        )?.let{
+            onRebuildItem(it)
+        }
+//        rebuildItemData(
+//            with = ItemData(
+//                name = name,
+//                label = label,
+//                aria = aria,
+//                imagePath = imagePath,
+//                action = action,
+//                showLabel = showLabel,
+//                showWhichIcon = showWhichIcon,
+//                useAria = useAria,
+//            ),
+//            viewModel = viewModel
+//        )
+//        onRebuildItem(
+//            ItemData(
+//                name = name,
+//                label = label,
+//                aria = aria,
+//                imagePath = imagePath,
+//                action = action,
+//                showLabel = showLabel,
+//                showWhichIcon = showWhichIcon,
+//                useAria = useAria,
+//            )
+//        )
     }
 
 //    ProvidePreferenceLocals {

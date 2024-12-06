@@ -155,7 +155,13 @@ fun BasePage(
         pageOfIt = pageData
     } else {
         if (uiState.pageList.contains(fileName) && uiState.pageList[fileName] != null) {
-            pageOfIt = uiState.pageList[fileName]!!
+//            pageOfIt = uiState.pageList[fileName]!!
+            pageOfIt = viewModel.getPageData(
+                of = fileName,
+                json = json,
+                context = context,
+                ignoreFile = false,
+            )
         }
     }
 
@@ -174,6 +180,7 @@ fun BasePage(
         if(isCompact){
             // if screen is compact
 //            PivotOffsets()
+//            Log.d("BasePage", "Compact Items are ${pageOfIt.items}")
             LazyVerticalGrid(
                 modifier = Modifier,
                 columns = when(pageOfIt.gridType){
@@ -198,18 +205,42 @@ fun BasePage(
                         }
                     }
                     // Rest of the items
-                    items(pageOfIt.items.size){i->
-                        ItemCell(
-                            readTheItemFile = pageOfIt.items[i],
-                            handoverText = "Item ${i}",
-                            context = context,
-                            pm = pm,
-                            uiState = uiState,
-                            viewModel = viewModel,
-                            tts = tts,
-                            onClick = onLaunchOneOfAction,
-                        )
+                    repeat(times = pageOfIt.items.size){
+                        item(
+//                            span = if(uiState.itemList[pageOfIt.items[it]]?.isCategory == true) {GridItemSpan(this.maxLineSpan)} else null
+                            span = { if(uiState.itemList[pageOfIt.items[it]]?.isCategory == true) GridItemSpan(this.maxLineSpan) else GridItemSpan(1) }
+                        ){
+                            ItemCell(
+                                readTheItemData = viewModel.getItemData(
+                                    pageOfIt.items[it],
+                                    json = json,
+                                    context = context,
+                                    ignoreFile = false,
+                                    forceReload = false
+                                ),
+                                readTheItemFile = pageOfIt.items[it],
+                                handoverText = "Item ${it}",
+                                context = context,
+                                pm = pm,
+                                uiState = uiState,
+                                viewModel = viewModel,
+                                tts = tts,
+                                onClick = onLaunchOneOfAction,
+                            )
+                        }
                     }
+//                    items(pageOfIt.items.size){i->
+//                        ItemCell(
+//                            readTheItemFile = pageOfIt.items[i],
+//                            handoverText = "Item ${i}",
+//                            context = context,
+//                            pm = pm,
+//                            uiState = uiState,
+//                            viewModel = viewModel,
+//                            tts = tts,
+//                            onClick = onLaunchOneOfAction,
+//                        )
+//                    }
                     item{
                         Spacer(
                             modifier = Modifier
@@ -253,6 +284,13 @@ fun BasePage(
                         // Rest of the items
                         items(pageOfIt.items.size){i->
                             ItemCell(
+                                readTheItemData = viewModel.getItemData(
+                                    pageOfIt.items[i],
+                                    json = json,
+                                    context = context,
+                                    ignoreFile = false,
+                                    forceReload = false
+                                ),
                                 readTheItemFile = pageOfIt.items[i],
                                 handoverText = "Item ${i}",
                                 context = context,

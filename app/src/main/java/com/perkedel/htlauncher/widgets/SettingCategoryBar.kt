@@ -8,6 +8,7 @@ import android.view.SoundEffectConstants
 import android.view.View
 import android.widget.Toast
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -78,8 +79,10 @@ fun SettingCategoryBar(
                     .weight(1f)
                     .padding(20.dp)
                     .align(Alignment.CenterVertically)
+                    .basicMarquee()
                 ,
-                text = title
+                text = title,
+                maxLines = 1,
             )
             if (icon != null) {
                 // ikr? just eval `(icon)` does not work unlike in most game engines. What a
@@ -103,6 +106,9 @@ fun LazyItemScope.settingCategoryBar(
     icon: @Composable() (() -> Unit?)? = null,
     view: View = LocalView.current,
 ){
+//    item{
+//
+//    }
     SettingCategoryBar(
         title = title,
         modifier = modifier,
@@ -125,6 +131,14 @@ fun SettingCategoryBarPreview(){
                 items(5){
                     SettingCategoryBar(
                         title = "Category ${it}",
+                        icon = {
+                            Icon(Icons.Default.Circle,"")
+                        }
+                    )
+                }
+                item{
+                    SettingCategoryBar(
+                        title = "Category aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
                         icon = {
                             Icon(Icons.Default.Circle,"")
                         }

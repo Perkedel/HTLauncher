@@ -72,6 +72,12 @@ fun EditPageData(
     onSelectedKey: (String)->Unit = {}
 ){
     var pageViewStyle:PageViewStyle by remember { mutableStateOf(data?.viewStyle ?: PageViewStyle.Default) }
+    var rebuildPageData: () -> Unit = {
+        data?.copy(
+            viewStyle = pageViewStyle,
+
+        )?.let { onRebuildItem(it) }
+    }
 
     // https://youtu.be/6dRwaXH2cYA
     // https://youtu.be/E00-PHw90X0
@@ -100,7 +106,7 @@ fun EditPageData(
                 icon = { Icon(imageVector = Icons.Default.Reorder, contentDescription = null) },
                 summary = { Text(text = stringResource(R.string.editor_page_reorder_item_count, data?.items?.size ?: 0)) },
                 onClick = {
-
+                    onSelectedKey("reorder_items")
                 }
             )
             item {
@@ -113,6 +119,7 @@ fun EditPageData(
                     title = { Text(text = stringResource(R.string.editor_page_view_style)) },
                     onValueChange = {
                         pageViewStyle = it
+                        rebuildPageData()
                     },
                     icon = {
                         Icon(when(pageViewStyle){

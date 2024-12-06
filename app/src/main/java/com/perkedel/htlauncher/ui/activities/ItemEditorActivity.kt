@@ -326,7 +326,7 @@ fun ItemEditorGreeting(
     // DONE: read file & type
 //    viewModel.setNavigator(navigator)
     LaunchedEffect(
-        key1 = true
+        key1 = viewModel.rawContent
     ) {
 
     }

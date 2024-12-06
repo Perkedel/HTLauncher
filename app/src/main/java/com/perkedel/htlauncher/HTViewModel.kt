@@ -16,10 +16,6 @@ import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
 import androidx.documentfile.provider.DocumentFile
 import androidx.lifecycle.viewModelScope
 import com.perkedel.htlauncher.data.ActionData
@@ -28,13 +24,13 @@ import com.perkedel.htlauncher.data.ItemData
 import com.perkedel.htlauncher.data.PageData
 import com.perkedel.htlauncher.data.SearchableApps
 import com.perkedel.htlauncher.data.TestJsonData
-import com.perkedel.htlauncher.data.hardcodes.HTLauncherHardcodes
+import com.perkedel.htlauncher.constanta.HTLauncherHardcodes
 import com.perkedel.htlauncher.enumerations.ActionDataLaunchType
 import com.perkedel.htlauncher.enumerations.ActionInternalCommand
 import com.perkedel.htlauncher.enumerations.EditWhich
+import com.perkedel.htlauncher.enumerations.InternalCategories
 import com.perkedel.htlauncher.func.AsyncService
 import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
@@ -44,7 +40,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.JsonElement
 
 @OptIn(FlowPreview::class)
 class HTViewModel(
@@ -132,6 +127,8 @@ class HTViewModel(
                 // clear everything
                 uiStating.pageList.clear()
                 uiStating.itemList.clear()
+                uiStating.coreConfig = null
+                uiStating.coreConfigJson = null
             }
 
 //        val launch = viewModelScope.launch {
@@ -142,6 +139,7 @@ class HTViewModel(
 
             // You must Folders!!
             val homeSafData:HomepagesWeHave = HTLauncherHardcodes.HOMESCREEN_FILE
+            var homeSafFileUri:Uri = Uri.EMPTY
             if(uiStating.selectedSaveDir != null && uiStating.selectedSaveDir.toString().isNotEmpty()){
                 for(a in listOfFolder){
                     folders[a] = getADirectory(uiStating.selectedSaveDir!!, context, a)
@@ -156,18 +154,21 @@ class HTViewModel(
 
 
                 val homeSaf:String = json.encodeToString<HomepagesWeHave>(homeSafData)
-                val homeSafFileUri = getATextFile(
+                homeSafFileUri = getATextFile(
                     dirUri = uiStating.selectedSaveDir!!,
                     context = context,
                     fileName = "${context.resources.getString(R.string.home_screen_file)}.json",
                     initData = homeSaf,
                     hardOverwrite = true,
                 )
-                Log.d("InitFileLoader", "Pls Homescreen:\n${homeSaf}")
+                Log.d("InitFileLoader", "Pls Homescreen ${homeSafFileUri}:\n${homeSaf}")
                 setHomeScreenJson(
                     homeSafFileUri
                 )
-                Log.d("InitFileLoader", "Pls the file Homescreen ${uiStating.coreConfig}")
+                setHomeScreenJson(
+                    homeSafFileUri
+                )
+                Log.d("InitFileLoader", "Pls the file Homescreen ${uiStating.coreConfig} fill ${homeSafFileUri}")
 
 
             } else {
@@ -175,15 +176,17 @@ class HTViewModel(
             }
 
 
-            if(uiStating.selectedSaveDir != null &&uiStating.selectedSaveDir.toString().isNotEmpty()) {
+            if(uiStating.selectedSaveDir != null && uiStating.selectedSaveDir.toString().isNotEmpty()) {
                 // https://dev.to/vtsen/how-to-debug-jetpack-compose-recomposition-with-logging-k7g
                 // https://developer.android.com/reference/android/util/Log
                 // https://stackoverflow.com/a/74044617/9079640
-                Log.d("DebugHomescreen", "Will check ${uiStating.selectedSaveDir}")
-                if (uiStating.coreConfig != null && uiStating.coreConfig.toString().isNotEmpty()) {
+                Log.d("DebugHomescreen", "Will check ${uiStating.selectedSaveDir}, the ${homeSafFileUri}")
+                if (homeSafFileUri.toString().isNotEmpty()) {
+//                if (uiStating.coreConfig != null && uiStating.coreConfig.toString().isNotEmpty()) {
                     Log.d("DebugHomescreen", "There is something!")
                     val fileStream:String = openATextFile(
-                        uri = uiStating.coreConfig!!,
+                        uri = homeSafFileUri,
+//                        uri = uiStating.coreConfig!!,
                         contentResolver = contentResolver
                     )
                     Log.d("DebugHomescreen", "It contains:\n${fileStream}")
@@ -288,12 +291,13 @@ class HTViewModel(
 
                     val predeterminedPage: PageData = when(i){
                         context.resources.getString(R.string.home_screen_page_file) -> HTLauncherHardcodes.HOMEPAGE_FILE
+                        "Settings" -> HTLauncherHardcodes.SETTINGS_PAGE_FILE
                         else -> PageData(
                             name = i,
                             isHome = i.contains("Home")
                         )
                     }
-                    var aPage: PageData = PageData()
+                    var aPage: PageData = predeterminedPage
 
                     if(uiStating.pageList.contains(i) && uiStating.pageList[i] != null){
                         Log.d("PageLoader", "Already Exist ${uiStating.itemList[i]}")
@@ -314,14 +318,14 @@ class HTViewModel(
                                 contentResolver = contentResolver,
                             )
                         )
-                        if (uiStating.pageList.contains(i)) {
-                            // https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-map/contains-key.html
-                            Log.d("PageLoader", "Key $i Exist!")
-                        } else {
-                            Log.d("PageLoader", "Key $i 404 NOT FOUND!")
-                        }
-                        uiStating.pageList[i] = aPage
+//                        if (uiStating.pageList.contains(i)) {
+//                            // https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-map/contains-key.html
+//                            Log.d("PageLoader", "Key $i Exist!")
+//                        } else {
+//                            Log.d("PageLoader", "Key $i 404 NOT FOUND!")
+//                        }
                     }
+                    uiStating.pageList[i] = aPage
 
                     // item
                     for (j in aPage.items) {
@@ -340,7 +344,10 @@ class HTViewModel(
                             j.contains(context.resources.getString(ActionInternalCommand.Emergency.id)) ||
                             j.contains("SOS", true) ||
                             j.contains(ActionInternalCommand.Messages.name) ||
-                            j.contains(ActionInternalCommand.Settings.name)
+                            j.contains(ActionInternalCommand.Settings.name) ||
+                            j.contains(ActionInternalCommand.SystemSettings.name) ||
+                            j.contains(ActionInternalCommand.Preferences.name)
+//                        Log.d("ItemLoader","Item is internal command $j")
                         val predeterminedItem: ItemData = when{
                             itemIsInternalCommand -> ItemData(
                                 name = j,
@@ -375,14 +382,15 @@ class HTViewModel(
                                     contentResolver = contentResolver,
                                 )
                             )
-                            if (uiStating.itemList.contains(j)) {
-                                // https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-map/contains-key.html
-                                Log.d("ItemLoader", "Key $j Exist!")
-                            } else {
-                                Log.d("ItemLoader", "Key $j 404 NOT FOUND!")
-                            }
-                            uiStating.itemList[j] = aItem
+//                            if (uiStating.itemList.contains(j)) {
+//                                // https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-map/contains-key.html
+//                                Log.d("ItemLoader", "Key $j Exist!")
+//                            } else {
+//                                Log.d("ItemLoader", "Key $j 404 NOT FOUND!")
+//                            }
+
                         }
+                        uiStating.itemList[j] = aItem
                     }
                 }
             }
@@ -571,5 +579,142 @@ class HTViewModel(
                 editingLevel = into
             )
         }
+    }
+
+    fun getPageData(of:String = "", json:Json = Json{
+        prettyPrint = true
+        encodeDefaults = true
+    }, context: Context, ignoreFile:Boolean = false, forceReload:Boolean = false):PageData{
+        val predeterminedPage: PageData = when(of){
+            "Home" -> HTLauncherHardcodes.HOMEPAGE_FILE
+            "home" -> HTLauncherHardcodes.HOMEPAGE_FILE
+            "Settings" -> HTLauncherHardcodes.SETTINGS_PAGE_FILE
+            else -> PageData(
+                name = of,
+                isHome = of.contains("Home")
+            )
+        }
+        var aPage: PageData = predeterminedPage
+        if(_uiState.value.selectedSaveDir != null && _uiState.value.selectedSaveDir.toString().isNotBlank() && !ignoreFile) {
+            if(_uiState.value.pageList.contains(of) && _uiState.value.pageList[of] != null || forceReload){
+                aPage = _uiState.value.pageList[of]!!
+            } else {
+                val selectFolder: Uri = getADirectory(
+                    dirUri = _uiState.value.selectedSaveDir!!,
+                    dirName = "Pages",
+                    context = context
+                )
+                val aPageUri: Uri = getATextFile(
+                    dirUri = selectFolder,
+                    context = context,
+                    initData = json.encodeToString<PageData>(predeterminedPage),
+                    fileName = "$of.json",
+                    hardOverwrite = false,
+                )
+                aPage = json.decodeFromString<PageData>(
+                    openATextFile(
+                        uri = aPageUri,
+                        contentResolver = context.contentResolver,
+                    )
+                )
+            }
+            _uiState.value.pageList[of] = aPage
+        } else {
+
+        }
+
+
+        return _uiState.value.pageList[of] ?: predeterminedPage
+    }
+    fun getItemData(of: String, json:Json = Json{
+        prettyPrint = true
+        encodeDefaults = true
+    }, context: Context, ignoreFile:Boolean = false, forceReload:Boolean = false):ItemData{
+        // codeium shim!!!!
+        val itemIsInternalCommand:Boolean =
+            of.contains(context.resources.getString(ActionInternalCommand.AllApps.id)) ||
+                    of.contains(context.resources.getString(ActionInternalCommand.Camera.id)) ||
+                    of.contains(context.resources.getString(ActionInternalCommand.Telephone.id)) ||
+                    of.contains(context.resources.getString(ActionInternalCommand.GoToPage.id)) ||
+                    of.contains(context.resources.getString(ActionInternalCommand.Gallery.id)) ||
+                    of.contains(context.resources.getString(ActionInternalCommand.Clock.id)) ||
+                    of.contains(context.resources.getString(ActionInternalCommand.Contacts.id)) ||
+                    of.contains(context.resources.getString(ActionInternalCommand.Emergency.id)) ||
+                    of.contains(context.resources.getString(ActionInternalCommand.Emergency.id)) ||
+                    of.contains("SOS", true) ||
+                    of.contains(context.resources.getString(ActionInternalCommand.Messages.id)) ||
+                    of.contains(context.resources.getString(ActionInternalCommand.Settings.id)) ||
+                    of.contains(context.resources.getString(ActionInternalCommand.SystemSettings.id)) ||
+                    of.contains(context.resources.getString(ActionInternalCommand.Preferences.id))
+
+        val itemIsCategory:Boolean =
+            of.contains(context.resources.getString(InternalCategories.SettingsSystem.id)) ||
+                    of.contains(context.resources.getString(InternalCategories.SettingsOverall.id))
+//        if(itemIsInternalCommand) Log.d("GetItemData","Internal Command ${of}")
+//        Log.d("GetItemData","Item $of requested")
+        val predeterminedItem: ItemData = when {
+            itemIsInternalCommand -> ItemData(
+                name = of,
+                label = of,
+                action = listOf(
+                    ActionData(
+                        name = of,
+                        action = of,
+                        type = ActionDataLaunchType.Internal,
+                    )
+                ),
+            )
+            itemIsCategory -> ItemData(
+                name = of,
+                label = of,
+                isCategory = true,
+                action = listOf(
+                    ActionData(
+                        name = of,
+                        action = of,
+                        type = ActionDataLaunchType.Category,
+                    )
+                ),
+            )
+//            "AllApps" -> HTLauncherHardcodes.ALLAPPS_FILE
+//            "Telephone" -> HTLauncherHardcodes.TELEPHONE_FILE
+//            "CategorySettingsOverall" -> HTLauncherHardcodes.CATEGORY_SETTINGS_OVERALL_FILE
+//            "CategorySettingsSystem" -> HTLauncherHardcodes.CATEGORY_SETTINGS_SYSTEM_FILE
+            else -> ItemData(
+                name = of,
+                label = of,
+            )
+        }
+
+        var aItem: ItemData = predeterminedItem
+        if(_uiState.value.selectedSaveDir != null && _uiState.value.selectedSaveDir.toString().isNotBlank() && !ignoreFile){
+            if((_uiState.value.itemList.contains(of) && _uiState.value.itemList[of] != null) || forceReload){
+                aItem = _uiState.value.itemList[of]!!
+            } else {
+                val selectFolder: Uri = getADirectory(
+                    dirUri = _uiState.value.selectedSaveDir!!,
+                    dirName = "Items",
+                    context = context
+                )
+                val aItemUri: Uri = getATextFile(
+                    dirUri = selectFolder,
+                    context = context,
+                    initData = json.encodeToString<ItemData>(predeterminedItem),
+                    fileName = "$of.json",
+                )
+
+                aItem = json.decodeFromString<ItemData>(
+                    openATextFile(
+                        uri = aItemUri,
+                        contentResolver = context.contentResolver,
+                    )
+                )
+            }
+            _uiState.value.itemList[of] = aItem
+        } else {
+            Log.d("GetItemData","Savedir null")
+        }
+
+        return _uiState.value.itemList[of] ?: predeterminedItem
     }
 }

@@ -2,6 +2,7 @@ package com.perkedel.htlauncher.enumerations
 
 import androidx.annotation.StringRes
 import com.perkedel.htlauncher.R
+import kotlinx.serialization.Serializable
 
 //sealed class Screen (val route:String) {
 //    data object HomeScreen : Screen("home")
@@ -18,11 +19,13 @@ import com.perkedel.htlauncher.R
 //    }
 //}
 
+@Serializable
 enum class Screen (@StringRes val title: Int){
     HomeScreen(title = R.string.app_name),
     AllAppsScreen(title = R.string.all_apps),
     ConfigurationScreen(title = R.string.configuration_screen),
     AboutScreen(title = R.string.about_screen),
-    LevelEditor(title = R.string.about_screen),
-    ItemsExplorer(title = R.string.about_screen),
+    LevelEditor(title = R.string.editor_screen),
+    ItemsExplorer(title = R.string.items_explorer_screen),
+    OpenAPage(title = R.string.open_page_screen),
 }
