@@ -13,6 +13,12 @@ object HTLauncherHardcodes {
     // https://stackoverflow.com/questions/77368662/kotlin-replace-only-last-given-string-from-string
     // https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.text/last-index-of-any.html
     // https://stackoverflow.com/a/50520935/9079640
+
+    val PAGES_BUILTIN_FILES:List<String> = listOf(
+        "Home",
+        "Settings",
+    )
+
     val HOMESCREEN_FILE:HomepagesWeHave = HomepagesWeHave(
 
     )

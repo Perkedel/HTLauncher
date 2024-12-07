@@ -333,6 +333,10 @@
     <string name="internal_categories_settings_overall_label" translatable="true">Overall Settings</string>
     <string name="internal_categories_settings_system_label" translatable="true">System Settings</string>
 
+    <!--  Internal Pages  -->
+    <string name="internal_pages_settings" translatable="false">Settings</string>
+    <string name="internal_pages_settings_label" translatable="true">Settings</string>
+
     <!--  Editor  -->
     <string name="editor_page_reorder_item">Reorder Items</string>
     <string name="editor_page_reorder_item_count">There are %d items</string>

@@ -279,8 +279,11 @@
     <string name="internal_commands_clock_label" translatable="true">Jam</string>
 
     <!--  Internal Categories  -->
-    <string name="internal_categories_settings_overall_label" translatable="true">Overall Settings</string>
-    <string name="internal_categories_settings_system_label" translatable="true">System Settings</string>
+    <string name="internal_categories_settings_overall_label" translatable="true">Pengaturan Keseluruhan</string>
+    <string name="internal_categories_settings_system_label" translatable="true">Pengaturan Sistem</string>
+
+    <!--  Internal Pages  -->
+    <string name="internal_pages_settings_label" translatable="true">Pengaturan</string>
 
     <!--  Editor  -->
     <string name="editor_page_reorder_item">Urutkan Item</string>

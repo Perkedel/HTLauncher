@@ -31,6 +31,7 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.expandIn
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -70,6 +71,7 @@ import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.core.app.ActivityCompat.shouldShowRequestPermissionRationale
 import androidx.core.content.pm.PackageInfoCompat
+import androidx.core.graphics.scaleMatrix
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
@@ -568,8 +570,10 @@ fun Navigation(
 
     Surface(
         modifier = Modifier,
-        color = when (currentScreen){
-            Screen.HomeScreen.name -> Color.Transparent
+        color = when{
+            currentScreen == Screen.HomeScreen.name -> Color.Transparent
+            currentScreen == Screen.AllAppsScreen.name -> Color.Transparent
+            currentScreen.startsWith("${context.packageName}.data.PageData") -> Color.Transparent
             else -> colorScheme.background
         }
     ) {
@@ -586,7 +590,13 @@ fun Navigation(
                         currentScreen == Screen.AboutScreen.name -> stringResource(R.string.about_screen)
                         currentScreen == Screen.LevelEditor.name -> stringResource(R.string.editor_screen)
                         currentScreen == Screen.ItemsExplorer.name -> "${stringResource(R.string.items_explorer_screen)} ${stringResource(htuiState.toEditWhatFile.label)}"
-                        currentScreen.startsWith("${context.packageName}.data.PageData") -> backStackEntry?.toRoute<PageData>()?.name ?: PageData().name
+                        currentScreen.startsWith("${context.packageName}.data.PageData") -> {
+                            val backStackName:String = backStackEntry?.toRoute<PageData>()?.name ?: PageData().name
+                            when{
+                                backStackName == stringResource(R.string.internal_pages_settings) -> stringResource(R.string.internal_pages_settings_label)
+                                else -> backStackName
+                            }
+                        }
                         else -> currentScreen
                     },
                     textDescription = when(currentScreen){
@@ -605,8 +615,9 @@ fun Navigation(
                     },
                     //                hideIt = hideTopBar
                     hideIt = navController.previousBackStackEntry == null && htuiState.isReady,
-                    hideMenuButton = when(currentScreen){
-                        Screen.HomeScreen.name -> false
+                    hideMenuButton = when{
+                        currentScreen == Screen.HomeScreen.name -> false
+                        currentScreen.startsWith("${context.packageName}.data.PageData") -> false
                         else -> true
                     },
                     actions = {
@@ -631,7 +642,9 @@ fun Navigation(
                             currentScreen == Screen.HomeScreen.name && !htuiState.isReady -> {
                                 anViewModel.openTheMoreMenu(true)
                             }
-
+                            currentScreen.startsWith("${context.packageName}.data.PageData") -> {
+                                anViewModel.openTheMoreMenu(true)
+                            }
                             else -> null
                         }
                     }
@@ -657,9 +670,14 @@ fun Navigation(
             ) {
                 composable(route = Screen.HomeScreen.name,
                     exitTransition = {
-                        scaleOut(
+                        when{
+                            // https://developer.android.com/develop/ui/compose/animation/composables-modifiers#enter-exit-transition
+//                            currentScreen.startsWith("${context.packageName}.data.PageData") ->
+                            else ->scaleOut(
 
-                        )
+                            )
+                        }
+
                     },
                     popEnterTransition = {
                         scaleIn()
@@ -725,54 +743,26 @@ fun Navigation(
 
                     }
 
-
-
-                    if (htuiState.openMoreMenu) {
-                        HomeMoreMenu(
-                            modifier = Modifier,
-                            onChosenMenu = {
-                                // https://stackoverflow.com/a/53138234
-                                when (it) {
-                                    "edit" -> {
-                                        // Edit
-                                    }
-
-                                    "configuration" -> {
-                                        // Configurations
-                                        navController.navigate(Screen.ConfigurationScreen.name)
-                                    }
-
-                                    "system_setting" -> {
-                                        // System Setting
-                                        // https://www.geeksforgeeks.org/android-jetpack-compose-open-specific-settings-screen/
-                                        //                                    val i = Intent(ACTION_WIRELESS_SETTINGS)
-                                        startIntent(
-                                            context = context,
-                                            what = Settings.ACTION_SETTINGS
-                                        )
-                                    }
-
-                                    "all_apps" -> {
-                                        // All Apps
-                                        navController.navigate(Screen.AllAppsScreen.name)
-                                    }
-
-                                    else -> {
-
-                                    }
-                                }
-                                anViewModel.openTheMoreMenu(false)
-                            },
-                            onDismissRequest = {
-                                anViewModel.openTheMoreMenu(false)
-//                                setStatusBarVisibility(false,systemUiController)
-                            }
-                        )
-                    }
                 }
                 composable<PageData>(
 //                composable(
 //                    route = "${Screen.OpenAPage.name}/{name}"
+                    exitTransition = {
+                        scaleOut(
+
+                        )
+                    },
+                    enterTransition = {
+                        scaleIn(
+
+                        )
+                    },
+                    popEnterTransition = {
+                        scaleIn()
+                    },
+                    popExitTransition = {
+                        scaleOut()
+                    }
                 ) { pagingData ->
                     // https://youtu.be/AIC_OFQ1r3k
                     Log.d("OpenAPage","Page Opened $currentScreen")
@@ -1387,7 +1377,48 @@ fun Navigation(
             }
         }
     }
+    if (htuiState.openMoreMenu) {
+        HomeMoreMenu(
+            modifier = Modifier,
+            onChosenMenu = {
+                // https://stackoverflow.com/a/53138234
+                when (it) {
+                    "edit" -> {
+                        // Edit
+                    }
 
+                    "configuration" -> {
+                        // Configurations
+                        navController.navigate(Screen.ConfigurationScreen.name)
+                    }
+
+                    "system_setting" -> {
+                        // System Setting
+                        // https://www.geeksforgeeks.org/android-jetpack-compose-open-specific-settings-screen/
+                        //                                    val i = Intent(ACTION_WIRELESS_SETTINGS)
+                        startIntent(
+                            context = context,
+                            what = Settings.ACTION_SETTINGS
+                        )
+                    }
+
+                    "all_apps" -> {
+                        // All Apps
+                        navController.navigate(Screen.AllAppsScreen.name)
+                    }
+
+                    else -> {
+
+                    }
+                }
+                anViewModel.openTheMoreMenu(false)
+            },
+            onDismissRequest = {
+                anViewModel.openTheMoreMenu(false)
+//                                setStatusBarVisibility(false,systemUiController)
+            }
+        )
+    }
 }
 
 private fun goBackHome(

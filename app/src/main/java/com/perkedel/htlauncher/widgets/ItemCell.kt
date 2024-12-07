@@ -229,6 +229,7 @@ fun ItemCell(
             stringResource(ActionInternalCommand.Messages.id) -> ActionInternalCommand.Messages.image
             stringResource(ActionInternalCommand.Emergency.id) -> ActionInternalCommand.Emergency.image
             stringResource(ActionInternalCommand.Settings.id) -> ActionInternalCommand.Settings.image
+            stringResource(ActionInternalCommand.SystemSettings.id) -> ActionInternalCommand.SystemSettings.image
             stringResource(ActionInternalCommand.Preferences.id) -> ActionInternalCommand.Preferences.image
             stringResource(ActionInternalCommand.GoToPage.id) -> ActionInternalCommand.GoToPage.image
             stringResource(ActionInternalCommand.OpenAPage.id) -> ActionInternalCommand.OpenAPage.image
@@ -246,6 +247,7 @@ fun ItemCell(
             stringResource(ActionInternalCommand.Emergency.id)-> stringResource(ActionInternalCommand.Emergency.label)
             stringResource(ActionInternalCommand.Gallery.id)-> stringResource(ActionInternalCommand.Gallery.label)
             stringResource(ActionInternalCommand.Settings.id)-> stringResource(ActionInternalCommand.Settings.label)
+            stringResource(ActionInternalCommand.SystemSettings.id)-> stringResource(ActionInternalCommand.SystemSettings.label)
             stringResource(ActionInternalCommand.Preferences.id)-> stringResource(ActionInternalCommand.Preferences.label)
             stringResource(ActionInternalCommand.Contacts.id)-> stringResource(ActionInternalCommand.Contacts.label)
             stringResource(InternalCategories.SettingsSystem.id) -> stringResource(InternalCategories.SettingsSystem.label)
@@ -433,7 +435,10 @@ fun ItemCell(
                     model = selectImage,
 //                model = Drawable.cre,
                     contentDescription = selectAria,
-                    modifier = Modifier,
+                    modifier = Modifier
+//                        .aspectRatio(1f)
+                        .size(32.dp)
+                    ,
                     error = painterResource(id = R.drawable.mavrickle),
                     placeholder = painterResource(id = R.drawable.placeholder),
                 )

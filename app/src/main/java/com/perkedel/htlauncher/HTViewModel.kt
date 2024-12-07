@@ -219,6 +219,8 @@ class HTViewModel(
                 val pageFiles:List<DocumentFile> = DocumentFile.fromTreeUri(context,pageFolder)?.listFiles()?.toList() ?: emptyList()
                 var pageFileNames:List<String> = pageFiles.map { it.name?.replaceAfterLast(".json","") ?: "" }.toList()
 //                var pageFileNames:List<String> = pageFiles.map { it.name ?: "" }.toList()
+                // but also pls add the built-in things!
+
 
                 val itemFolder:Uri = getADirectory(
                     dirUri = uiStating.selectedSaveDir!!,
@@ -333,21 +335,24 @@ class HTViewModel(
                         Log.d("ItemLoader", "Checking item ${j}")
 
                         val itemIsInternalCommand:Boolean =
-                            j.contains(ActionInternalCommand.AllApps.name) ||
-                            j.contains(ActionInternalCommand.Camera.name) ||
-                            j.contains(ActionInternalCommand.Telephone.name) ||
-                            j.contains(ActionInternalCommand.GoToPage.name) ||
-                            j.contains(ActionInternalCommand.Gallery.name) ||
-                            j.contains(ActionInternalCommand.Clock.name) ||
-                            j.contains(ActionInternalCommand.Contacts.name) ||
-                            j.contains(ActionInternalCommand.Emergency.name) ||
-                            j.contains(context.resources.getString(ActionInternalCommand.Emergency.id)) ||
-                            j.contains("SOS", true) ||
-                            j.contains(ActionInternalCommand.Messages.name) ||
-                            j.contains(ActionInternalCommand.Settings.name) ||
-                            j.contains(ActionInternalCommand.SystemSettings.name) ||
-                            j.contains(ActionInternalCommand.Preferences.name)
+                            j == ActionInternalCommand.AllApps.name ||
+                            j == ActionInternalCommand.Camera.name ||
+                            j == ActionInternalCommand.Telephone.name ||
+                            j == ActionInternalCommand.GoToPage.name ||
+                            j == ActionInternalCommand.Gallery.name ||
+                            j == ActionInternalCommand.Clock.name ||
+                            j == ActionInternalCommand.Contacts.name ||
+                            j == ActionInternalCommand.Emergency.name ||
+                            j == context.resources.getString(ActionInternalCommand.Emergency.id) ||
+                            j == "SOS" ||
+                            j == ActionInternalCommand.Messages.name ||
+                            j == ActionInternalCommand.Settings.name ||
+                            j == ActionInternalCommand.SystemSettings.name ||
+                            j == ActionInternalCommand.Preferences.name
 //                        Log.d("ItemLoader","Item is internal command $j")
+                        val itemIsCategory:Boolean =
+                            j == InternalCategories.SettingsSystem.name ||
+                                    j == InternalCategories.SettingsOverall.name
                         val predeterminedItem: ItemData = when{
                             itemIsInternalCommand -> ItemData(
                                 name = j,
@@ -357,6 +362,17 @@ class HTViewModel(
                                         name = j,
                                         action = j,
                                         type = ActionDataLaunchType.Internal,
+                                    )
+                                ),
+                            )
+                            itemIsCategory -> ItemData(
+                                name = j,
+                                label = j,
+                                action = listOf(
+                                    ActionData(
+                                        name = j,
+                                        action = j,
+                                        type = ActionDataLaunchType.Category,
                                     )
                                 ),
                             )
@@ -632,38 +648,27 @@ class HTViewModel(
     }, context: Context, ignoreFile:Boolean = false, forceReload:Boolean = false):ItemData{
         // codeium shim!!!!
         val itemIsInternalCommand:Boolean =
-            of.contains(context.resources.getString(ActionInternalCommand.AllApps.id)) ||
-                    of.contains(context.resources.getString(ActionInternalCommand.Camera.id)) ||
-                    of.contains(context.resources.getString(ActionInternalCommand.Telephone.id)) ||
-                    of.contains(context.resources.getString(ActionInternalCommand.GoToPage.id)) ||
-                    of.contains(context.resources.getString(ActionInternalCommand.Gallery.id)) ||
-                    of.contains(context.resources.getString(ActionInternalCommand.Clock.id)) ||
-                    of.contains(context.resources.getString(ActionInternalCommand.Contacts.id)) ||
-                    of.contains(context.resources.getString(ActionInternalCommand.Emergency.id)) ||
-                    of.contains(context.resources.getString(ActionInternalCommand.Emergency.id)) ||
-                    of.contains("SOS", true) ||
-                    of.contains(context.resources.getString(ActionInternalCommand.Messages.id)) ||
-                    of.contains(context.resources.getString(ActionInternalCommand.Settings.id)) ||
-                    of.contains(context.resources.getString(ActionInternalCommand.SystemSettings.id)) ||
-                    of.contains(context.resources.getString(ActionInternalCommand.Preferences.id))
+            of == context.resources.getString(ActionInternalCommand.AllApps.id) ||
+                    of == context.resources.getString(ActionInternalCommand.Camera.id) ||
+                    of == context.resources.getString(ActionInternalCommand.Telephone.id) ||
+                    of == context.resources.getString(ActionInternalCommand.GoToPage.id) ||
+                    of == context.resources.getString(ActionInternalCommand.Gallery.id) ||
+                    of == context.resources.getString(ActionInternalCommand.Clock.id) ||
+                    of == context.resources.getString(ActionInternalCommand.Contacts.id) ||
+                    of == context.resources.getString(ActionInternalCommand.Emergency.id) ||
+                    of == "SOS" ||
+                    of == context.resources.getString(ActionInternalCommand.Messages.id) ||
+                    of == context.resources.getString(ActionInternalCommand.Settings.id) ||
+                    of == context.resources.getString(ActionInternalCommand.SystemSettings.id) ||
+                    of == context.resources.getString(ActionInternalCommand.Preferences.id)
 
         val itemIsCategory:Boolean =
-            of.contains(context.resources.getString(InternalCategories.SettingsSystem.id)) ||
-                    of.contains(context.resources.getString(InternalCategories.SettingsOverall.id))
+            of == context.resources.getString(InternalCategories.SettingsSystem.id) ||
+                    of == context.resources.getString(InternalCategories.SettingsOverall.id)
 //        if(itemIsInternalCommand) Log.d("GetItemData","Internal Command ${of}")
+        if(itemIsCategory) Log.d("GetItemData","Internal Category ${of}")
 //        Log.d("GetItemData","Item $of requested")
         val predeterminedItem: ItemData = when {
-            itemIsInternalCommand -> ItemData(
-                name = of,
-                label = of,
-                action = listOf(
-                    ActionData(
-                        name = of,
-                        action = of,
-                        type = ActionDataLaunchType.Internal,
-                    )
-                ),
-            )
             itemIsCategory -> ItemData(
                 name = of,
                 label = of,
@@ -673,6 +678,17 @@ class HTViewModel(
                         name = of,
                         action = of,
                         type = ActionDataLaunchType.Category,
+                    )
+                ),
+            )
+            itemIsInternalCommand -> ItemData(
+                name = of,
+                label = of,
+                action = listOf(
+                    ActionData(
+                        name = of,
+                        action = of,
+                        type = ActionDataLaunchType.Internal,
                     )
                 ),
             )
