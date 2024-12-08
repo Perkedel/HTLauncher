@@ -4,6 +4,7 @@ agp = "8.7.2"
 coilCompose = "3.0.2"
 coilNetworkOkhttp = "3.0.2"
 coilSvg = "3.0.4"
+composescrollbars = "1.4.0"
 datastore = "1.1.1"
 datastorePreferences = "1.1.1"
 #kotlin = "1.9.23"
@@ -22,6 +23,8 @@ kotlinxSerialization = "2.0.20"
 kotlinxSerializationJson = "1.7.3"
 kryptoprefs = "0.4.3"
 kryptoprefsGson = "0.4.3"
+lazycolumns = "0.3.7"
+lazycolumnscrollbar = "2.2.0"
 library = "1.1.1"
 lifecycleRuntimeKtx = "2.8.7"
 activityCompose = "1.9.3"
@@ -45,6 +48,7 @@ material3-adaptive = "1.0.0"
 cascade = "2.3.0"
 koin = "4.1.0-Beta1"
 uiTextGoogleFonts = "1.7.5"
+foundationDesktop = "1.7.0"
 
 [libraries]
 accompanist-adaptive = { module = "com.google.accompanist:accompanist-adaptive" }
@@ -65,6 +69,7 @@ cascade-compose = { module = "me.saket.cascade:cascade-compose", version.ref = "
 coil-compose = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coilCompose" }
 coil-network-okhttp = { module = "io.coil-kt.coil3:coil-network-okhttp", version.ref = "coilNetworkOkhttp" }
 coil-svg = { module = "io.coil-kt.coil3:coil-svg", version.ref = "coilSvg" }
+composescrollbars = { module = "com.github.GIGAMOLE:ComposeScrollbars", version.ref = "composescrollbars" }
 gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
 guava = { module = "com.google.guava:guava", version.ref = "guava" }
 happyrouter = { module = "com.github.happyfresh.HappySupportAndroid:happyrouter", version.ref = "happyfresh" }
@@ -93,6 +98,8 @@ koin-androidx-compose = { module = "io.insert-koin:koin-androidx-compose", versi
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
 kryptoprefs = { module = "com.github.rumboalla.KryptoPrefs:kryptoprefs", version.ref = "kryptoprefs" }
 kryptoprefs-gson = { module = "com.github.rumboalla.KryptoPrefs:kryptoprefs-gson", version.ref = "kryptoprefsGson" }
+lazycolumns = { module = "com.github.BILLyTheLiTTle:LazyColumns", version.ref = "lazycolumns" }
+lazycolumnscrollbar = { module = "com.github.nanihadesuka:LazyColumnScrollbar", version.ref = "lazycolumnscrollbar" }
 library = { module = "me.zhanghai.compose.preference:library", version.ref = "library" }
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 androidx-constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintlayout" }
@@ -107,6 +114,7 @@ androidx-compose-material3 = { group = "androidx.wear.compose", name = "compose-
 androidx-compose-material3-adaptive-navigation = { module = "androidx.compose.material3.adaptive:adaptive-navigation", version.ref = "material3-adaptive" }
 androidx-compose-material3-adaptive-navigation-suite = { module = "androidx.compose.material3:material3-adaptive-navigation-suite", version.ref = "adaptiveNavigationSuite" }
 androidx-ui-text-google-fonts = { group = "androidx.compose.ui", name = "ui-text-google-fonts", version.ref = "uiTextGoogleFonts" }
+androidx-foundation-desktop = { group = "androidx.compose.foundation", name = "foundation-desktop", version.ref = "foundationDesktop" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

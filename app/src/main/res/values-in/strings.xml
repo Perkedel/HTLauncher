@@ -259,6 +259,7 @@
     <string name="action_save">Simpan</string>
     <string name="action_delete">Hapus</string>
     <string name="action_open">Buka</string>
+    <string name="action_search">Cari</string>
     <string name="category_bar">Kategori</string>
     <string name="category_bar_fill">Kategori %s</string>
 

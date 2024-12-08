@@ -7,6 +7,7 @@ import android.net.Uri
 import android.speech.tts.TextToSpeech
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Category
 import androidx.compose.material.icons.filled.FormatPaint
@@ -38,6 +39,7 @@ import com.perkedel.htlauncher.ui.previews.HTPreviewAnnotations
 import com.perkedel.htlauncher.ui.theme.HTLauncherTheme
 import me.zhanghai.compose.preference.ProvidePreferenceLocals
 import me.zhanghai.compose.preference.preference
+import my.nanihadesuka.compose.LazyColumnScrollbar
 
 @Composable
 fun LevelEditor(
@@ -64,58 +66,63 @@ fun LevelEditor(
     // https://fonts.google.com/icons?selected=Material+Symbols+Outlined:logout:FILL@0;wght@400;GRAD@0;opsz@24&icon.size=24&icon.color=%23e8eaed
     // https://developer.android.com/reference/kotlin/androidx/compose/material/icons/package-summary
     val counters:MutableMap<String,Int> = LinkedHashMap<String,Int>()
-
+    val lazyListState = rememberLazyListState()
 
     ProvidePreferenceLocals {
-        LazyColumn(
-            modifier = Modifier.fillMaxSize()
+        LazyColumnScrollbar(
+            state = lazyListState
         ) {
-            preference(
-                key = "home_editor",
-                title = { Text(text = stringResource(R.string.home_screen_file_label) ) },
-                icon = { Icon(imageVector = Icons.Default.Home, contentDescription = null) },
+            LazyColumn(
+                modifier = Modifier.fillMaxSize(),
+                state = lazyListState
+            ) {
+                preference(
+                    key = "home_editor",
+                    title = { Text(text = stringResource(R.string.home_screen_file_label) ) },
+                    icon = { Icon(imageVector = Icons.Default.Home, contentDescription = null) },
 //                summary = { Text(text = "${uiState.pageList.size} ${stringResource(R.string.pieces_unit)}") },
-                summary = { Text(text = "Reorder pages") },
-                onClick = {
-                    onEditWhat(EditWhich.Home)
-                }
-            )
-            preference(
-                key = "pages_editor",
-                title = { Text(text = stringResource(R.string.pages_folder_label) ) },
-                icon = { Icon(imageVector = Icons.Default.Pages, contentDescription = null) },
-                summary = { Text(text = "${context.resources.getQuantityString(R.plurals.pieces_units, uiState.pageList.size, uiState.pageList.size)}") },
-                onClick = {
-                    onEditWhat(EditWhich.Pages)
-                }
-            )
-            preference(
-                key = "items_editor",
-                title = { Text(text = stringResource(R.string.items_folder_label) ) },
-                icon = { Icon(imageVector = Icons.Default.Category, contentDescription = null) },
-                summary = { Text(text = "${context.resources.getQuantityString(R.plurals.pieces_units, uiState.itemList.size, uiState.itemList.size)}") },
-                onClick = {
-                    onEditWhat(EditWhich.Items)
-                }
-            )
-            preference(
-                key = "themes_editor",
-                title = { Text(text = stringResource(R.string.themes_folder_label) ) },
-                icon = { Icon(imageVector = Icons.Default.FormatPaint, contentDescription = null) },
+                    summary = { Text(text = "Reorder pages") },
+                    onClick = {
+                        onEditWhat(EditWhich.Home)
+                    }
+                )
+                preference(
+                    key = "pages_editor",
+                    title = { Text(text = stringResource(R.string.pages_folder_label) ) },
+                    icon = { Icon(imageVector = Icons.Default.Pages, contentDescription = null) },
+                    summary = { Text(text = "${context.resources.getQuantityString(R.plurals.pieces_units, uiState.pageList.size, uiState.pageList.size)}") },
+                    onClick = {
+                        onEditWhat(EditWhich.Pages)
+                    }
+                )
+                preference(
+                    key = "items_editor",
+                    title = { Text(text = stringResource(R.string.items_folder_label) ) },
+                    icon = { Icon(imageVector = Icons.Default.Category, contentDescription = null) },
+                    summary = { Text(text = "${context.resources.getQuantityString(R.plurals.pieces_units, uiState.itemList.size, uiState.itemList.size)}") },
+                    onClick = {
+                        onEditWhat(EditWhich.Items)
+                    }
+                )
+                preference(
+                    key = "themes_editor",
+                    title = { Text(text = stringResource(R.string.themes_folder_label) ) },
+                    icon = { Icon(imageVector = Icons.Default.FormatPaint, contentDescription = null) },
 //                summary = { Text(text = "You are already FULL VERSION.") },
-                onClick = {
-                    onEditWhat(EditWhich.Themes)
-                }
-            )
-            preference(
-                key = "medias_editor",
-                title = { Text(text = stringResource(R.string.medias_folder_label) ) },
-                icon = { Icon(imageVector = Icons.Default.Image, contentDescription = null) },
+                    onClick = {
+                        onEditWhat(EditWhich.Themes)
+                    }
+                )
+                preference(
+                    key = "medias_editor",
+                    title = { Text(text = stringResource(R.string.medias_folder_label) ) },
+                    icon = { Icon(imageVector = Icons.Default.Image, contentDescription = null) },
 //                summary = { Text(text = "You are already FULL VERSION.") },
-                onClick = {
-                    onEditWhat(EditWhich.Medias)
-                }
-            )
+                    onClick = {
+                        onEditWhat(EditWhich.Medias)
+                    }
+                )
+            }
         }
     }
 }

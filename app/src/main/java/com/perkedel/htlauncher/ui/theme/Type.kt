@@ -9,6 +9,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import com.perkedel.htlauncher.R
 
+// GOOGLE FONT
 //val provider = GoogleFont.Provider(
 //    providerAuthority = "com.google.android.gms.fonts",
 //    providerPackage = "com.google.android.gms",
@@ -28,6 +29,7 @@ import com.perkedel.htlauncher.R
 //        fontProvider = provider,
 //    )
 //)
+// CANCEL: Allegedly Google Font is proprietary, & means Promoting Non-Free Network & Addons!
 
 // MATERIAL GENERATOR
 // http://material-foundation.github.io?primary=%230052EB&bodyFont=Ubuntu&displayFont=Ubuntu&colorMatch=true

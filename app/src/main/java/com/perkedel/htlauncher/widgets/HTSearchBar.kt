@@ -21,8 +21,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalInspectionMode
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import com.perkedel.htlauncher.R
 import com.perkedel.htlauncher.ui.previews.HTPreviewAnnotations
 import com.perkedel.htlauncher.ui.theme.HTLauncherTheme
 
@@ -46,7 +48,7 @@ fun HTSearchBar(
                 OutlinedTextField(
                     modifier = Modifier.fillMaxWidth(),
                     value = value,
-                    label = { Text("Search") },
+                    label = { Text(stringResource(R.string.action_search)) },
                     onValueChange = onValueChange,
                     leadingIcon = {
                         Icon(Icons.Default.Search, "")

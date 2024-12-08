@@ -80,6 +80,9 @@ import com.perkedel.htlauncher.widgets.FirstPageCard
 import com.perkedel.htlauncher.widgets.ItemCell
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import my.nanihadesuka.compose.LazyColumnScrollbar
+import my.nanihadesuka.compose.LazyVerticalGridScrollbar
+import my.nanihadesuka.compose.ScrollbarSettings
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -181,54 +184,61 @@ fun BasePage(
             // if screen is compact
 //            PivotOffsets()
 //            Log.d("BasePage", "Compact Items are ${pageOfIt.items}")
-            LazyVerticalGrid(
-                modifier = Modifier,
-                columns = when(pageOfIt.gridType){
-                    PageGridType.Default -> GridCells.Fixed(pageOfIt.cellCount)
-                    PageGridType.Adaptive -> GridCells.Adaptive(pageOfIt.cellSize.dp)
-                    else -> GridCells.Fixed(pageOfIt.cellCount)
-                },
+            LazyVerticalGridScrollbar(
                 state = lazyListState,
-                content = {
-                    // Permanent Card on first page
-                    if (isFirstPage || pageOfIt.isHome){
-                        item(
-                            span = { GridItemSpan(this.maxLineSpan) }
-                        ){
-                            FirstPageCard(
-                                handoverText = pageOfIt.name,
-                                isCompact = isCompact,
-                                isOnNumberWhat = isOnNumberWhat,
-                                modifier = Modifier.weight(1f),
-                                onMoreMenuButton = onMoreMenuButtonClicked,
-                            )
+                settings = ScrollbarSettings(
+                    thumbSelectedColor = colorScheme.primary,
+                    thumbUnselectedColor = colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
+                )
+            ) {
+                LazyVerticalGrid(
+                    modifier = Modifier,
+                    columns = when(pageOfIt.gridType){
+                        PageGridType.Default -> GridCells.Fixed(pageOfIt.cellCount)
+                        PageGridType.Adaptive -> GridCells.Adaptive(pageOfIt.cellSize.dp)
+                        else -> GridCells.Fixed(pageOfIt.cellCount)
+                    },
+                    state = lazyListState,
+                    content = {
+                        // Permanent Card on first page
+                        if (isFirstPage || pageOfIt.isHome){
+                            item(
+                                span = { GridItemSpan(this.maxLineSpan) }
+                            ){
+                                FirstPageCard(
+                                    handoverText = pageOfIt.name,
+                                    isCompact = isCompact,
+                                    isOnNumberWhat = isOnNumberWhat,
+                                    modifier = Modifier.weight(1f),
+                                    onMoreMenuButton = onMoreMenuButtonClicked,
+                                )
+                            }
                         }
-                    }
-                    // Rest of the items
-                    repeat(times = pageOfIt.items.size){
-                        item(
+                        // Rest of the items
+                        repeat(times = pageOfIt.items.size){
+                            item(
 //                            span = if(uiState.itemList[pageOfIt.items[it]]?.isCategory == true) {GridItemSpan(this.maxLineSpan)} else null
-                            span = { if(uiState.itemList[pageOfIt.items[it]]?.isCategory == true) GridItemSpan(this.maxLineSpan) else GridItemSpan(1) }
-                        ){
-                            ItemCell(
-                                readTheItemData = viewModel.getItemData(
-                                    pageOfIt.items[it],
-                                    json = json,
+                                span = { if(uiState.itemList[pageOfIt.items[it]]?.isCategory == true) GridItemSpan(this.maxLineSpan) else GridItemSpan(1) }
+                            ){
+                                ItemCell(
+                                    readTheItemData = viewModel.getItemData(
+                                        pageOfIt.items[it],
+                                        json = json,
+                                        context = context,
+                                        ignoreFile = false,
+                                        forceReload = false
+                                    ),
+                                    readTheItemFile = pageOfIt.items[it],
+                                    handoverText = "Item ${it}",
                                     context = context,
-                                    ignoreFile = false,
-                                    forceReload = false
-                                ),
-                                readTheItemFile = pageOfIt.items[it],
-                                handoverText = "Item ${it}",
-                                context = context,
-                                pm = pm,
-                                uiState = uiState,
-                                viewModel = viewModel,
-                                tts = tts,
-                                onClick = onLaunchOneOfAction,
-                            )
+                                    pm = pm,
+                                    uiState = uiState,
+                                    viewModel = viewModel,
+                                    tts = tts,
+                                    onClick = onLaunchOneOfAction,
+                                )
+                            }
                         }
-                    }
 //                    items(pageOfIt.items.size){i->
 //                        ItemCell(
 //                            readTheItemFile = pageOfIt.items[i],
@@ -241,16 +251,18 @@ fun BasePage(
 //                            onClick = onLaunchOneOfAction,
 //                        )
 //                    }
-                    item{
-                        Spacer(
-                            modifier = Modifier
-                                .padding(16.dp)
-                            ,
-                        )
-                    }
+                        item{
+                            Spacer(
+                                modifier = Modifier
+                                    .padding(16.dp)
+                                ,
+                            )
+                        }
 
-                }
-            )
+                    }
+                )
+            }
+
         } else {
             // anything else
             Row(
@@ -273,43 +285,52 @@ fun BasePage(
 //                        )
                     }
                 }
-                LazyVerticalGrid(
-                    columns = when(pageOfIt.gridType){
-                        PageGridType.Default -> GridCells.Fixed(pageOfIt.cellCountLandscape)
-                        PageGridType.Adaptive -> GridCells.Adaptive(pageOfIt.cellSize.dp)
-                        else -> GridCells.Fixed(pageOfIt.cellCountLandscape)
-                    },
+                LazyVerticalGridScrollbar(
                     state = lazyListState,
-                    content = {
-                        // Rest of the items
-                        items(pageOfIt.items.size){i->
-                            ItemCell(
-                                readTheItemData = viewModel.getItemData(
-                                    pageOfIt.items[i],
-                                    json = json,
+                    settings = ScrollbarSettings(
+                        thumbSelectedColor = colorScheme.primary,
+                        thumbUnselectedColor = colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
+                    )
+                ){
+                    LazyVerticalGrid(
+                        columns = when(pageOfIt.gridType){
+                            PageGridType.Default -> GridCells.Fixed(pageOfIt.cellCountLandscape)
+                            PageGridType.Adaptive -> GridCells.Adaptive(pageOfIt.cellSize.dp)
+                            else -> GridCells.Fixed(pageOfIt.cellCountLandscape)
+                        },
+                        state = lazyListState,
+                        content = {
+                            // Rest of the items
+                            items(pageOfIt.items.size){i->
+                                ItemCell(
+                                    readTheItemData = viewModel.getItemData(
+                                        pageOfIt.items[i],
+                                        json = json,
+                                        context = context,
+                                        ignoreFile = false,
+                                        forceReload = false
+                                    ),
+                                    readTheItemFile = pageOfIt.items[i],
+                                    handoverText = "Item ${i}",
                                     context = context,
-                                    ignoreFile = false,
-                                    forceReload = false
-                                ),
-                                readTheItemFile = pageOfIt.items[i],
-                                handoverText = "Item ${i}",
-                                context = context,
-                                pm = pm,
-                                uiState = uiState,
-                                viewModel = viewModel,
-                                tts = tts,
-                                onClick = onLaunchOneOfAction,
-                            )
+                                    pm = pm,
+                                    uiState = uiState,
+                                    viewModel = viewModel,
+                                    tts = tts,
+                                    onClick = onLaunchOneOfAction,
+                                )
+                            }
+                            item{
+                                Spacer(
+                                    modifier = Modifier
+                                        .padding(16.dp)
+                                    ,
+                                )
+                            }
                         }
-                        item{
-                            Spacer(
-                                modifier = Modifier
-                                    .padding(16.dp)
-                                ,
-                            )
-                        }
-                    }
-                )
+                    )
+                }
+
             }
         }
 

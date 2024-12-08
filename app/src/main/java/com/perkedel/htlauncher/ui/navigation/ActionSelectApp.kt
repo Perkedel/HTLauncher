@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Backspace
 import androidx.compose.material.icons.filled.Backspace
@@ -59,6 +60,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import me.zhanghai.compose.preference.Preference
 import me.zhanghai.compose.preference.ProvidePreferenceLocals
+import my.nanihadesuka.compose.LazyColumnScrollbar
+import my.nanihadesuka.compose.ScrollbarSettings
 
 @Composable
 fun ActionSelectApp(
@@ -91,64 +94,77 @@ fun ActionSelectApp(
 //    var appFilter:List<PackageInfo> = emptyList()
 //    appFilter = if(packList != null && searchT.isNotEmpty()) packList.filter { it.applicationInfo?.loadLabel(pm).toString().contains(searchT,true) || it.packageName.contains(searchT,true) || searchT.isEmpty() } else packList
     val appFilter by viewModel.appAll.collectAsState()
+    val lazyListState = rememberLazyListState()
 
     ProvidePreferenceLocals {
-        LazyColumn {
-            item{
-                HTSearchBar(
-                    value = searchT,
-                    onValueChange = {
-                        searchT = it
-                    },
-                    megaTitle = "Select an App"
-                )
-                
-            }
-            items(
+        // https://github.com/nanihadesuka/LazyColumnScrollbar
+        LazyColumnScrollbar(
+            state = lazyListState,
+            settings = ScrollbarSettings(
+                thumbSelectedColor = colorScheme.primary,
+                thumbUnselectedColor = colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
+            )
+        ) {
+            LazyColumn(
+                state = lazyListState,
+            ) {
+                item{
+                    HTSearchBar(
+                        value = searchT,
+                        onValueChange = {
+                            searchT = it
+                        },
+                        megaTitle = "Select an App"
+                    )
+
+                }
+                items(
 //                count = appList.size
 //                appList.filter { it.loadLabel(pm).contains(searchT, true) || it.packageName.contains(searchT, true) || searchT.isEmpty()}
-                items = appFilter
-            ){
+                    items = appFilter
+                ){
 //                val ddawe = pm.getApplicationIcon(appList[it].packageName)
-                val ddawe = pm.getApplicationIcon(it.packageName)
+                    val ddawe = pm.getApplicationIcon(it.packageName)
 //                val ddlabel:String = it.loadLabel(pm).toString()
 //                val ddlabel:String = it.applicationInfo?.loadLabel(pm).toString()
-                val ddlabel:String = it.label
-                Preference(
-                    icon = {
-                        AsyncImage(
-                            model = ddawe,
-                            contentDescription = "",
-                            modifier = Modifier
-                                .size(75.dp),
-                            error = painterResource(id = R.drawable.mavrickle),
-                            placeholder = painterResource(id = R.drawable.mavrickle),
-                        )
-                    },
-                    title = { Text(ddlabel) },
-                    summary = {
-                        Text(
-//                            appList[it].packageName,
-                            text = it.packageName,
-                            modifier = Modifier.basicMarquee(
-                                // https://medium.com/@theAndroidDeveloper/jetpack-compose-gets-official-support-for-marquee-heres-how-to-use-it-1f678aecb851
-                                // https://composables.com/foundation/basicmarquee
-                                spacing = MarqueeSpacing(20.dp),
-                                iterations = Int.MAX_VALUE,
-                                animationMode = MarqueeAnimationMode.Immediately
+                    val ddlabel:String = it.label
+                    Preference(
+                        icon = {
+                            AsyncImage(
+                                model = ddawe,
+                                contentDescription = "",
+                                modifier = Modifier
+                                    .size(75.dp),
+                                error = painterResource(id = R.drawable.mavrickle),
+                                placeholder = painterResource(id = R.drawable.mavrickle),
                             )
-                        )
-                    },
-                    onClick = {
+                        },
+                        title = { Text(ddlabel) },
+                        summary = {
+                            Text(
+//                            appList[it].packageName,
+                                text = it.packageName,
+                                modifier = Modifier.basicMarquee(
+                                    // https://medium.com/@theAndroidDeveloper/jetpack-compose-gets-official-support-for-marquee-heres-how-to-use-it-1f678aecb851
+                                    // https://composables.com/foundation/basicmarquee
+                                    spacing = MarqueeSpacing(20.dp),
+                                    iterations = Int.MAX_VALUE,
+                                    animationMode = MarqueeAnimationMode.Immediately
+                                )
+                            )
+                        },
+                        onClick = {
 //                        onSelectedApp(appList[it])
 //                        onSelectedApp(it)
 //                        if(it.applicationInfo != null)
 //                            onSelectedApp(it.applicationInfo!!)
-                        onSelectedApp(pm.getApplicationInfo(it.packageName,0))
-                    }
-                )
+                            onSelectedApp(pm.getApplicationInfo(it.packageName,0))
+                        }
+                    )
+                }
             }
         }
+
     }
 }
 

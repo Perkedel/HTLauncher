@@ -8,6 +8,7 @@ import android.speech.tts.TextToSpeech
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Code
 import androidx.compose.material3.Icon
@@ -38,6 +39,7 @@ import com.perkedel.htlauncher.ui.previews.HTPreviewAnnotations
 import com.perkedel.htlauncher.ui.theme.HTLauncherTheme
 import me.zhanghai.compose.preference.Preference
 import me.zhanghai.compose.preference.ProvidePreferenceLocals
+import my.nanihadesuka.compose.LazyColumnScrollbar
 
 @Composable
 fun ItemsExplorer(
@@ -77,11 +79,16 @@ fun ItemsExplorer(
         "Test",
         "HUHA"
     )
+    val lazyListState = rememberLazyListState()
 
     ProvidePreferenceLocals {
-        LazyColumn(
-            modifier = Modifier.fillMaxSize()
+        LazyColumnScrollbar(
+            state = lazyListState
         ) {
+            LazyColumn(
+                modifier = Modifier.fillMaxSize(),
+                state = lazyListState
+            ) {
 //            item {
 //                Preference(
 //                    title = { Text(text = stringResource(R.string.home_screen_file_label) ) },
@@ -92,34 +99,36 @@ fun ItemsExplorer(
 //                    }
 //                )
 //            }
-            items(
-                count = editData.size,
-            ){
-                Preference(
-                    title = { Text(text = editData[it] ) },
-                    icon = {
-                        when(exploreType){
-                            EditWhich.Items -> AsyncImage(
-                                modifier = Modifier.size(72.dp),
-                                placeholder = painterResource(R.drawable.placeholder),
-                                error = painterResource(R.drawable.mavrickle),
-                                model = when(uiState.itemList[editData[it]]?.action?.get(0)?.type){
-                                    ActionDataLaunchType.LauncherActivity -> if(uiState.itemList[editData[it]]?.action?.get(0)?.action?.isNotBlank() == true) pm.getApplicationIcon(uiState.itemList[editData[it]]?.action?.get(0)?.action ?: "") else R.drawable.all_apps
-                                    ActionDataLaunchType.Internal -> HTLauncherHardcodes.getInternalActionIcon(uiState.itemList[editData[it]]?.action?.get(0)?.action)
-                                    else -> R.drawable.placeholder
-                                },
-                                contentDescription = "",
-                            )
-                            else -> Icon(imageVector = Icons.Default.Code, contentDescription = null)
-                        }
-                    },
+                items(
+                    count = editData.size,
+                ){
+                    Preference(
+                        title = { Text(text = editData[it] ) },
+                        icon = {
+                            when(exploreType){
+                                EditWhich.Items -> AsyncImage(
+                                    modifier = Modifier.size(72.dp),
+                                    placeholder = painterResource(R.drawable.placeholder),
+                                    error = painterResource(R.drawable.mavrickle),
+                                    model = when(uiState.itemList[editData[it]]?.action?.get(0)?.type){
+                                        ActionDataLaunchType.LauncherActivity -> if(uiState.itemList[editData[it]]?.action?.get(0)?.action?.isNotBlank() == true) pm.getApplicationIcon(uiState.itemList[editData[it]]?.action?.get(0)?.action ?: "") else R.drawable.all_apps
+                                        ActionDataLaunchType.Internal -> HTLauncherHardcodes.getInternalActionIcon(uiState.itemList[editData[it]]?.action?.get(0)?.action)
+                                        else -> R.drawable.placeholder
+                                    },
+                                    contentDescription = "",
+                                )
+                                else -> Icon(imageVector = Icons.Default.Code, contentDescription = null)
+                            }
+                        },
 //                    summary = { Text(text = "You are already FULL VERSION.") },
-                    onClick = {
-                        onEditWhat(exploreType,editData[it])
-                    }
-                )
+                        onClick = {
+                            onEditWhat(exploreType,editData[it])
+                        }
+                    )
+                }
             }
         }
+
     }
 }
 

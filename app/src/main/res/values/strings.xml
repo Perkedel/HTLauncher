@@ -30,6 +30,7 @@
     <string name="action_open">Open</string>
     <string name="action_load">Load</string>
     <string name="action_retry">Retry</string>
+    <string name="action_search">Search</string>
 
     <!--  Home Screen  -->
     <string name="home_screen">Home</string>

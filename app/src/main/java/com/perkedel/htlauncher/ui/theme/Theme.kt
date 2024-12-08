@@ -300,12 +300,17 @@ fun rememberColorScheme(
     dynamicColor: Boolean = true,
     forceTheme: Boolean = false,
     forceLightDark:Boolean = false,
-    forceDark:Boolean = false
+    forceDark:Boolean = false,
+    darkVoidBackground:Boolean = true,
 ):ColorScheme {
     val colorScheme = when {
         dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && !forceTheme-> {
             val context = LocalContext.current
-            if (darkTheme || (forceLightDark && forceDark)) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
+            if(darkVoidBackground){
+                if (darkTheme || (forceLightDark && forceDark)) dynamicDarkColorScheme(context).copy(background = Color.Black) else dynamicLightColorScheme(context)
+            } else {
+                if (darkTheme || (forceLightDark && forceDark)) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
+            }
         }
 
         darkTheme || (forceLightDark && forceDark) -> DarkColorScheme

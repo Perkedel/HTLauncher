@@ -8,15 +8,20 @@ import android.content.pm.PackageManager
 import android.speech.tts.TextToSpeech
 import androidx.compose.foundation.MarqueeAnimationMode
 import androidx.compose.foundation.MarqueeSpacing
+//import androidx.compose.foundation.VerticalScrollbar
 import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.rememberScrollState
+//import androidx.compose.foundation.rememberScrollbarAdapter
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -74,10 +79,15 @@ import com.perkedel.htlauncher.ui.theme.HTLauncherTheme
 import com.perkedel.htlauncher.ui.theme.rememberColorScheme
 import com.perkedel.htlauncher.widgets.HTSearchBar
 import com.perkedel.htlauncher.widgets.SettingCategoryBar
+import com.perkedel.htlauncher.widgets.simpleVerticalScrollbar
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import me.zhanghai.compose.preference.Preference
 import me.zhanghai.compose.preference.ProvidePreferenceLocals
+import my.nanihadesuka.compose.LazyColumnScrollbar
+import my.nanihadesuka.compose.ScrollbarSettings
+
+//import com.gigamole.scrollbars
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -196,109 +206,132 @@ fun AllAppsScreen(
 //
 //    appFilter = if(packList != null && searchT.isNotEmpty()) packList.filter { it.applicationInfo?.loadLabel(pm).toString().contains(searchT,true) || it.packageName.contains(searchT,true) || searchT.isEmpty() } else packList
     val appFilter by anViewModel.appAll.collectAsState()
+    val lazyListState = rememberLazyListState()
 
     Box(
         modifier = Modifier
     ){
         ProvidePreferenceLocals {
-            LazyColumn(
-                verticalArrangement = Arrangement.spacedBy(16.dp),
+            // https://blog.stackademic.com/jetpack-compose-multiplatform-scrollbar-scrolling-7c231a002ee1
+            // https://github.com/nanihadesuka/LazyColumnScrollbar
+            LazyColumnScrollbar(
+                state = lazyListState,
+                settings = ScrollbarSettings(
+                    thumbSelectedColor = colorScheme.primary,
+                    thumbUnselectedColor = colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
+                )
             ) {
-                item{
-                    HTSearchBar(
-                        value = searchT,
-                        onValueChange = {
-                            searchT = it
-                        }
-                    )
-                }
-                item{
-                    SettingCategoryBar(
-                        title = stringResource(R.string.recent_apps),
-                        icon = {
-                            Icon(Icons.Default.Restore,"")
-                        },
-                    )
-                }
-                item{
-                    SettingCategoryBar(
-                        title = stringResource(R.string.whole_apps),
-                        icon = {
-                            Icon(Icons.Default.Apps,"")
-                        },
-                    )
-                }
-                if(appFilter.isNotEmpty()){
-                    items(
+                LazyColumn(
+                    state = lazyListState,
+                    modifier = Modifier,
+                    verticalArrangement = Arrangement.spacedBy(16.dp),
+                ) {
+                    item{
+                        HTSearchBar(
+                            value = searchT,
+                            onValueChange = {
+                                searchT = it
+                            }
+                        )
+                    }
+                    item{
+                        SettingCategoryBar(
+                            title = stringResource(R.string.recent_apps),
+                            icon = {
+                                Icon(Icons.Default.Restore,"")
+                            },
+                        )
+                    }
+                    item{
+                        SettingCategoryBar(
+                            title = stringResource(R.string.whole_apps),
+                            icon = {
+                                Icon(Icons.Default.Apps,"")
+                            },
+                        )
+                    }
+                    if(appFilter.isNotEmpty()){
+                        items(
 //                    count = appList.size
 //                    items = appList.filter { it.loadLabel(pm).contains(searchT, true) || it.packageName.contains(searchT, true) || searchT.isEmpty() }
 //                    items = appList
-                        items = appFilter
+                            items = appFilter
 //                    items = packList.filter { it.applicationInfo?.loadLabel(pm).toString().contains(searchT,true) || it.packageName.contains(searchT,true) || searchT.isEmpty() }
-                    ) {
+                        ) {
 //                    val ddawe = pm.getApplicationIcon(packList[it].packageName)
 //                    val ddawe = pm.getApplicationIcon(appList[it].packageName)
-                        val ddawe = pm.getApplicationIcon(it.packageName)
+                            val ddawe = pm.getApplicationIcon(it.packageName)
 //                    val ddlabel:String = it.loadLabel(pm).toString()
-                        val ddlabel:String = it.label
+                            val ddlabel:String = it.label
 //                    val ddlabel:String = it.applicationInfo?.loadLabel(pm).toString()
-                        Preference(
-                            icon = {
+                            Preference(
+                                icon = {
 
-                                AsyncImage(
-                                    model = ddawe,
-                                    contentDescription = "",
-                                    modifier = Modifier
-                                        .size(75.dp),
-                                    error = painterResource(id = R.drawable.mavrickle),
-                                    placeholder = painterResource(id = R.drawable.mavrickle),
-                                )
-                            },
+                                    AsyncImage(
+                                        model = ddawe,
+                                        contentDescription = "",
+                                        modifier = Modifier
+                                            .size(75.dp),
+                                        error = painterResource(id = R.drawable.mavrickle),
+                                        placeholder = painterResource(id = R.drawable.mavrickle),
+                                    )
+                                },
 //                        title = { Text("${packList[it].applicationInfo.loadLabel(pm)}") },
-                            title = { Text(ddlabel) },
+                                title = { Text(ddlabel) },
 //                    summary = {Text("${packList.get(it).applicationInfo.loadDescription(pm)}")},
-                            summary = {
-                                Text(
+                                summary = {
+                                    Text(
 //                                packList[it].packageName,
 //                                appList[it].packageName,
-                                    text = it.packageName,
-                                    modifier = Modifier.basicMarquee(
-                                        // https://medium.com/@theAndroidDeveloper/jetpack-compose-gets-official-support-for-marquee-heres-how-to-use-it-1f678aecb851
-                                        // https://composables.com/foundation/basicmarquee
-                                        spacing = MarqueeSpacing(20.dp),
-                                        iterations = Int.MAX_VALUE,
-                                        animationMode = MarqueeAnimationMode.Immediately
+                                        text = it.packageName,
+                                        modifier = Modifier.basicMarquee(
+                                            // https://medium.com/@theAndroidDeveloper/jetpack-compose-gets-official-support-for-marquee-heres-how-to-use-it-1f678aecb851
+                                            // https://composables.com/foundation/basicmarquee
+                                            spacing = MarqueeSpacing(20.dp),
+                                            iterations = Int.MAX_VALUE,
+                                            animationMode = MarqueeAnimationMode.Immediately
+                                        )
                                     )
-                                )
-                            },
+                                },
 
-                            onClick = {
+                                onClick = {
 //                            onLaunchApp(appList[it])
-                                onLaunchApp(pm.getApplicationInfo(it.packageName,0))
+                                    onLaunchApp(pm.getApplicationInfo(it.packageName,0))
 //                            if(it.applicationInfo != null)
 //                                onLaunchApp(it.applicationInfo!!)
 
 
-                            }
-                        )
-                    }
-                } else {
-                    item{
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(16.dp)
-                            ,
-                            contentAlignment = Alignment.Center
-                        ){
-                            Text(
-                                "EMPTY"
+                                }
                             )
                         }
+                    } else {
+                        item{
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(16.dp)
+                                ,
+                                contentAlignment = Alignment.Center
+                            ){
+                                Text(
+                                    "EMPTY"
+                                )
+                            }
+                        }
                     }
-                }
 
+                }
             }
+
+//            Scrollbars(state = rememberScrollState())
+            // https://github.com/JetBrains/compose-multiplatform/tree/master/tutorials/Desktop_Components#scrollbars
+            // https://foso.github.io/Jetpack-Compose-Playground/desktop/general/scrollbar/
+//            VerticalScrollbar(
+//                modifier = Modifier.align(Alignment.CenterEnd).fillMaxHeight(),
+//                adapter = rememberScrollbarAdapter(
+//                    scrollState = lazyListState
+//                )
+//            )
         }
     }
 

@@ -71,7 +71,8 @@ android {
 }
 
 dependencies {
-//    implementation(libs.androidx.ui.text.google.fonts) // NON-FREE?
+//    implementation(libs.androidx.foundation.desktop)
+    //    implementation(libs.androidx.ui.text.google.fonts) // NON-FREE?
     val nav_version = "2.8.3"
     val viewModel_version = "2.6.1"
     val retrofit_version = "2.11.0" // https://github.com/square/retrofit
@@ -179,6 +180,16 @@ dependencies {
 
     // https://insert-koin.io/docs/setup/koin
     implementation(libs.koin.androidx.compose)
+
+    // https://github.com/GIGAMOLE/ComposeScrollbars?tab=readme-ov-file#sample-app
+//    implementation(libs.scrollbar)
+//    implementation(libs.composescrollbars)
+
+    // https://github.com/nanihadesuka/LazyColumnScrollbar
+    implementation(libs.lazycolumnscrollbar)
+
+    // https://github.com/BILLyTheLiTTle/LazyColumns
+//    implementation(libs.lazycolumns)
 }
 
 //composeCompiler {
