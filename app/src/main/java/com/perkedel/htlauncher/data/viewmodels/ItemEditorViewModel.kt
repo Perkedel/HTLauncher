@@ -8,6 +8,7 @@ import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Message
+import android.util.Log
 import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
 import androidx.compose.material3.adaptive.navigation.ThreePaneScaffoldNavigator
 import androidx.compose.runtime.getValue
@@ -21,6 +22,7 @@ import com.perkedel.htlauncher.data.ItemData
 import com.perkedel.htlauncher.data.PageData
 import com.perkedel.htlauncher.data.SearchableApps
 import com.perkedel.htlauncher.enumerations.EditWhich
+import com.perkedel.htlauncher.enumerations.ItemDetailPaneNavigate
 import com.perkedel.htlauncher.enumerations.ItemExtraPaneNavigate
 import com.perkedel.htlauncher.func.AsyncService
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -33,13 +35,13 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.encodeToJsonElement
 
 class ItemEditorViewModel(
     private val asyncService: AsyncService = AsyncService()
 ):ViewModel() {
     var uri: Uri? by mutableStateOf(null)
         private set
+    var saveDirUri: Uri? by mutableStateOf(null)
 
     var editType: EditWhich? by mutableStateOf(null)
         private set
@@ -51,9 +53,13 @@ class ItemEditorViewModel(
     var itemData: ItemData? by mutableStateOf(null)
     var homeData: HomepagesWeHave? by mutableStateOf(null)
     var pageData: PageData? by mutableStateOf(null)
-    var jsoning: Json? by mutableStateOf(null)
+    var jsoning: Json? by mutableStateOf(Json{
+        prettyPrint = true
+        encodeDefaults = true
+    })
     var actionEdit:ActionData? by mutableStateOf(null)
     var actionId:Int? by mutableStateOf(0)
+    var itemDetailPaneNavigate: ItemDetailPaneNavigate? by mutableStateOf(ItemDetailPaneNavigate.Default)
     var itemExtraPaneNavigate: ItemExtraPaneNavigate? by mutableStateOf(ItemExtraPaneNavigate.Default)
     var isEditingAction:Boolean by mutableStateOf(false)
 
@@ -67,6 +73,9 @@ class ItemEditorViewModel(
 
     fun updateUri(uri: Uri?){
         this.uri = uri
+    }
+    fun selectSaveDirUri(uri: Uri?){
+        this.saveDirUri = uri
     }
     fun updateFilename(filename: String?){
         this.filename = filename
@@ -94,6 +103,7 @@ class ItemEditorViewModel(
     }
     fun updatePageData(with: PageData){
         this.pageData = with
+        Log.d("UpdatePageData","I will update page data\n${this.pageData}")
     }
     fun updateHomeData(with: HomepagesWeHave){
         this.homeData = with
@@ -129,6 +139,9 @@ class ItemEditorViewModel(
     fun selectExtraNavigate(whichIs: ItemExtraPaneNavigate = ItemExtraPaneNavigate.Default){
         this.itemExtraPaneNavigate = whichIs
     }
+    fun selectDetailNavigate(whichIs: ItemDetailPaneNavigate = ItemDetailPaneNavigate.Default){
+        this.itemDetailPaneNavigate = whichIs
+    }
 
     fun addItemDataAction(with: ActionData = ActionData()){
         actionEdit = with
@@ -161,6 +174,21 @@ class ItemEditorViewModel(
         this.itemData = this.itemData?.copy(
             action = compile
         )
+    }
+
+    fun changeItemOrders(into:List<String>){
+        val json = Json {
+            // https://coldfusion-example.blogspot.com/2022/03/jetpack-compose-kotlinx-serialization_79.html
+            prettyPrint = true
+            encodeDefaults = true
+        }
+        this.pageData = this.pageData?.copy(
+            items = into
+        )
+        this.pageData?.let {
+//            updateRawContent(json.encodeToString(it))
+        }
+
     }
 
     fun typedEditNow(editType: EditWhich?, rawJson: String = ""){

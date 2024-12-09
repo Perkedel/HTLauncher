@@ -94,6 +94,7 @@ fun ActionSelectApp(
 //    var appFilter:List<PackageInfo> = emptyList()
 //    appFilter = if(packList != null && searchT.isNotEmpty()) packList.filter { it.applicationInfo?.loadLabel(pm).toString().contains(searchT,true) || it.packageName.contains(searchT,true) || searchT.isEmpty() } else packList
     val appFilter by viewModel.appAll.collectAsState()
+    val appFilterSort = appFilter.sortedBy { it.label }
     val lazyListState = rememberLazyListState()
 
     ProvidePreferenceLocals {
@@ -121,7 +122,7 @@ fun ActionSelectApp(
                 items(
 //                count = appList.size
 //                appList.filter { it.loadLabel(pm).contains(searchT, true) || it.packageName.contains(searchT, true) || searchT.isEmpty()}
-                    items = appFilter
+                    items = appFilterSort
                 ){
 //                val ddawe = pm.getApplicationIcon(appList[it].packageName)
                     val ddawe = pm.getApplicationIcon(it.packageName)

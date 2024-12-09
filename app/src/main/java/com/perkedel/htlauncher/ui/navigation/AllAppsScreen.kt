@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalFoundationApi::class)
+
 package com.perkedel.htlauncher.ui.navigation
 
 import android.content.ActivityNotFoundException
@@ -6,6 +8,7 @@ import android.content.pm.ApplicationInfo
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.speech.tts.TextToSpeech
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.MarqueeAnimationMode
 import androidx.compose.foundation.MarqueeSpacing
 //import androidx.compose.foundation.VerticalScrollbar
@@ -206,6 +209,7 @@ fun AllAppsScreen(
 //
 //    appFilter = if(packList != null && searchT.isNotEmpty()) packList.filter { it.applicationInfo?.loadLabel(pm).toString().contains(searchT,true) || it.packageName.contains(searchT,true) || searchT.isEmpty() } else packList
     val appFilter by anViewModel.appAll.collectAsState()
+    val appFilterSort = appFilter.sortedBy { it.label }
     val lazyListState = rememberLazyListState()
 
     Box(
@@ -214,6 +218,8 @@ fun AllAppsScreen(
         ProvidePreferenceLocals {
             // https://blog.stackademic.com/jetpack-compose-multiplatform-scrollbar-scrolling-7c231a002ee1
             // https://github.com/nanihadesuka/LazyColumnScrollbar
+            // https://youtu.be/XfYlRn_Jy1g
+            // https://github.com/philipplackner/CategorizedLazyColumn
             LazyColumnScrollbar(
                 state = lazyListState,
                 settings = ScrollbarSettings(
@@ -234,7 +240,7 @@ fun AllAppsScreen(
                             }
                         )
                     }
-                    item{
+                    stickyHeader{
                         SettingCategoryBar(
                             title = stringResource(R.string.recent_apps),
                             icon = {
@@ -242,7 +248,7 @@ fun AllAppsScreen(
                             },
                         )
                     }
-                    item{
+                    stickyHeader{
                         SettingCategoryBar(
                             title = stringResource(R.string.whole_apps),
                             icon = {
@@ -250,12 +256,12 @@ fun AllAppsScreen(
                             },
                         )
                     }
-                    if(appFilter.isNotEmpty()){
+                    if(appFilterSort.isNotEmpty()){
                         items(
 //                    count = appList.size
 //                    items = appList.filter { it.loadLabel(pm).contains(searchT, true) || it.packageName.contains(searchT, true) || searchT.isEmpty() }
 //                    items = appList
-                            items = appFilter
+                            items = appFilterSort
 //                    items = packList.filter { it.applicationInfo?.loadLabel(pm).toString().contains(searchT,true) || it.packageName.contains(searchT,true) || searchT.isEmpty() }
                         ) {
 //                    val ddawe = pm.getApplicationIcon(packList[it].packageName)

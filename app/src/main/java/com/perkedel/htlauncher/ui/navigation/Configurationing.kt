@@ -10,6 +10,8 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.speech.tts.TextToSpeech
+import android.view.SoundEffectConstants
+import android.view.View
 import android.widget.Toast
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
@@ -48,6 +50,7 @@ import androidx.compose.ui.hapticfeedback.HapticFeedback
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
@@ -76,9 +79,12 @@ import me.zhanghai.compose.preference.preference
 fun Configurationing(
     navController: NavController = rememberNavController(),
     context: Context = LocalContext.current,
+    view: View = LocalView.current,
     pm: PackageManager = context.packageManager,
     haptic: HapticFeedback = LocalHapticFeedback.current,
-    onSelectedConfigMenu:(ConfigSelected)->Unit = {},
+    onSelectedConfigMenu: (ConfigSelected) -> Unit = {
+        view.playSoundEffect(SoundEffectConstants.CLICK)
+    },
     onSelectedSaveDir: (Uri) -> Unit = {  },
     onChooseSaveDir: () -> Unit = {},
     onChooseTextFile: () -> Unit = {},
@@ -177,14 +183,14 @@ fun Configurationing(
                 title = { Text(text = stringResource(R.string.quick_start_option) ) },
                 icon = { Icon(imageVector = Icons.Default.Info, contentDescription = null) },
                 onClick = {
-
+                    onSelectedConfigMenu(ConfigSelected.GetStarted)
                 }
             )
             listPreference(
                 key = "select_language",
                 title = { Text(text = stringResource(R.string.language_option) ) },
-                defaultValue = "English (US)",
-                values = listOf("English (US)", "Indonesian"),
+                defaultValue = "Automatic",
+                values = listOf("Automatic","English (US)", "Indonesian"),
                 icon = { Icon(imageVector = Icons.Default.Translate, contentDescription = null) },
                 summary = { Text(text = it) },
             )
@@ -206,6 +212,7 @@ fun Configurationing(
                 title = { Text(text = stringResource(R.string.display_option) ) },
                 icon = { Icon(imageVector = Icons.Default.DisplaySettings, contentDescription = null) },
                 onClick = {
+                    onSelectedConfigMenu(ConfigSelected.Display)
                 }
             )
             preference(
@@ -226,6 +233,7 @@ fun Configurationing(
                 title = { Text(text = stringResource(R.string.a11y_option) ) },
                 icon = { Icon(imageVector = Icons.Default.Accessibility, contentDescription = null) },
                 onClick = {
+                    onSelectedConfigMenu(ConfigSelected.Accessibility)
                 }
             )
             preference(
@@ -246,7 +254,7 @@ fun Configurationing(
                 title = { Text(text = stringResource(R.string.menus_option) ) },
                 icon = { Icon(imageVector = Icons.Default.SettingsInputComponent, contentDescription = null) },
                 onClick = {
-
+                    onSelectedConfigMenu(ConfigSelected.MenusSettings)
                 }
             )
 
@@ -299,6 +307,7 @@ fun Configurationing(
                 title = { Text(text = stringResource(R.string.items_pages_option) ) },
                 icon = { Icon(imageVector = Icons.Default.Pages, contentDescription = null) },
                 onClick = {
+                    onSelectedConfigMenu(ConfigSelected.ItemsSettings)
                 }
             )
 
@@ -330,6 +339,7 @@ fun Configurationing(
                 title = { Text(text = stringResource(R.string.contacts_option) ) },
                 icon = { Icon(imageVector = Icons.Default.Contacts, contentDescription = null) },
                 onClick = {
+                    onSelectedConfigMenu(ConfigSelected.ContactsSettings)
                 }
             )
             preference(
@@ -350,6 +360,7 @@ fun Configurationing(
                 title = { Text(text = stringResource(R.string.telephone_option) ) },
                 icon = { Icon(imageVector = Icons.Default.Phone, contentDescription = null) },
                 onClick = {
+                    onSelectedConfigMenu(ConfigSelected.TelephoneSettings)
                 }
             )
             preference(
@@ -370,6 +381,7 @@ fun Configurationing(
                 title = { Text(text = stringResource(R.string.messages_option) ) },
                 icon = { Icon(imageVector = Icons.Default.Sms, contentDescription = null) },
                 onClick = {
+                    onSelectedConfigMenu(ConfigSelected.MessagesSettings)
                 }
             )
             preference(
@@ -390,6 +402,7 @@ fun Configurationing(
                 title = { Text(text = stringResource(R.string.emergency_option) ) },
                 icon = { Icon(imageVector = Icons.Default.Sos, contentDescription = null) },
                 onClick = {
+                    onSelectedConfigMenu(ConfigSelected.EmergencySettings)
                 }
             )
             preference(
@@ -410,6 +423,7 @@ fun Configurationing(
                 title = { Text(text = stringResource(R.string.apps_option) ) },
                 icon = { Icon(imageVector = Icons.Default.Apps, contentDescription = null) },
                 onClick = {
+                    onSelectedConfigMenu(ConfigSelected.AppsSettings)
                 }
             )
 
@@ -441,6 +455,7 @@ fun Configurationing(
                 title = { Text(text = stringResource(R.string.compatibility_option) ) },
                 icon = { Icon(imageVector = Icons.Default.Error, contentDescription = null) },
                 onClick = {
+                    onSelectedConfigMenu(ConfigSelected.Compatibility)
                 }
             )
 //            preference(
@@ -469,6 +484,7 @@ fun Configurationing(
                 title = { Text(text = stringResource(R.string.remove_default_option) ) },
                 icon = { Icon(imageVector = Icons.Default.Restore, contentDescription = null) },
                 onClick = {
+                    onSelectedConfigMenu(ConfigSelected.RemoveDefault)
                 }
             )
             preference(
@@ -489,6 +505,7 @@ fun Configurationing(
                 title = { Text(text = stringResource(R.string.manual_option) ) },
                 icon = { Icon(imageVector = Icons.Default.Book, contentDescription = null) },
                 onClick = {
+                    onSelectedConfigMenu(ConfigSelected.UserManual)
                 }
             )
             preference(

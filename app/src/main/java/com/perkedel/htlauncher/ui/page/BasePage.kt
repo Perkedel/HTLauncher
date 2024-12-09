@@ -187,6 +187,8 @@ fun BasePage(
             LazyVerticalGridScrollbar(
                 state = lazyListState,
                 settings = ScrollbarSettings(
+                    scrollbarPadding = 4.dp,
+                    thumbThickness = 4.dp,
                     thumbSelectedColor = colorScheme.primary,
                     thumbUnselectedColor = colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
                 )
@@ -205,13 +207,20 @@ fun BasePage(
                             item(
                                 span = { GridItemSpan(this.maxLineSpan) }
                             ){
-                                FirstPageCard(
-                                    handoverText = pageOfIt.name,
-                                    isCompact = isCompact,
-                                    isOnNumberWhat = isOnNumberWhat,
-                                    modifier = Modifier.weight(1f),
-                                    onMoreMenuButton = onMoreMenuButtonClicked,
-                                )
+                                Row {
+                                    FirstPageCard(
+                                        handoverText = pageOfIt.name,
+                                        isCompact = isCompact,
+                                        isOnNumberWhat = isOnNumberWhat,
+                                        modifier = Modifier.weight(1f),
+                                        onMoreMenuButton = onMoreMenuButtonClicked,
+                                    )
+                                    Spacer(
+                                        modifier = Modifier
+                                            .padding(8.dp)
+                                    )
+                                }
+
                             }
                         }
                         // Rest of the items
@@ -288,6 +297,8 @@ fun BasePage(
                 LazyVerticalGridScrollbar(
                     state = lazyListState,
                     settings = ScrollbarSettings(
+                        scrollbarPadding = 4.dp,
+                        thumbThickness = 4.dp,
                         thumbSelectedColor = colorScheme.primary,
                         thumbUnselectedColor = colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
                     )
@@ -301,24 +312,30 @@ fun BasePage(
                         state = lazyListState,
                         content = {
                             // Rest of the items
-                            items(pageOfIt.items.size){i->
-                                ItemCell(
-                                    readTheItemData = viewModel.getItemData(
-                                        pageOfIt.items[i],
-                                        json = json,
+                            repeat(
+                                times = pageOfIt.items.size
+                            ){
+                                item(
+                                    span = { if(uiState.itemList[pageOfIt.items[it]]?.isCategory == true) GridItemSpan(this.maxLineSpan) else GridItemSpan(1) }
+                                ) {
+                                    ItemCell(
+                                        readTheItemData = viewModel.getItemData(
+                                            pageOfIt.items[it],
+                                            json = json,
+                                            context = context,
+                                            ignoreFile = false,
+                                            forceReload = false
+                                        ),
+                                        readTheItemFile = pageOfIt.items[it],
+                                        handoverText = "Item ${it}",
                                         context = context,
-                                        ignoreFile = false,
-                                        forceReload = false
-                                    ),
-                                    readTheItemFile = pageOfIt.items[i],
-                                    handoverText = "Item ${i}",
-                                    context = context,
-                                    pm = pm,
-                                    uiState = uiState,
-                                    viewModel = viewModel,
-                                    tts = tts,
-                                    onClick = onLaunchOneOfAction,
-                                )
+                                        pm = pm,
+                                        uiState = uiState,
+                                        viewModel = viewModel,
+                                        tts = tts,
+                                        onClick = onLaunchOneOfAction,
+                                    )
+                                }
                             }
                             item{
                                 Spacer(

@@ -19,6 +19,7 @@
     <string name="action_load">Muat</string>
     <string name="action_retry">Retry</string>
     <string name="home_screen">Rumah</string>
+    <string name="default_screen">Default</string>
     <string name="all_apps">Semua Aplikasi</string>
     <string name="whole_apps">Seluruh Aplikasi</string>
     <string name="recent_apps">Aplikasi Terbaru</string>
@@ -260,6 +261,16 @@
     <string name="action_delete">Hapus</string>
     <string name="action_open">Buka</string>
     <string name="action_search">Cari</string>
+    <string name="action_close">Tutup</string>
+    <string name="action_move_up">Pindah Atas</string>
+    <string name="action_move_down">Pindah Bawah</string>
+    <string name="action_move_top">Pindah Teratas</string>
+    <string name="action_move_bottom">Pindah Terbawah</string>
+    <string name="action_move_options">Pilihan Pindah</string>
+    <string name="action_move_up_detailed">Pindah %s Atas</string>
+    <string name="action_move_down_detailed">Pindah %s Bawah</string>
+    <string name="action_move_top_detailed">Pindah %s Teratas</string>
+    <string name="action_move_bottom_detailed">Pindah %s Terbawah</string>
     <string name="category_bar">Kategori</string>
     <string name="category_bar_fill">Kategori %s</string>
 

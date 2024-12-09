@@ -40,6 +40,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import com.perkedel.htlauncher.R
 import com.perkedel.htlauncher.data.ActionData
 import com.perkedel.htlauncher.data.viewmodels.ItemEditorViewModel
 import com.perkedel.htlauncher.enumerations.ActionDataLaunchType
@@ -258,7 +259,7 @@ fun EditActionData(
         }
         HTButton(
             modifier = Modifier.fillMaxWidth(),
-            title = "Close",
+            title = stringResource(R.string.action_close),
             leftIcon = Icons.Default.Check,
             onClick = onClose
         )

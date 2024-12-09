@@ -127,8 +127,8 @@ class HTViewModel(
                 // clear everything
                 uiStating.pageList.clear()
                 uiStating.itemList.clear()
-                uiStating.coreConfig = null
-                uiStating.coreConfigJson = null
+//                uiStating.coreConfig = null
+//                uiStating.coreConfigJson = null
             }
 
 //        val launch = viewModelScope.launch {
@@ -731,7 +731,7 @@ class HTViewModel(
             }
             _uiState.value.itemList[of] = aItem
         } else {
-            Log.d("GetItemData","Savedir null")
+//            Log.d("GetItemData","Savedir null")
         }
 
         return _uiState.value.itemList[of] ?: predeterminedItem

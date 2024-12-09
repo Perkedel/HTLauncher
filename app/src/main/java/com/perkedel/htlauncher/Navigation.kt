@@ -1332,6 +1332,7 @@ fun Navigation(
 //                                    it.putExtra("editType",editType)
 //                                    it.putExtra("fileName",filename)
 //                                    }
+                                toIntent.putExtra("saveDirUri", htuiState.selectedSaveDir)
                                 toIntent.putExtra(Intent.EXTRA_STREAM, theUri)
 //                                toIntent.putExtra("editType", editType as? Parcelable)
                                 toIntent.putExtra("editType", editType.name)

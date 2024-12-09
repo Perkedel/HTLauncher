@@ -31,9 +31,20 @@
     <string name="action_load">Load</string>
     <string name="action_retry">Retry</string>
     <string name="action_search">Search</string>
+    <string name="action_close">Close</string>
+    <string name="action_move_up">Move Up</string>
+    <string name="action_move_down">Move Down</string>
+    <string name="action_move_top">Move To Top</string>
+    <string name="action_move_bottom">Move To Bottom</string>
+    <string name="action_move_options">Move Options</string>
+    <string name="action_move_up_detailed">Move %s Up</string>
+    <string name="action_move_down_detailed">Move %s Down</string>
+    <string name="action_move_top_detailed">Move %s Top</string>
+    <string name="action_move_bottom_detailed">Move %s Bottom</string>
 
     <!--  Home Screen  -->
     <string name="home_screen">Home</string>
+    <string name="default_screen">Default</string>
     <string name="all_apps">All Apps</string>
     <string name="whole_apps">Whole Apps</string>
     <string name="recent_apps">Recent Apps</string>

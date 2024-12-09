@@ -12,6 +12,7 @@ import android.content.ContentResolver
 import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
+import android.graphics.pdf.PdfDocument.Page
 import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -55,6 +56,8 @@ import com.perkedel.htlauncher.ui.theme.HTLauncherTheme
 import com.perkedel.htlauncher.ui.theme.rememberColorScheme
 import android.net.Uri
 import android.util.Log
+import android.view.SoundEffectConstants
+import android.view.View
 import android.widget.Toast
 import androidx.activity.BackEventCompat
 import androidx.activity.OnBackPressedCallback
@@ -78,6 +81,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -94,6 +98,7 @@ import com.perkedel.htlauncher.data.ActionData
 import com.perkedel.htlauncher.data.HomepagesWeHave
 import com.perkedel.htlauncher.data.ItemData
 import com.perkedel.htlauncher.data.PageData
+import com.perkedel.htlauncher.enumerations.ItemDetailPaneNavigate
 import com.perkedel.htlauncher.enumerations.ItemExtraPaneNavigate
 import com.perkedel.htlauncher.func.WindowInfo
 import com.perkedel.htlauncher.func.rememberWindowInfo
@@ -101,6 +106,7 @@ import com.perkedel.htlauncher.ui.dialog.HTAlertDialog
 import com.perkedel.htlauncher.ui.navigation.ActionSelectApp
 import com.perkedel.htlauncher.ui.navigation.EditActionData
 import com.perkedel.htlauncher.ui.navigation.EditPageData
+import com.perkedel.htlauncher.ui.navigation.EditPageItems
 import com.perkedel.htlauncher.widgets.HTButton
 import com.perkedel.htlauncher.widgets.ItemCell
 import com.perkedel.htlauncher.writeATextFile
@@ -124,13 +130,18 @@ class ItemEditorActivity : ComponentActivity() {
 
         super.onCreate(savedInstanceState)
 //        onBackPressedDispatcher.addCallback(onBackPressedCallback)
+        val b:Bundle? = intent.extras
+        val uri: Uri? = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            intent.getParcelableExtra("uri", Uri::class.java)
+        } else {
+            intent.getParcelableExtra("uri")
+        }
+        val saveUri: Uri? = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            intent.getParcelableExtra("saveDirUri", Uri::class.java)
+        } else {
+            intent.getParcelableExtra("saveDirUri")
+        }
         if(editorViewModel.uri == null) {
-            val b:Bundle? = intent.extras
-            val uri: Uri? = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                intent.getParcelableExtra("uri", Uri::class.java)
-            } else {
-                intent.getParcelableExtra("uri")
-            }
 //            val editType: EditWhich? = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
 //                intent.getParcelableExtra("editType", EditWhich::class.java)
 ////                intent.extras?.getParcelable("editType", EditWhich::class.java)
@@ -172,6 +183,10 @@ class ItemEditorActivity : ComponentActivity() {
 //            Log.d("ItemEditor", "Obtained New Uri awa ${uri} which is ${editTypeName}")
 //            Log.d("ItemEditor", "Obtained New Uri awa ${fileName} ${uri} which is ${editType}")
             Log.d("ItemEditor", "Obtained New Uri awa ${fileName} ${uri} which is ${editTypeName}")
+        }
+        if(editorViewModel.saveDirUri == null){
+            editorViewModel.selectSaveDirUri(saveUri)
+            Log.d("ItemEditor", "Obtained Save Dir Uri ${editorViewModel.saveDirUri}")
         }
         Log.d("ItemEditor", "Welcome to Edit File")
         enableEdgeToEdge()
@@ -274,6 +289,7 @@ fun saveThisFile(saveUri:Uri, context: Context, contentResolver: ContentResolver
 fun ItemEditorGreeting(
     modifier: Modifier = Modifier,
     context:Context = LocalContext.current,
+    view: View = LocalView.current,
     uiState:HTUIState = HTUIState(),
     viewModel: ItemEditorViewModel = ItemEditorViewModel(),
     editUri:Uri? = null,
@@ -281,6 +297,7 @@ fun ItemEditorGreeting(
     onBack:()-> Unit = {
     },
     onSave:(Uri,ContentResolver,EditWhich, String)-> Unit = { uri, resolver, editType, content ->
+        view.playSoundEffect(SoundEffectConstants.CLICK)
         saveThisFile(
             saveUri = uri,
             context = context,
@@ -326,21 +343,24 @@ fun ItemEditorGreeting(
     // DONE: read file & type
 //    viewModel.setNavigator(navigator)
     LaunchedEffect(
-        key1 = viewModel.rawContent
+//        key1 = viewModel.homeData,
+//        key2 = viewModel.pageData,
+//        key3 = viewModel.itemData,
+        key1 = editUri,
     ) {
-
-    }
-    Log.d("ItemEditor", "Numer ${editUri?.toString()} which is ${viewModel.editType}")
-    if(editUri != null){
-        viewModel.updateRawContent(openATextFile(
-            uri = viewModel.uri!!,
-            contentResolver = context.contentResolver
-        ))
-        if(viewModel.rawContent != null && viewModel.rawContent!!.isNotEmpty()){
+        Log.d("ItemEditor", "Numer ${editUri?.toString()} which is ${viewModel.editType}")
+        if(editUri != null){
+            viewModel.updateRawContent(openATextFile(
+                uri = viewModel.uri!!,
+                contentResolver = context.contentResolver
+            ))
+            if(viewModel.rawContent != null && viewModel.rawContent!!.isNotEmpty()){
 //            viewModel.updateJsoning(Json.decodeFromString(viewModel.rawContent!!))
-            viewModel.typedEditNow(viewModel.editType,viewModel.rawContent!!)
+                viewModel.typedEditNow(viewModel.editType,viewModel.rawContent!!)
+            }
         }
     }
+
 
     val saveNow: () -> Unit = {
         if(editUri != null) {
@@ -468,6 +488,7 @@ fun ItemEditorGreeting(
                         onEditActionData = { actionData, idOf ->
                             viewModel.updateActionDataId(idOf)
                             viewModel.updateActionData(actionData)
+                            viewModel.selectDetailNavigate(ItemDetailPaneNavigate.EditingAction)
                             viewModel.setOpenActionData(true)
                             navigator.navigateTo(
                                 pane = ListDetailPaneScaffoldRole.Detail,
@@ -487,14 +508,17 @@ fun ItemEditorGreeting(
                             viewModel.updatePageData(it)
                             viewModel.updateRawContent(json.encodeToString<PageData>(it))
                         },
-                        onEditActionData = { actionData, idOf ->
-                            viewModel.updateActionDataId(idOf)
-                            viewModel.updateActionData(actionData)
-                            viewModel.setOpenActionData(true)
-                            navigator.navigateTo(
-                                pane = ListDetailPaneScaffoldRole.Detail,
-                                content = "Action ${idOf} ${viewModel.actionEdit}"
-                            )
+                        onSelectedKey = {
+                            when(it){
+                                "reorder_items" -> {
+                                    viewModel.selectDetailNavigate(ItemDetailPaneNavigate.ReorderItems)
+                                    navigator.navigateTo(
+                                        pane = ListDetailPaneScaffoldRole.Detail,
+                                        content = "Reorder Items"
+                                    )
+                                }
+                                else -> {}
+                            }
                         }
                     )
                     else -> {
@@ -549,13 +573,24 @@ fun ItemEditorGreeting(
                             contentAlignment = Alignment.Center
                         ){
                             when{
-                                viewModel.isEditingAction -> {
+                                viewModel.isEditingAction || viewModel.itemDetailPaneNavigate == ItemDetailPaneNavigate.EditingAction -> {
                                     EditActionData(
                                         modifier = Modifier.fillMaxSize(),
                                         data = viewModel.actionEdit,
                                         id = viewModel.actionId ?: 0,
                                         onRebuild = { actioning:ActionData,idOf:Int ->
                                             viewModel.appendItemDataAction(actioning,idOf)
+                                            var obtainItemData:ItemData? = viewModel.itemData
+                                            var obtainActionData:ActionData? = viewModel.actionEdit
+                                            obtainItemData?.let {
+//                                                obtainItemData = obtainItemData!!.copy(
+//                                                    action = actioning
+//                                                )
+//                                                viewModel.updateRawContent(json.encodeToString<ItemData>(
+//                                                    obtainItemData!!
+//                                                ))
+                                            }
+
 //                                            viewModel.resyncItemDataAction()
 //                                            saveNow()
                                         },
@@ -565,6 +600,7 @@ fun ItemEditorGreeting(
                                             viewModel.clearActionData()
                                             viewModel.setOpenActionData(false)
                                             Log.d("ItemEditorActivity","Total Action${viewModel.itemData?.action}")
+                                            viewModel.selectDetailNavigate(ItemDetailPaneNavigate.Default)
                                             navigator.navigateBack()
                                         },
                                         onSelectAction = {
@@ -573,6 +609,32 @@ fun ItemEditorGreeting(
                                                 pane = ListDetailPaneScaffoldRole.Extra,
                                                 content = "select action aaa ${viewModel.rawContent}"
                                             )
+                                        }
+                                    )
+                                }
+                                viewModel.itemDetailPaneNavigate == ItemDetailPaneNavigate.ReorderItems -> {
+                                    EditPageItems(
+                                        modifier = Modifier.fillMaxSize(),
+                                        data = viewModel.pageData,
+                                        onClose = {
+                                            saveNow()
+                                            viewModel.selectDetailNavigate(ItemDetailPaneNavigate.Default)
+                                            navigator.navigateBack()
+                                        },
+                                        onSwap = {
+//                                            Log.d("SwapPageItems","Here now list\n ${it}")
+//                                            viewModel.changeItemOrders(it)
+//                                            viewModel.pageData?.let {
+//                                                Log.d("SwapPageItems","Here now page\n ${it}")
+//                                                viewModel.updateRawContent(json.encodeToString<PageData>(
+//                                                    viewModel.pageData!!
+//                                                ))
+//                                            }
+                                        },
+                                        onRebuild = {
+                                            Log.d("RebuildPageData","Please rebuild:\n$it")
+                                            viewModel.updatePageData(it)
+                                            viewModel.updateRawContent(json.encodeToString<PageData>(it))
                                         }
                                     )
                                 }
@@ -605,12 +667,15 @@ fun ItemEditorGreeting(
                                 onSelectedApp = {
                                     viewModel.selectActionPackage(it)
                                     saveNow()
+                                    viewModel.selectExtraNavigate(ItemExtraPaneNavigate.Default)
 //                                    viewModel.resyncItemDataAction()
                                     navigator.navigateBack()
                                 }
                             )
                         }
-                        else -> {}
+                        else -> {
+                            Text(content)
+                        }
                     }
                 }
             }

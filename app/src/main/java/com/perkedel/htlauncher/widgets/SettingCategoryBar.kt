@@ -51,6 +51,8 @@ fun SettingCategoryBar(
     tts: MutableState<TextToSpeech?> = rememberTextToSpeech(),
     icon: @Composable() (() -> Unit?)? = null,
     view: View = LocalView.current,
+    onClick: ()-> Unit = {},
+    onLongClick: ()-> Unit = {},
 ){
     val readout:String = stringResource(R.string.category_bar_fill, title)
 
@@ -60,6 +62,7 @@ fun SettingCategoryBar(
             .combinedClickable(
                 onClick = {
                     view.playSoundEffect(SoundEffectConstants.CLICK)
+                    onClick()
                 },
                 onLongClick = {
                     // DONE: Talkback read this title!
@@ -69,6 +72,7 @@ fun SettingCategoryBar(
                     )
                     Toast.makeText(context, readout, Toast.LENGTH_SHORT).show()
                     haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                    onLongClick()
                 },
                 onClickLabel = readout
             ),

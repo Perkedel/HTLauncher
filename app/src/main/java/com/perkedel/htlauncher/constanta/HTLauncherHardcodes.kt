@@ -8,6 +8,7 @@ import com.perkedel.htlauncher.data.PageData
 import com.perkedel.htlauncher.data.SearchableApps
 import com.perkedel.htlauncher.enumerations.ActionDataLaunchType
 import com.perkedel.htlauncher.enumerations.ActionInternalCommand
+import com.perkedel.htlauncher.enumerations.InternalCategories
 
 object HTLauncherHardcodes {
     // https://stackoverflow.com/questions/77368662/kotlin-replace-only-last-given-string-from-string
@@ -132,11 +133,14 @@ object HTLauncherHardcodes {
             ActionInternalCommand.Contacts.name -> R.drawable.contacts
             ActionInternalCommand.Preferences.name -> R.drawable.preferences
             ActionInternalCommand.Settings.name -> R.drawable.settings
+            ActionInternalCommand.SystemSettings.name -> R.drawable.settings_gear
             ActionInternalCommand.Messages.name -> R.drawable.messages
             ActionInternalCommand.Camera.name -> R.drawable.camera
             ActionInternalCommand.Gallery.name -> R.drawable.gallery
             ActionInternalCommand.GoToPage.name -> R.drawable.go_to_page
             ActionInternalCommand.OpenAPage.name -> R.drawable.open_a_page
+            InternalCategories.SettingsSystem.name -> R.drawable.settings_gear
+            InternalCategories.SettingsOverall.name -> R.drawable.settings
             else -> R.drawable.placeholder
         }
     }
