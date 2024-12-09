@@ -190,6 +190,9 @@ dependencies {
 
     // https://github.com/BILLyTheLiTTle/LazyColumns
 //    implementation(libs.lazycolumns)
+
+    // https://github.com/Calvin-LL/Reorderable
+    implementation(libs.reorderable)
 }
 
 //composeCompiler {

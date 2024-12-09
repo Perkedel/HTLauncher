@@ -348,11 +348,13 @@ class HTViewModel(
                             j == ActionInternalCommand.Messages.name ||
                             j == ActionInternalCommand.Settings.name ||
                             j == ActionInternalCommand.SystemSettings.name ||
-                            j == ActionInternalCommand.Preferences.name
-//                        Log.d("ItemLoader","Item is internal command $j")
-                        val itemIsCategory:Boolean =
-                            j == InternalCategories.SettingsSystem.name ||
+                            j == ActionInternalCommand.Preferences.name ||
+                                    j == InternalCategories.SettingsSystem.name ||
                                     j == InternalCategories.SettingsOverall.name
+//                        Log.d("ItemLoader","Item is internal command $j")
+//                        val itemIsCategory:Boolean =
+//                            j == InternalCategories.SettingsSystem.name ||
+//                                    j == InternalCategories.SettingsOverall.name
                         val predeterminedItem: ItemData = when{
                             itemIsInternalCommand -> ItemData(
                                 name = j,
@@ -365,17 +367,17 @@ class HTViewModel(
                                     )
                                 ),
                             )
-                            itemIsCategory -> ItemData(
-                                name = j,
-                                label = j,
-                                action = listOf(
-                                    ActionData(
-                                        name = j,
-                                        action = j,
-                                        type = ActionDataLaunchType.Category,
-                                    )
-                                ),
-                            )
+//                            itemIsCategory -> ItemData(
+//                                name = j,
+//                                label = j,
+//                                action = listOf(
+//                                    ActionData(
+//                                        name = j,
+//                                        action = j,
+//                                        type = ActionDataLaunchType.Category,
+//                                    )
+//                                ),
+//                            )
                             else -> ItemData()
                         }
                         var aItem: ItemData = ItemData()
@@ -660,27 +662,28 @@ class HTViewModel(
                     of == context.resources.getString(ActionInternalCommand.Messages.id) ||
                     of == context.resources.getString(ActionInternalCommand.Settings.id) ||
                     of == context.resources.getString(ActionInternalCommand.SystemSettings.id) ||
-                    of == context.resources.getString(ActionInternalCommand.Preferences.id)
-
-        val itemIsCategory:Boolean =
-            of == context.resources.getString(InternalCategories.SettingsSystem.id) ||
+                    of == context.resources.getString(ActionInternalCommand.Preferences.id) ||
+                    of == context.resources.getString(InternalCategories.SettingsSystem.id) ||
                     of == context.resources.getString(InternalCategories.SettingsOverall.id)
+//        val itemIsCategory:Boolean =
+//            of == context.resources.getString(InternalCategories.SettingsSystem.id) ||
+//                    of == context.resources.getString(InternalCategories.SettingsOverall.id)
 //        if(itemIsInternalCommand) Log.d("GetItemData","Internal Command ${of}")
-        if(itemIsCategory) Log.d("GetItemData","Internal Category ${of}")
+//        if(itemIsCategory) Log.d("GetItemData","Internal Category ${of}")
 //        Log.d("GetItemData","Item $of requested")
         val predeterminedItem: ItemData = when {
-            itemIsCategory -> ItemData(
-                name = of,
-                label = of,
-                isCategory = true,
-                action = listOf(
-                    ActionData(
-                        name = of,
-                        action = of,
-                        type = ActionDataLaunchType.Category,
-                    )
-                ),
-            )
+//            itemIsCategory -> ItemData(
+//                name = of,
+//                label = of,
+//                isCategory = true,
+//                action = listOf(
+//                    ActionData(
+//                        name = of,
+//                        action = of,
+//                        type = ActionDataLaunchType.Category,
+//                    )
+//                ),
+//            )
             itemIsInternalCommand -> ItemData(
                 name = of,
                 label = of,
@@ -732,5 +735,25 @@ class HTViewModel(
         }
 
         return _uiState.value.itemList[of] ?: predeterminedItem
+    }
+    fun getItemIcon(of:String, json:Json = Json{
+        prettyPrint = true
+        encodeDefaults = true
+    }, context: Context, ignoreFile:Boolean = false, forceReload:Boolean = false, pm:PackageManager): Any?{
+        val target:ItemData = getItemData(
+            of = of,
+            json = json,
+            context = context,
+            ignoreFile = ignoreFile,
+            forceReload = forceReload
+        )
+        return when(target.action[0].type){
+            ActionDataLaunchType.LauncherActivity -> if(target.action[0].action.isNotBlank()) pm.getApplicationIcon(
+                target.action[0].action ?: "") else R.drawable.all_apps
+            ActionDataLaunchType.Activity -> if(target.action[0].action.isNotBlank()) pm.getApplicationIcon(
+                target.action[0].action ?: "") else R.drawable.all_apps
+            ActionDataLaunchType.Internal -> HTLauncherHardcodes.getInternalActionIcon(target.action[0].action)
+            else -> R.drawable.placeholder
+        }
     }
 }

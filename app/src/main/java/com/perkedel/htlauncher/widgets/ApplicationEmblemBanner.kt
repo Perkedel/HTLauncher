@@ -86,7 +86,9 @@ fun ApplicationEmblemBanner(
                     fontSize = 38.sp
                 )
                 Text(
-                    modifier = modifierText.basicMarquee(),
+                    modifier = modifierText
+                        .basicMarquee()
+                    ,
                     text = context.packageName,
                     textAlign = TextAlign.Center,
                 )

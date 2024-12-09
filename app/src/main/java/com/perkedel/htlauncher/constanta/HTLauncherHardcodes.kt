@@ -135,6 +135,8 @@ object HTLauncherHardcodes {
             ActionInternalCommand.Messages.name -> R.drawable.messages
             ActionInternalCommand.Camera.name -> R.drawable.camera
             ActionInternalCommand.Gallery.name -> R.drawable.gallery
+            ActionInternalCommand.GoToPage.name -> R.drawable.go_to_page
+            ActionInternalCommand.OpenAPage.name -> R.drawable.open_a_page
             else -> R.drawable.placeholder
         }
     }
