@@ -84,6 +84,8 @@ class MainActivity : ComponentActivity() {
         )
         super.onCreate(savedInstanceState)
 
+
+
 //        val prefs: DataStore<Preferences> = remember { createDataStore(applicationContext) }
 //        val selectedSaveDir by prefs
 //            .data
@@ -94,6 +96,13 @@ class MainActivity : ComponentActivity() {
 //            .collectAsState("")
 //        val dataStorePrefs: DataStore<Preferences> = createDataStore(applicationContext)
         val dataStorePrefs: DataStore<Preferences> = applicationContext.preferencesDataStore
+
+//        val selectedSaveDir by dataStorePrefs
+//            .data
+//            .map {
+//                val saveDir = stringPreferencesKey("saveDir")
+//                it[saveDir] ?: ""
+//            }
 
         if (Build.VERSION.SDK_INT < 26) {
 //        val permissionDialogQueue = htui.visiblePermissionDialogQueue

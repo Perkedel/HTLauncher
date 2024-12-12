@@ -3,6 +3,7 @@
 package com.perkedel.htlauncher.data.viewmodels
 
 import android.content.ClipData.Item
+import android.content.Context
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
@@ -14,8 +15,11 @@ import androidx.compose.material3.adaptive.navigation.ThreePaneScaffoldNavigator
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.documentfile.provider.DocumentFile
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.perkedel.htlauncher.HTUIState
+import com.perkedel.htlauncher.R
 import com.perkedel.htlauncher.data.ActionData
 import com.perkedel.htlauncher.data.HomepagesWeHave
 import com.perkedel.htlauncher.data.ItemData
@@ -25,6 +29,8 @@ import com.perkedel.htlauncher.enumerations.EditWhich
 import com.perkedel.htlauncher.enumerations.ItemDetailPaneNavigate
 import com.perkedel.htlauncher.enumerations.ItemExtraPaneNavigate
 import com.perkedel.htlauncher.func.AsyncService
+import com.perkedel.htlauncher.func.removeDotExtensions
+import com.perkedel.htlauncher.getADirectory
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -84,6 +90,7 @@ class ItemEditorViewModel(
     }
 
     // TypedEdit
+    var filenameDisplay:String? by mutableStateOf(null)
     var itemData: ItemData? by mutableStateOf(null)
     var homeData: HomepagesWeHave? by mutableStateOf(null)
     var pageData: PageData? by mutableStateOf(null)
@@ -107,6 +114,9 @@ class ItemEditorViewModel(
 
     fun updateUri(uri: Uri?){
         this.uri = uri
+    }
+    fun displayFilename(filename: String?){
+        this.filenameDisplay = filename
     }
     fun selectSaveDirUri(uri: Uri?){
         this.saveDirUri = uri
@@ -224,6 +234,17 @@ class ItemEditorViewModel(
         }
 
     }
+    fun changePagePathInHome(into:List<String> = emptyList()){
+        var compile = this.homeData?.pagesPath?.toMutableList() ?: HomepagesWeHave().pagesPath.toMutableList()
+        this.homeData = this.homeData?.copy(
+            pagesPath = into
+        )
+    }
+    fun changeItemsInPage(into: List<String>){
+        this.pageData = this.pageData?.copy(
+            items = into
+        )
+    }
 
     fun typedEditNow(editType: EditWhich?, rawJson: String = ""){
         val json = Json {
@@ -296,5 +317,37 @@ class ItemEditorViewModel(
 //            installAllApps(with,packageManager)
             _appAll.value = asyncService.getSearchableApps(with,packageManager)
         }
+    }
+    fun getItemFolderContents(saveDirUri: Uri, context:Context):List<String> {
+        if(saveDirUri.toString().isNotBlank()) {
+            val itemFolder: Uri = getADirectory(
+                dirUri = saveDirUri,
+                context = context,
+                dirName = context.resources.getString(R.string.items_folder)
+            )
+            val itemFiles: List<DocumentFile> =
+                DocumentFile.fromTreeUri(context, itemFolder)?.listFiles()?.toList() ?: emptyList()
+            // https://stackoverflow.com/questions/47871538/how-to-get-a-filename-without-extension-in-kotlin
+            // https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.text/replace-after.html
+            // https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.text/replace-after.html
+            Log.d("GetItemContent","Item File contents: ${itemFiles.map { it.name?.substring(0, it.name?.lastIndexOf('.') ?: 0) ?: "" }}")
+//            return itemFiles.map { it.name?.replaceAfter(".json","") ?: "" }.toList()
+//            return itemFiles.map {  it.name?.substring(0, it.name?.lastIndexOf('.') ?: 0) ?: "" }.toList()
+            return itemFiles.map {  removeDotExtensions(it.name ?: "") }.toList()
+        } else return emptyList()
+    }
+    fun getPageFolderContents(saveDirUri: Uri, context:Context):List<String> {
+        if(saveDirUri.toString().isNotBlank()) {
+            val pageFolder: Uri = getADirectory(
+                dirUri = saveDirUri,
+                context = context,
+                dirName = context.resources.getString(R.string.pages_folder)
+            )
+            val pageFiles: List<DocumentFile> =
+                DocumentFile.fromTreeUri(context, pageFolder)?.listFiles()?.toList() ?: emptyList()
+//            return pageFiles.map { it.name?.substring(0, it.name?.lastIndexOf('.') ?: 0) ?: "" }.toList()
+//            return pageFiles.map { it.name?.replaceAfterLast(".json", "") ?: "" }.toList()
+            return pageFiles.map { removeDotExtensions(it.name ?: "") }.toList()
+        } else return emptyList()
     }
 }

@@ -5,6 +5,11 @@ import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.view.View
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.hapticfeedback.HapticFeedback
 import androidx.compose.ui.platform.LocalConfiguration
@@ -14,6 +19,7 @@ import androidx.compose.ui.platform.LocalView
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.perkedel.htlauncher.HTViewModel
 import com.perkedel.htlauncher.data.HomepagesWeHave
+import com.perkedel.htlauncher.data.PageData
 import com.perkedel.htlauncher.data.viewmodels.ItemEditorViewModel
 import com.perkedel.htlauncher.enumerations.PageViewStyle
 import com.perkedel.htlauncher.func.WindowInfo
@@ -40,7 +46,16 @@ fun EditHomePageOrders(
     configuration: Configuration = LocalConfiguration.current,
     isCompact: Boolean = windowInfo.screenWidthInfo is WindowInfo.WindowType.Compact,
     isOrientation: Int = configuration.orientation,
+    onTryAdd: ()->Unit = {},
 ){
+    var list:List<String> by remember { mutableStateOf(data?.pagesPath ?: HomepagesWeHave().pagesPath) }
+    LaunchedEffect(
+        key1 = data
+    ) {
+        list = data?.pagesPath ?: PageData().items
+    }
+    var areYouSureToRemove:Boolean by remember { mutableStateOf(false) }
+    var toRemove:Int by remember { mutableStateOf(-1) }
     ProvidePreferenceLocals {
 
     }

@@ -227,12 +227,21 @@ fun Navigation(
             it[saveDir] ?: ""
         }
         .collectAsState("")
-    try{
-    anViewModel.selectSaveDirUri(Uri.parse(selectedSaveDir))
-    } catch (e:Exception){
-        e.printStackTrace()
-    } catch (e:IOException){
-        e.printStackTrace()
+    LaunchedEffect(
+        selectedSaveDir,
+//        prefs.data.map {
+//            val saveDir = stringPreferencesKey("saveDir")
+//        },
+//        htuiState.selectedSaveDir,
+//        Uri.parse(selectedSaveDir)
+    ) {
+        try{
+            anViewModel.selectSaveDirUri(Uri.parse(selectedSaveDir))
+        } catch (e:Exception){
+            e.printStackTrace()
+        } catch (e:IOException){
+            e.printStackTrace()
+        }
     }
     // https://medium.com/@yogesh_shinde/implementing-image-video-documents-picker-in-jetpack-compose-73ef846cfffb
     // https://composables.com/jetpack-compose-tutorials/activityresultcontract
@@ -383,7 +392,7 @@ fun Navigation(
 
 
 
-    LaunchedEffect(true, htuiState.selectedSaveDir, context) {
+    LaunchedEffect(htuiState.selectedSaveDir) {
 
 //        val preloadThing = async {
 //            // https://medium.com/@rajputmukesh748/mastering-async-and-await-in-kotlin-coroutines-833e57fa0e8f
@@ -408,14 +417,16 @@ fun Navigation(
 //        )
 //        preloadThing
         coroutineScope.launch {
-            anViewModel.preloadFiles(
-                context = context,
-                contentResolver = saveDirResolver,
-                uiStating = htuiState,
-                listOfFolder = listOfFolder,
-                folders = folders,
-                json = json,
-            )
+            if(!htuiState.inited) {
+                anViewModel.preloadFiles(
+                    context = context,
+                    contentResolver = saveDirResolver,
+                    uiStating = htuiState,
+                    listOfFolder = listOfFolder,
+                    folders = folders,
+                    json = json,
+                )
+            }
         }
 //        coroutineScope.launch {
 //

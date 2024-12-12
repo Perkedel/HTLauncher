@@ -55,10 +55,15 @@ import androidx.compose.material.icons.filled.Save
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.PlainTooltip
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.TooltipBox
+import androidx.compose.material3.TooltipDefaults
 import androidx.compose.material3.adaptive.navigation.ThreePaneScaffoldNavigator
+import androidx.compose.material3.rememberTooltipState
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -281,10 +286,10 @@ fun ItemEditorGreeting(
     modifier: Modifier = Modifier,
     context:Context = LocalContext.current,
     view: View = LocalView.current,
-    uiState:HTUIState = HTUIState(),
     viewModel: ItemEditorViewModel = ItemEditorViewModel(),
     coroutineScope: CoroutineScope = rememberCoroutineScope(),
     htViewModel: HTViewModel = HTViewModel(),
+//    uiState:HTUIState = htViewModel.uiState,
     editUri:Uri? = null,
     navigator:ThreePaneScaffoldNavigator<Any> = rememberListDetailPaneScaffoldNavigator<Any>(),
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
@@ -352,20 +357,30 @@ fun ItemEditorGreeting(
 //            viewModel.updateJsoning(Json.decodeFromString(viewModel.rawContent!!))
                 viewModel.typedEditNow(viewModel.editType,viewModel.rawContent!!)
             }
+//            viewModel.displayFilename(viewModel.uri?.lastPathSegment) // HOW DID YOU KNOW, CODEIUM?!
+            // nvm, you lastPathSegment succ! it shows whole path!!!
+            viewModel.displayFilename(when(viewModel.editType){
+                EditWhich.Home -> context.resources.getString(R.string.home_screen_file)
+                EditWhich.Items -> viewModel.itemData?.name
+                EditWhich.Pages -> viewModel.pageData?.name
+                else -> viewModel.uri?.lastPathSegment
+            })
         }
     }
 
 
     val saveNow: () -> Unit = {
         if(editUri != null) {
-            viewModel.updateRawContent(
-                when(viewModel.editType){
-                    EditWhich.Items -> json.encodeToString<ItemData>(viewModel.itemData ?: ItemData())
-                    EditWhich.Pages -> json.encodeToString<PageData>(viewModel.pageData ?: PageData())
-                    EditWhich.Home -> json.encodeToString<HomepagesWeHave>(viewModel.homeData ?: HomepagesWeHave())
-                    else -> "{}"
-                }
-            )
+            var toSave:String = when(viewModel.editType){
+                EditWhich.Items -> json.encodeToString<ItemData>(viewModel.itemData ?: ItemData())
+                EditWhich.Pages -> json.encodeToString<PageData>(viewModel.pageData ?: PageData())
+                EditWhich.Home -> json.encodeToString<HomepagesWeHave>(viewModel.homeData ?: HomepagesWeHave())
+                else -> "{}"
+            }
+            toSave = toSave.substring(0,toSave.lastIndexOf('}')) + '}' // save file bug double write
+//            viewModel.updateRawContent(
+//
+//            )
 //                                viewModel.updateRawContent(json.encodeToString(value = when(viewModel.editType){
 //                                    EditWhich.Items -> viewModel.itemData
 //                                    EditWhich.Pages -> viewModel.pageData
@@ -377,7 +392,8 @@ fun ItemEditorGreeting(
 ////                                    EditWhich.Misc -> TODO()
 ////                                    null -> TODO()
 //                                }))
-            onSave(editUri,context.contentResolver,viewModel.editType ?: EditWhich.Misc, viewModel.rawContent ?: "")
+//            onSave(editUri,context.contentResolver,viewModel.editType ?: EditWhich.Misc, viewModel.rawContent ?: "")
+            onSave(editUri,context.contentResolver,viewModel.editType ?: EditWhich.Misc, toSave)
 //                                onSave(editUri,context.contentResolver,viewModel.editType ?: EditWhich.Misc, when(viewModel.editType){
 //                                    EditWhich.Items -> json.encodeToString<ItemData>(value = viewModel.itemData ?: ItemData())
 //                                    else -> "{}"
@@ -392,7 +408,7 @@ fun ItemEditorGreeting(
     val onBackPressedCallback:OnBackPressedCallback = object :OnBackPressedCallback(true){
         // https://github.com/philipplackner/PredictiveBackMigration
         override fun handleOnBackPressed() {
-            saveNow()
+//            saveNow()
 //            pressBackButton()
             if(navigator.canNavigateBack()){
                 navigator.navigateBack()
@@ -443,7 +459,7 @@ fun ItemEditorGreeting(
         modifier = Modifier.fillMaxSize(),
         topBar = {
             HTAppBar(
-                textTitle = "Edito",
+                textTitle = viewModel.filenameDisplay ?: "EDIT",
                 textDescription = "(${viewModel.editType?.toString()}) ${viewModel.uri?.toString()}",
                 canNavigateBack = true,
                 navigateUp = {
@@ -458,14 +474,22 @@ fun ItemEditorGreeting(
 
                 },
                 actions = {
-                    IconButton(
-                        onClick = saveNow,
+                    // https://cs.android.com/androidx/platform/frameworks/support/+/androidx-main:compose/material3/material3/samples/src/main/java/androidx/compose/material3/samples/TooltipSamples.kt
+                    TooltipBox(
+                        positionProvider = TooltipDefaults.rememberRichTooltipPositionProvider(),
+                        tooltip = {PlainTooltip { Text(stringResource(R.string.action_save)) }},
+                        state = rememberTooltipState(),
                     ) {
-                        Icon(
-                            imageVector = Icons.Default.Save,
-                            contentDescription = stringResource(R.string.action_save)
-                        )
+                        IconButton(
+                            onClick = saveNow,
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Save,
+                                contentDescription = stringResource(R.string.action_save)
+                            )
+                        }
                     }
+
                 }
             )
         },
@@ -500,7 +524,7 @@ fun ItemEditorGreeting(
                         data = viewModel.pageData,
                         onRebuildItem = {
                             viewModel.updatePageData(it)
-                            viewModel.updateRawContent(json.encodeToString<PageData>(it))
+//                            viewModel.updateRawContent(json.encodeToString<PageData>(it))
                         },
                         onSelectedKey = {
                             when(it){
@@ -522,7 +546,7 @@ fun ItemEditorGreeting(
                             data = viewModel.homeData,
                             onRebuildItem = {
                                 viewModel.updateHomeData(it)
-                                viewModel.updateRawContent(json.encodeToString<HomepagesWeHave>(it))
+//                                viewModel.updateRawContent(json.encodeToString<HomepagesWeHave>(it))
                             },
                             onSelectedKey = {
                                 when(it) {
@@ -651,7 +675,14 @@ fun ItemEditorGreeting(
                                         onRebuild = {
                                             Log.d("RebuildPageData","Please rebuild:\n$it")
                                             viewModel.updatePageData(it)
-                                            viewModel.updateRawContent(json.encodeToString<PageData>(it))
+//                                            viewModel.updateRawContent(json.encodeToString<PageData>(it))
+                                        },
+                                        onTryAdd = {
+                                            viewModel.selectExtraNavigate(ItemExtraPaneNavigate.AddItem)
+                                            navigator.navigateTo(
+                                                pane = ListDetailPaneScaffoldRole.Extra,
+                                                content = "Add Item to Page"
+                                            )
                                         }
                                     )
                                 }
@@ -669,7 +700,14 @@ fun ItemEditorGreeting(
                                         onRebuild = {
                                             Log.d("RebuildHomeData","Please rebuild:\n$it")
                                             viewModel.updateHomeData(it)
-                                            viewModel.updateRawContent(json.encodeToString<HomepagesWeHave>(it))
+//                                            viewModel.updateRawContent(json.encodeToString<HomepagesWeHave>(it))
+                                        },
+                                        onTryAdd = {
+                                            viewModel.selectExtraNavigate(ItemExtraPaneNavigate.AddItem)
+                                            navigator.navigateTo(
+                                                pane = ListDetailPaneScaffoldRole.Extra,
+                                                content = "Add Page to Home"
+                                            )
                                         }
                                     )
                                 }
@@ -723,18 +761,39 @@ fun ItemEditorGreeting(
                                 viewModel = viewModel,
                                 pageData = viewModel.pageData,
                                 itemData = viewModel.itemData,
+                                data = when(viewModel.editType){
+                                    EditWhich.Home -> {
+                                        // view all things in Page folder
+                                        viewModel.getPageFolderContents(
+                                            saveDirUri = viewModel.saveDirUri ?: Uri.EMPTY,
+                                            context = context,
+                                        )
+                                    }
+                                    EditWhich.Pages -> {
+                                        // view all things in Page folder
+                                        viewModel.getItemFolderContents(
+                                            saveDirUri = viewModel.saveDirUri ?: Uri.EMPTY,
+                                            context = context,
+                                        )
+                                    }
+                                    else -> emptyList()
+                                },
                                 homepagesWeHave = viewModel.homeData,
                                 addIntoWhich = viewModel.editType,
                                 onSelectThing = { name, which, overwrite ->
+                                    Log.d("SelectAddIntoList","Name = $name, which = $which, overwrite = $overwrite")
                                     when(which){
                                         EditWhich.Home -> {
-
+                                            viewModel.changePagePathInHome(overwrite)
                                         }
                                         EditWhich.Pages -> {
-
+                                            viewModel.changeItemsInPage(overwrite)
+//                                            viewModel.updateRawContent(json.encodeToString<PageData>(it))
                                         }
                                         else -> {}
                                     }
+                                    viewModel.selectExtraNavigate(ItemExtraPaneNavigate.Default)
+                                    navigator.navigateBack()
                                 },
                                 pm = context.packageManager,
                             )

@@ -30,6 +30,7 @@ import com.perkedel.htlauncher.enumerations.ActionInternalCommand
 import com.perkedel.htlauncher.enumerations.EditWhich
 import com.perkedel.htlauncher.enumerations.InternalCategories
 import com.perkedel.htlauncher.func.AsyncService
+import com.perkedel.htlauncher.func.removeDotExtensions
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
@@ -129,6 +130,7 @@ class HTViewModel(
                 uiStating.itemList.clear()
 //                uiStating.coreConfig = null
 //                uiStating.coreConfigJson = null
+                uiStating.inited = false
             }
 
 //        val launch = viewModelScope.launch {
@@ -217,7 +219,8 @@ class HTViewModel(
                     dirName = context.resources.getString(R.string.pages_folder)
                 )
                 val pageFiles:List<DocumentFile> = DocumentFile.fromTreeUri(context,pageFolder)?.listFiles()?.toList() ?: emptyList()
-                var pageFileNames:List<String> = pageFiles.map { it.name?.replaceAfterLast(".json","") ?: "" }.toList()
+                var pageFileNames:List<String> = pageFiles.map { removeDotExtensions(it.name ?: "") }.toList()
+//                var pageFileNames:List<String> = pageFiles.map { it.name?.substring(0, it.name?.lastIndexOf('.') ?: 0) ?: "" }.toList()
 //                var pageFileNames:List<String> = pageFiles.map { it.name ?: "" }.toList()
                 // but also pls add the built-in things!
 
@@ -228,7 +231,8 @@ class HTViewModel(
                     dirName = context.resources.getString(R.string.items_folder)
                 )
                 val itemFiles:List<DocumentFile> = DocumentFile.fromTreeUri(context,itemFolder)?.listFiles()?.toList() ?: emptyList()
-                val itemFileNames:List<String> = itemFiles.map { it.name?.replaceAfterLast(".json","") ?: "" }.toList()
+                val itemFileNames:List<String> = itemFiles.map { removeDotExtensions(it.name ?: "") }.toList()
+//                val itemFileNames:List<String> = itemFiles.map { it.name?.substring(0, it.name?.lastIndexOf('.') ?: 0) ?: "" }.toList()
 
                 // fill rest
                 Log.d("FolderQuery","Loading Rest of the items now!")
@@ -413,6 +417,7 @@ class HTViewModel(
                 }
             }
             setIsReady(into = true)
+            uiStating.inited = true
 //        }
         }
 

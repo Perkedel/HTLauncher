@@ -18,6 +18,11 @@ val Orange40 = Color(0xFF6650a4)
 val OrangeGrey40 = Color(0xFF625b71)
 val Yellow40 = Color(0xFF7D5260)
 
+val WarnColorLight = Color(0xFFFFA500)
+val WarnColorDark = Color(0xFFB76A00)
+val WarnColorLightContainer = Color(0xFFFFD7A2)
+val WarnColorDarkContainer = Color(0xFF362700)
+
 // INCOMING MATERIAL DESIGN GENERATOR!!!
 // http://material-foundation.github.io?primary=%230052EB&bodyFont=Ubuntu&displayFont=Ubuntu&colorMatch=true
 

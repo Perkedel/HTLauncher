@@ -135,12 +135,14 @@ fun HomeScreen(
                 hasFirstLastButton = !isCompact,
                 onLastPage = {
                     coroutineScope.launch {
-                        handoverPagerState.animateScrollToPage(0)
+//                        handoverPagerState.animateScrollToPage(0)
+                        handoverPagerState.animateScrollToPage(page = handoverPagerState.pageCount-1)
                     }
                 },
                 onFirstPage = {
                     coroutineScope.launch {
-                        handoverPagerState.animateScrollToPage(page = handoverPagerState.pageCount-1)
+//                        handoverPagerState.animateScrollToPage(page = handoverPagerState.pageCount-1)
+                        handoverPagerState.animateScrollToPage(0)
                     }
                 },
                 onLeftPage = {

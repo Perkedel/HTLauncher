@@ -14,6 +14,7 @@ import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.encodeToJsonElement
 
 data class HTUIState(
+    var inited: Boolean = false,
     val currentPage: Int = 0,
     val openMoreMenu: Boolean = false,
     val openCreateNewFile: Boolean = false,

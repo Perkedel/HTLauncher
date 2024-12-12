@@ -143,6 +143,11 @@ fun EditPageItems(
     // https://github.com/Calvin-LL/Reorderable?tab=readme-ov-file#complete-example-with-haptic-feedback and with this section.
 //    val dragDropState = rememberDragDropState(onSwap)
     var list:List<String> by remember { mutableStateOf(data?.items ?: PageData().items) }
+    LaunchedEffect(
+        key1 = data
+    ) {
+        list = data?.items ?: PageData().items
+    }
     var areYouSureToRemove:Boolean by remember { mutableStateOf(false) }
     var toRemove:Int by remember { mutableStateOf(-1) }
 
@@ -319,6 +324,7 @@ fun EditPageItems(
                 state = lazyListState,
             ) {
                 LazyVerticalGrid(
+                    modifier = Modifier.fillMaxSize(),
                     state = lazyListState,
                     columns = when(pageData.gridType){
                         PageGridType.Default -> GridCells.Fixed(if(isCompact) pageData.cellCount else pageData.cellCountLandscape)
@@ -592,6 +598,7 @@ fun EditPageItems(
                 state = lazyColumnState
             ) {
                 LazyColumn(
+                    modifier = Modifier.fillMaxSize(),
                     state = lazyColumnState
                 ) {
                     item(
@@ -690,7 +697,7 @@ fun EditPageItems(
                                 ),
                                 DropdownMenuOptions(
                                     key = "remove",
-                                    label = stringResource(R.string.action_move_bottom),
+                                    label = stringResource(R.string.action_remove),
                                     onClick = {
                                         askRemoveItemFromHereIndex(list.indexOf(it))
                                     },

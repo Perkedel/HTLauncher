@@ -71,7 +71,7 @@ fun OutlinedText(
     style: TextStyle = LocalTextStyle.current,
     onTextLayout: ((TextLayoutResult) -> Unit)? = null,
     outlineDrawStyle: Stroke = Stroke(
-        width = 10f,
+        width = 8f,
         miter = 5f,
         join = StrokeJoin.Round,
     ),

@@ -152,15 +152,15 @@ fun ItemCell(
 
     // DONE:
     if(readTheItemData != null){
-        Log.d("ItemCell", "Injecting ${readTheItemData}")
+//        Log.d("ItemCell", "Injecting ${readTheItemData}")
         itemOfIt = readTheItemData
     } else {
-        Log.d("ItemCell", "Instead File $readTheItemFile")
+//        Log.d("ItemCell", "Instead File $readTheItemFile")
         if (uiState.itemList.contains(readTheItemFile) && uiState.itemList[readTheItemFile] != null) {
 //        if (uiState.itemList.contains(readTheItemFile) && uiState.itemList[readTheItemFile] != null) {
 //        if(uiState.selectedSaveDir != null){
 //            itemOfIt = uiState.itemList[readTheItemFile]!!
-            Log.d("ItemCell", "Reading ${readTheItemFile}")
+//            Log.d("ItemCell", "Reading ${readTheItemFile}")
             itemOfIt = viewModel.getItemData(
                 readTheItemFile,
                 json = json,

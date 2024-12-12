@@ -83,39 +83,51 @@ fun FirstPageCard(
         if(isCompact) {
             Row(
                 modifier = Modifier
+                    .padding(8.dp)
+                ,
+                verticalAlignment = Alignment.CenterVertically,
             ) {
-                Column(
-                    verticalArrangement = Arrangement.spacedBy(16.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    modifier = if (isCompact) Modifier
-                        .weight(1f)
-                    else Modifier
-                        .fillMaxHeight()
-                        .size(200.dp)
-
-                ) {
-                    Text("${handoverText} ${isOnNumberWhat} | ${currentDateAndTime}")
-
-                    // https://www.geeksforgeeks.org/text-clock-in-android-using-jetpack-compose/
-//                AndroidView(
-//                    factory = { context ->
-//                        TextClock(context).apply {
-//                            // on below line we are setting 12 hour format.
-////                            format12Hour?.let { this.format12Hour = "hh:mm:ss a" }
-//                            format24Hour?.let { this.format24Hour = "hh:mm:ss a" }
-//                            // on below line we are setting time zone.
-//                            timeZone?.let { this.timeZone = it }
-//                            // on below line we are setting text size.
-////                            textSize.let { this.textSize = 30f }
-//                            // pls format text
-////                            textColors.let {this.textColors =  }
-//                        }
-//                    },
-//                    modifier = Modifier.padding(5.dp),
-//                )
-
-                    // bottom the more menu?
-                }
+//                Column(
+////                    verticalArrangement = Arrangement.spacedBy(16.dp),
+//                    verticalArrangement = Arrangement.Center,
+//                    horizontalAlignment = Alignment.CenterHorizontally,
+//                    modifier = if (isCompact) Modifier
+//                        .weight(1f)
+//                    else Modifier
+//                        .fillMaxHeight()
+//                        .size(200.dp)
+//
+//                ) {
+////                    Text("${handoverText} ${isOnNumberWhat} | ${currentDateAndTime}")
+//
+//                    // https://www.geeksforgeeks.org/text-clock-in-android-using-jetpack-compose/
+////                AndroidView(
+////                    factory = { context ->
+////                        TextClock(context).apply {
+////                            // on below line we are setting 12 hour format.
+//////                            format12Hour?.let { this.format12Hour = "hh:mm:ss a" }
+////                            format24Hour?.let { this.format24Hour = "hh:mm:ss a" }
+////                            // on below line we are setting time zone.
+////                            timeZone?.let { this.timeZone = it }
+////                            // on below line we are setting text size.
+//////                            textSize.let { this.textSize = 30f }
+////                            // pls format text
+//////                            textColors.let {this.textColors =  }
+////                        }
+////                    },
+////                    modifier = Modifier.padding(5.dp),
+////                )
+//                    // bottom the more menu?
+//                }
+                HTViewClock(
+                    modifier = Modifier.padding(4.dp),
+                )
+                Spacer(
+                    modifier = Modifier.weight(1f)
+                )
+                HTBatteryLevel(
+                    circular = true,
+                )
                 IconButton(
                     onClick = {
                         view.playSoundEffect(SoundEffectConstants.CLICK)
@@ -139,6 +151,7 @@ fun FirstPageCard(
                 else Modifier
                     .fillMaxHeight()
                     .size(200.dp)
+                    .padding(8.dp,0.dp)
             ) {
                 if(moreMenuOnTop){
                     HTButton(
@@ -153,7 +166,9 @@ fun FirstPageCard(
                     )
                 }
                 Text("CLOCK")
-                Text("BAT")
+                HTBatteryLevel(
+                    circular = false,
+                )
                 Text("SIGNAL")
                 Spacer(
                     modifier = Modifier
