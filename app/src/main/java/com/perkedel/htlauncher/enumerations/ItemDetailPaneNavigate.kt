@@ -5,4 +5,5 @@ enum class ItemDetailPaneNavigate(val naming:String = ""){
     None(naming = ""),
     EditingAction(naming = "EditingAction"),
     ReorderItems(naming = "ReorderItems"),
+    ReorderPages(naming = "ReorderPages"),
 }

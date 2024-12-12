@@ -36,7 +36,9 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.DragHandle
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
@@ -50,12 +52,16 @@ import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -89,16 +95,21 @@ import com.perkedel.htlauncher.enumerations.PageGridType
 import com.perkedel.htlauncher.enumerations.PageViewStyle
 import com.perkedel.htlauncher.func.WindowInfo
 import com.perkedel.htlauncher.func.rememberWindowInfo
+import com.perkedel.htlauncher.ui.dialog.HTAlertDialog
 import com.perkedel.htlauncher.ui.previews.HTPreviewAnnotations
 import com.perkedel.htlauncher.ui.theme.HTLauncherTheme
 import com.perkedel.htlauncher.ui.theme.rememberColorScheme
 import com.perkedel.htlauncher.widgets.HTButton
 import com.perkedel.htlauncher.widgets.OutlinedText
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
 import my.nanihadesuka.compose.LazyColumnScrollbar
 import my.nanihadesuka.compose.LazyVerticalGridScrollbar
 import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.rememberReorderableLazyGridState
 import sh.calvin.reorderable.rememberReorderableLazyListState
+import kotlin.coroutines.coroutineContext
 
 @Composable
 fun EditPageItems(
@@ -111,6 +122,7 @@ fun EditPageItems(
 //    onSwap: (Int, Int) -> Unit = { i: Int, i1: Int -> },
     onSwap: (List<String>) -> Unit = {},
     onClose: () -> Unit = {},
+    onTryAdd: () -> Unit = {},
     view: View = LocalView.current,
     haptic: HapticFeedback = LocalHapticFeedback.current,
     viewModel: ItemEditorViewModel = viewModel(),
@@ -120,6 +132,8 @@ fun EditPageItems(
     configuration: Configuration = LocalConfiguration.current,
     isCompact: Boolean = windowInfo.screenWidthInfo is WindowInfo.WindowType.Compact,
     isOrientation: Int = configuration.orientation,
+    snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
+    coroutineScope: CoroutineScope = rememberCoroutineScope(),
 ) {
     // https://medium.com/@mousaieparniyan/building-a-draggable-lazy-column-in-jetpack-compose-372e4783d964
     // https://dev.to/mardsoul/how-to-create-lazycolumn-with-drag-and-drop-elements-in-jetpack-compose-part-1-4bn5
@@ -129,6 +143,8 @@ fun EditPageItems(
     // https://github.com/Calvin-LL/Reorderable?tab=readme-ov-file#complete-example-with-haptic-feedback and with this section.
 //    val dragDropState = rememberDragDropState(onSwap)
     var list:List<String> by remember { mutableStateOf(data?.items ?: PageData().items) }
+    var areYouSureToRemove:Boolean by remember { mutableStateOf(false) }
+    var toRemove:Int by remember { mutableStateOf(-1) }
 
     viewModel.saveDirUri?.let {
         htViewModel.selectSaveDirUri(it)
@@ -136,6 +152,41 @@ fun EditPageItems(
 
     val lazyListState = rememberLazyGridState()
     val lazyColumnState = rememberLazyListState()
+    val addItemToHere:(String,Boolean) -> Unit = { name:String, intoTop:Boolean ->
+        list = list.toMutableList().apply {
+            add(if(intoTop) 0 else list.size-1, name)
+        }
+
+        onSwap(list)
+        data?.copy(
+            items = list
+        )?.let { onRebuild(it) }
+    }
+    val removeItemFromHere: (String)->Unit = { name:String ->
+        if(toRemove >= 0) {
+            list = list.toMutableList().apply {
+                remove(name)
+            }
+
+            onSwap(list)
+            data?.copy(
+                items = list
+            )?.let { onRebuild(it) }
+        }
+    }
+    val removeItemFromHereIndex: (Int)-> Unit = {
+        list = list.toMutableList().apply {
+            removeAt(it)
+        }
+        onSwap(list)
+        data?.copy(
+            items = list
+        )?.let { onRebuild(it) }
+    }
+    val askRemoveItemFromHereIndex:(Int)->Unit = {
+        toRemove = it
+        areYouSureToRemove = true
+    }
     val moveItemToWhere:(String,Int)->Unit = { whichIs:String, intoRelative:Int ->
         list = list.toMutableList().apply{
 
@@ -239,12 +290,26 @@ fun EditPageItems(
         Card(
             modifier = Modifier.fillMaxWidth()
         ) {
-            HTButton(
-                modifier = Modifier.fillMaxWidth(),
-                title = stringResource(R.string.action_close),
-                leftIcon = Icons.Default.Check,
-                onClick = onClose
-            )
+            Row {
+                HTButton(
+                    modifier = Modifier,
+                    title = stringResource(R.string.action_close),
+                    leftIcon = Icons.Default.Check,
+                    onClick = onClose
+                )
+                Spacer(
+                    modifier = Modifier.weight(1f)
+                )
+                HTButton(
+                    modifier = Modifier,
+                    title = stringResource(R.string.action_add),
+                    rightIcon = Icons.Default.Add,
+                    onClick = {
+                        onTryAdd()
+                    }
+                )
+            }
+
         }
     }
 
@@ -308,6 +373,14 @@ fun EditPageItems(
                                                 label = context.resources.getString(R.string.action_move_bottom_detailed,list[it]),
                                                 action = {
                                                     moveItemToExtreme(list[it],false)
+                                                    true
+                                                }
+                                            ),
+                                            CustomAccessibilityAction(
+                                                label = context.resources.getString(R.string.action_remove_detailed,list[it]),
+                                                action = {
+//                                                    removeItemFromHereIndex(it)
+                                                    askRemoveItemFromHereIndex(it)
                                                     true
                                                 }
                                             ),
@@ -408,6 +481,14 @@ fun EditPageItems(
                                                                 moveItemToExtreme(list[it],true)
                                                             },
                                                             icon = Icons.Default.VerticalAlignBottom
+                                                        ),
+                                                        DropdownMenuOptions(
+                                                            key = "remove",
+                                                            label = stringResource(R.string.action_remove),
+                                                            onClick = {
+                                                                askRemoveItemFromHereIndex(it)
+                                                            },
+                                                            icon = Icons.Default.Delete
                                                         ),
                                                     )
                                                     Spacer(
@@ -556,6 +637,13 @@ fun EditPageItems(
                                                 true
                                             }
                                         ),
+                                        CustomAccessibilityAction(
+                                            label = context.resources.getString(R.string.action_remove_detailed,it),
+                                            action = {
+                                                askRemoveItemFromHereIndex(list.indexOf(it))
+                                                true
+                                            }
+                                        ),
                                     )
                                 }
                             ,
@@ -599,6 +687,14 @@ fun EditPageItems(
                                         moveItemToExtreme(it,false)
                                     },
                                     icon = Icons.Default.VerticalAlignBottom
+                                ),
+                                DropdownMenuOptions(
+                                    key = "remove",
+                                    label = stringResource(R.string.action_move_bottom),
+                                    onClick = {
+                                        askRemoveItemFromHereIndex(list.indexOf(it))
+                                    },
+                                    icon = Icons.Default.Delete
                                 ),
                             )
                             val elevation by animateDpAsState(if (isDragging) 4.dp else 0.dp,
@@ -698,7 +794,42 @@ fun EditPageItems(
                 columnViewStyle(data)
             }
         }
-
+    }
+    if(areYouSureToRemove) {
+        if (toRemove >= 0) {
+            HTAlertDialog(
+                title = stringResource(R.string.remove_dialog_title, list[toRemove]),
+                context = context,
+                text = "${
+                    stringResource(
+                        R.string.remove_dialog_content,
+                        list[toRemove]
+                    )
+                }\n${stringResource(R.string.will_not_delete_item_itself)}",
+                onDismissRequest = {
+                    areYouSureToRemove = false
+                    toRemove = -1
+                },
+                onConfirm = {
+                    removeItemFromHereIndex(toRemove)
+                    areYouSureToRemove = false
+                    toRemove = -1
+                }
+            )
+        } else {
+            LaunchedEffect(
+                key1 = toRemove,
+                key2 = areYouSureToRemove
+            ) {
+                coroutineScope.launch {
+                    snackbarHostState.showSnackbar(
+                        message = context.resources.getString(R.string.not_found, list[toRemove]),
+                        duration = SnackbarDuration.Short
+                    )
+                }
+            }
+            areYouSureToRemove = false
+        }
     }
 }
 

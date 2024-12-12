@@ -1,4 +1,4 @@
-@file:OptIn(ExperimentalMaterial3AdaptiveApi::class)
+@file:OptIn(ExperimentalMaterial3AdaptiveApi::class, FlowPreview::class)
 
 package com.perkedel.htlauncher.data.viewmodels
 
@@ -25,6 +25,7 @@ import com.perkedel.htlauncher.enumerations.EditWhich
 import com.perkedel.htlauncher.enumerations.ItemDetailPaneNavigate
 import com.perkedel.htlauncher.enumerations.ItemExtraPaneNavigate
 import com.perkedel.htlauncher.func.AsyncService
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
@@ -48,6 +49,39 @@ class ItemEditorViewModel(
 
     var filename: String? by mutableStateOf(null)
     var rawContent: String? by mutableStateOf(null)
+
+    // Search
+    val _searchInTheWild = MutableStateFlow("")
+    val searchInTheWild = _searchInTheWild.asStateFlow()
+    val _isSearchingInTheWild = MutableStateFlow(false)
+    val isSearchingInTheWild = _isSearchingInTheWild.asStateFlow()
+    val _wildList = MutableStateFlow(listOf<String>())
+    val wildList = searchInTheWild
+        .debounce(1500L)
+        .onEach { _isSearchingInTheWild.update { true } }
+        .combine(_wildList){ text, wild ->
+            if(text.isBlank()){
+                wild
+            } else {
+                wild.filter {
+                    it.contains(text)
+                }
+            }
+        }
+        .stateIn(
+            viewModelScope,
+            SharingStarted.WhileSubscribed(5000L),
+            _wildList.value
+        )
+    fun updateWildList(with:List<String>){
+        _wildList.value = with
+    }
+    fun updateSearchInTheWild(with: String){
+        _searchInTheWild.value = with
+    }
+    fun updateIsSearchingInTheWild(with: Boolean){
+        _isSearchingInTheWild.value = with
+    }
 
     // TypedEdit
     var itemData: ItemData? by mutableStateOf(null)

@@ -7,32 +7,20 @@
 
 package com.perkedel.htlauncher.ui.activities
 
-import android.content.ClipData.Item
 import android.content.ContentResolver
 import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
-import android.graphics.pdf.PdfDocument.Page
 import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material3.AssistChip
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -45,10 +33,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavHost
-import coil3.Uri as CoilUri
 import com.perkedel.htlauncher.HTUIState
 import com.perkedel.htlauncher.ui.bars.HTAppBar
 import com.perkedel.htlauncher.ui.previews.HTPreviewAnnotations
@@ -61,7 +46,6 @@ import android.view.View
 import android.widget.Toast
 import androidx.activity.BackEventCompat
 import androidx.activity.OnBackPressedCallback
-import androidx.activity.compose.BackHandler
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.activity.viewModels
 import androidx.compose.foundation.rememberScrollState
@@ -71,29 +55,26 @@ import androidx.compose.material.icons.filled.Save
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.adaptive.layout.ThreePaneScaffoldValue
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.adaptive.navigation.ThreePaneScaffoldNavigator
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.perkedel.htlauncher.R
 import com.perkedel.htlauncher.data.viewmodels.ItemEditorViewModel
 import com.perkedel.htlauncher.enumerations.EditWhich
 import com.perkedel.htlauncher.openATextFile
 import com.perkedel.htlauncher.ui.navigation.EditItemData
 import kotlinx.serialization.json.Json
-import javax.annotation.meta.When
-import androidx.fragment.app.FragmentActivity
-import androidx.navigation.findNavController
+import com.perkedel.htlauncher.HTViewModel
 import com.perkedel.htlauncher.data.ActionData
 import com.perkedel.htlauncher.data.HomepagesWeHave
 import com.perkedel.htlauncher.data.ItemData
@@ -104,18 +85,24 @@ import com.perkedel.htlauncher.func.WindowInfo
 import com.perkedel.htlauncher.func.rememberWindowInfo
 import com.perkedel.htlauncher.ui.dialog.HTAlertDialog
 import com.perkedel.htlauncher.ui.navigation.ActionSelectApp
+import com.perkedel.htlauncher.ui.navigation.AddIntoTheListOf
 import com.perkedel.htlauncher.ui.navigation.EditActionData
+import com.perkedel.htlauncher.ui.navigation.EditHomeData
+import com.perkedel.htlauncher.ui.navigation.EditHomePageOrders
 import com.perkedel.htlauncher.ui.navigation.EditPageData
 import com.perkedel.htlauncher.ui.navigation.EditPageItems
+import com.perkedel.htlauncher.ui.page.BasePage
 import com.perkedel.htlauncher.widgets.HTButton
 import com.perkedel.htlauncher.widgets.ItemCell
 import com.perkedel.htlauncher.writeATextFile
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.serialization.encodeToString
 import okio.IOException
 
 class ItemEditorActivity : ComponentActivity() {
 
     private val editorViewModel by viewModels<ItemEditorViewModel>()
+    private val htViewModel by viewModels<HTViewModel>()
 //    private val navigator = rememberListDetailPaneScaffoldNavigator<Any>()
 //    private val navigator: ThreePaneScaffoldNavigator<Any>
 
@@ -169,6 +156,8 @@ class ItemEditorActivity : ComponentActivity() {
 //            editorViewModel.updateEditType(editType)
             editorViewModel.updateEditType(when(editTypeName){
                 applicationContext.resources.getString(R.string.home_screen_file) -> EditWhich.Home
+                "Home" -> EditWhich.Home
+                "home" -> EditWhich.Home
                 applicationContext.resources.getString(R.string.items_folder) -> EditWhich.Items
                 applicationContext.resources.getString(R.string.pages_folder) -> EditWhich.Pages
                 applicationContext.resources.getString(R.string.medias_folder) -> EditWhich.Medias
@@ -186,6 +175,7 @@ class ItemEditorActivity : ComponentActivity() {
         }
         if(editorViewModel.saveDirUri == null){
             editorViewModel.selectSaveDirUri(saveUri)
+            htViewModel.selectSaveDirUri(editorViewModel.saveDirUri)
             Log.d("ItemEditor", "Obtained Save Dir Uri ${editorViewModel.saveDirUri}")
         }
         Log.d("ItemEditor", "Welcome to Edit File")
@@ -200,6 +190,7 @@ class ItemEditorActivity : ComponentActivity() {
                         modifier = Modifier.fillMaxSize(),
                         context = applicationContext,
                         viewModel = editorViewModel,
+                        htViewModel = htViewModel,
                         editUri = editorViewModel.uri,
                         onBack = {
                             pressBackButton()
@@ -292,8 +283,11 @@ fun ItemEditorGreeting(
     view: View = LocalView.current,
     uiState:HTUIState = HTUIState(),
     viewModel: ItemEditorViewModel = ItemEditorViewModel(),
+    coroutineScope: CoroutineScope = rememberCoroutineScope(),
+    htViewModel: HTViewModel = HTViewModel(),
     editUri:Uri? = null,
     navigator:ThreePaneScaffoldNavigator<Any> = rememberListDetailPaneScaffoldNavigator<Any>(),
+    snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
     onBack:()-> Unit = {
     },
     onSave:(Uri,ContentResolver,EditWhich, String)-> Unit = { uri, resolver, editType, content ->
@@ -521,6 +515,29 @@ fun ItemEditorGreeting(
                             }
                         }
                     )
+                    EditWhich.Home -> {
+                        EditHomeData(
+                            modifier = Modifier,
+                            viewModel = viewModel,
+                            data = viewModel.homeData,
+                            onRebuildItem = {
+                                viewModel.updateHomeData(it)
+                                viewModel.updateRawContent(json.encodeToString<HomepagesWeHave>(it))
+                            },
+                            onSelectedKey = {
+                                when(it) {
+                                    "reorder_pages" -> {
+                                        viewModel.selectDetailNavigate(ItemDetailPaneNavigate.ReorderPages)
+                                        navigator.navigateTo(
+                                            pane = ListDetailPaneScaffoldRole.Detail,
+                                            content = "Reorder Pages"
+                                        )
+                                    }
+                                    else -> {}
+                                }
+                            },
+                        )
+                    }
                     else -> {
                         Column(
                             modifier = Modifier
@@ -638,12 +655,39 @@ fun ItemEditorGreeting(
                                         }
                                     )
                                 }
+                                viewModel.itemDetailPaneNavigate == ItemDetailPaneNavigate.ReorderPages -> {
+                                    EditHomePageOrders(
+                                        modifier = Modifier.fillMaxSize(),
+                                        data = viewModel.homeData,
+                                        onClose = {
+                                            saveNow()
+                                            viewModel.selectDetailNavigate(ItemDetailPaneNavigate.Default)
+                                        },
+                                        onSwap = {
+//                                            viewModel.changePageOrders(it)
+                                        },
+                                        onRebuild = {
+                                            Log.d("RebuildHomeData","Please rebuild:\n$it")
+                                            viewModel.updateHomeData(it)
+                                            viewModel.updateRawContent(json.encodeToString<HomepagesWeHave>(it))
+                                        }
+                                    )
+                                }
                                 viewModel.editType == EditWhich.Items -> {
                                     Card(
                                         modifier = Modifier.padding(16.dp)
                                     ) {
                                         ItemCell(
                                             readTheItemData = viewModel.itemData ?: ItemData()
+                                        )
+                                    }
+                                }
+                                viewModel.editType == EditWhich.Pages -> {
+                                    Card(
+                                        modifier = Modifier.padding(16.dp)
+                                    ) {
+                                        BasePage(
+                                            pageData = viewModel.pageData,
                                         )
                                     }
                                 }
@@ -671,6 +715,28 @@ fun ItemEditorGreeting(
 //                                    viewModel.resyncItemDataAction()
                                     navigator.navigateBack()
                                 }
+                            )
+                        }
+                        viewModel.itemExtraPaneNavigate == ItemExtraPaneNavigate.AddItem -> {
+                            AddIntoTheListOf(
+                                modifier = Modifier.fillMaxSize(),
+                                viewModel = viewModel,
+                                pageData = viewModel.pageData,
+                                itemData = viewModel.itemData,
+                                homepagesWeHave = viewModel.homeData,
+                                addIntoWhich = viewModel.editType,
+                                onSelectThing = { name, which, overwrite ->
+                                    when(which){
+                                        EditWhich.Home -> {
+
+                                        }
+                                        EditWhich.Pages -> {
+
+                                        }
+                                        else -> {}
+                                    }
+                                },
+                                pm = context.packageManager,
                             )
                         }
                         else -> {

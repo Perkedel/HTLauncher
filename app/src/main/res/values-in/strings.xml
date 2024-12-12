@@ -119,6 +119,10 @@
     <string name="value_null"><i>null</i></string>
     <string name="value_unselected"><i>tidak terpilih</i></string>
     <string name="textfield_cannot_empty">Tidak boleh kosong</string>
+    <string name="remove_dialog_title">Menghapus %s</string>
+    <string name="remove_dialog_content">Yakin untuk menghapus %s?</string>
+    <string name="will_not_delete_item_itself">NB, ini tidak akan menghapus item itu sendiri.</string>
+    <string name="not_found">WERROR 404 Tidak Ditemukan %s</string>
 
     <string name="reloading_save">Konfigurasi Dimuat Ulang</string>
     <string name="save_error">Galat Menyimpan</string>
@@ -271,8 +275,13 @@
     <string name="action_move_down_detailed">Pindah %s Bawah</string>
     <string name="action_move_top_detailed">Pindah %s Teratas</string>
     <string name="action_move_bottom_detailed">Pindah %s Terbawah</string>
+    <string name="action_add">Tambah</string>
+    <string name="action_remove">Hapus</string>
+    <string name="action_decrease">Kurangi</string>
+    <string name="action_increase">Tambahkan</string>
     <string name="category_bar">Kategori</string>
     <string name="category_bar_fill">Kategori %s</string>
+    <string name="action_remove_detailed">Hapus %s</string>
 
     <!--  Internal Commmands  -->
     <string name="internal_commands_all_apps_label" translatable="true">Semua Aplikasi</string>
@@ -299,11 +308,19 @@
 
     <!--  Editor  -->
     <string name="editor_page_reorder_item">Urutkan Item</string>
-    <string name="editor_page_reorder_item_count">terdapat %d item</string>
+    <string name="editor_page_reorder_item_count">Terdapat %d Item</string>
+    <plurals name="editor_page_reorder_item_count_plural">
+        <item quantity="other">Terdapat %d Item</item>
+    </plurals>
     <string name="editor_page_view_style">Jenis Tampilan</string>
     <string name="editor_page_view_style_default">Default</string>
     <string name="editor_page_view_style_grid">Petak</string>
     <string name="editor_page_view_style_column">Kolom</string>
+    <string name="editor_home_reorder_pages">Urutkan Halaman</string>
+    <string name="editor_home_reorder_pages_count">Terdapat %d Halaman</string>
+    <plurals name="editor_home_reorder_pages_count_plural">
+        <item quantity="other">Terdapat %d Halaman</item>
+    </plurals>
 
     <!--  Purchase  -->
     <string name="purchase_offer_title">Tawaran</string>

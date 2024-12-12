@@ -279,7 +279,7 @@ fun AllAppsScreen(
                                         modifier = Modifier
                                             .size(75.dp),
                                         error = painterResource(id = R.drawable.mavrickle),
-                                        placeholder = painterResource(id = R.drawable.mavrickle),
+                                        placeholder = painterResource(id = R.drawable.placeholder),
                                     )
                                 },
 //                        title = { Text("${packList[it].applicationInfo.loadLabel(pm)}") },

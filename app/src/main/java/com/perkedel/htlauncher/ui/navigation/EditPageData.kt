@@ -34,6 +34,7 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.LocalInspectionMode
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import com.perkedel.htlauncher.R
 import com.perkedel.htlauncher.data.ActionData
@@ -104,7 +105,8 @@ fun EditPageData(
                 key = "reorder_items",
                 title = { Text(text = stringResource(R.string.editor_page_reorder_item) ) },
                 icon = { Icon(imageVector = Icons.Default.Reorder, contentDescription = null) },
-                summary = { Text(text = stringResource(R.string.editor_page_reorder_item_count, data?.items?.size ?: 0)) },
+                summary = { Text(text = pluralStringResource(R.plurals.editor_page_reorder_item_count_plural, data?.items?.size ?: 0, data?.items?.size ?: 0)) },
+//                summary = { Text(text = stringResource(R.string.editor_page_reorder_item_count, data?.items?.size ?: 0)) },
                 onClick = {
                     onSelectedKey("reorder_items")
                 }

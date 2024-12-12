@@ -1205,6 +1205,9 @@ fun Navigation(
                                         context = context,
                                         fileName = "${context.resources.getString(R.string.home_screen_file)}.json",
                                         mimeType = context.resources.getString(R.string.text_plain_type),
+                                        initData = json.encodeToString<HomepagesWeHave>(
+                                            HomepagesWeHave()
+                                        ),
                                         hardOverwrite = false,
                                     )
                                     toIntent.apply {
@@ -1215,8 +1218,8 @@ fun Navigation(
                                     )
                                     toIntent.putExtra(Intent.EXTRA_STREAM, theUri)
 //                                toIntent.putExtra("editType", editType as? Parcelable)
-                                    toIntent.putExtra("editType", context.resources.getString(R.string.home_screen_file))
-                                    toIntent.putExtra("editTypeName",context.resources.getString(R.string.home_screen_file))
+                                    toIntent.putExtra("editType", EditWhich.Home.name)
+                                    toIntent.putExtra("editTypeName",EditWhich.Home.name)
                                     toIntent.putExtra("filename",context.resources.getString(R.string.home_screen_file))
                                     toIntent.putExtra("fileName",context.resources.getString(R.string.home_screen_file))
                                     startIntent(

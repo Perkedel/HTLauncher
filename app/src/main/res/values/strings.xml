@@ -41,6 +41,11 @@
     <string name="action_move_down_detailed">Move %s Down</string>
     <string name="action_move_top_detailed">Move %s Top</string>
     <string name="action_move_bottom_detailed">Move %s Bottom</string>
+    <string name="action_add">Add</string>
+    <string name="action_remove">Remove</string>
+    <string name="action_decrease">Decrease</string>
+    <string name="action_increase">Increase</string>
+    <string name="action_remove_detailed">Remove %s</string>
 
     <!--  Home Screen  -->
     <string name="home_screen">Home</string>
@@ -171,6 +176,10 @@
     <string name="save_success">Saved</string>
     <string name="error_unknown_reason">idk why</string>
     <string name="textfield_cannot_empty">Cannot be empty</string>
+    <string name="remove_dialog_title">Removing %s</string>
+    <string name="remove_dialog_content">Are you sure to remove %s?</string>
+    <string name="will_not_delete_item_itself">Note, this will not delete the item itself.</string>
+    <string name="not_found">WERROR 404 Not Found %s</string>
 
     <string name="menu_home">Home</string>
     <string name="menu_gallery">Gallery</string>
@@ -352,10 +361,22 @@
     <!--  Editor  -->
     <string name="editor_page_reorder_item">Reorder Items</string>
     <string name="editor_page_reorder_item_count">There are %d items</string>
+    <plurals name="editor_page_reorder_item_count_plural">
+        <item quantity="zero">There are %d item</item>
+        <item quantity="one">There is %d item</item>
+        <item quantity="other">There are %d items</item>
+    </plurals>
     <string name="editor_page_view_style">View Style</string>
     <string name="editor_page_view_style_default">Default</string>
     <string name="editor_page_view_style_grid">Grid</string>
     <string name="editor_page_view_style_column">Column</string>
+    <string name="editor_home_reorder_pages">Reorder Pages</string>
+    <string name="editor_home_reorder_pages_count">There are %d Pages</string>
+    <plurals name="editor_home_reorder_pages_count_plural">
+        <item quantity="zero">There are %d Page</item>
+        <item quantity="one">There is %d Page</item>
+        <item quantity="other">There are %d Pages</item>
+    </plurals>
 
     <!--  filetype  -->
     <string name="text_plain_type" translatable="false">text/plain</string>
