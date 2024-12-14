@@ -51,6 +51,7 @@ import com.perkedel.htlauncher.R
 import com.perkedel.htlauncher.enumerations.ButtonTypes
 import com.perkedel.htlauncher.func.WindowInfo
 import com.perkedel.htlauncher.func.rememberWindowInfo
+import com.perkedel.htlauncher.ui.previews.HTPreviewAnnotations
 import com.perkedel.htlauncher.ui.theme.HTLauncherTheme
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -145,7 +146,7 @@ fun FirstPageCard(
             }
         } else {
             Column(
-                verticalArrangement = Arrangement.spacedBy(16.dp),
+//                verticalArrangement = Arrangement.spacedBy(16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = if (isCompact) Modifier
                     .weight(1f)
@@ -174,6 +175,7 @@ fun FirstPageCard(
                 )
                 HTSignalStrength(
                     showNumbers = true,
+                    showCarrier = true,
                 )
                 Spacer(
                     modifier = Modifier
@@ -197,11 +199,12 @@ fun FirstPageCard(
     }
 }
 
-@PreviewFontScale
-@PreviewLightDark
-@PreviewScreenSizes
-@PreviewDynamicColors
-@Preview(showBackground = true)
+//@PreviewFontScale
+//@PreviewLightDark
+//@PreviewScreenSizes
+//@PreviewDynamicColors
+//@Preview(showBackground = true)
+@HTPreviewAnnotations
 @Composable
 fun FirstPageCardPreview(){
     HTLauncherTheme {

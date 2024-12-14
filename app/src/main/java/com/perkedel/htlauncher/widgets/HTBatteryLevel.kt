@@ -89,6 +89,9 @@ fun HTBatteryLevel(
     // https://stackoverflow.com/questions/75579909/how-can-i-update-the-value-i-draw-with-jetpack-compose
     var batteryLevel:Int by remember { mutableStateOf(70) }
     var isCharging:Boolean by remember { mutableStateOf(true) }
+    var temperature:Int by remember { mutableStateOf(30) }
+    var isOverheated:Boolean by remember { mutableStateOf(false) }
+    var chargeRemaining:Long = 0L
     SystemBroadcastReceiver(Intent.ACTION_BATTERY_CHANGED) { batteryStatus ->
         val batteryPct: Float? = batteryStatus?.let { intent ->
             val level: Int = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, -1)
@@ -102,6 +105,8 @@ fun HTBatteryLevel(
                 intent.getIntExtra(BatteryManager.EXTRA_PLUGGED, -1) == BatteryManager.BATTERY_PLUGGED_AC
             }
         }
+        temperature = batteryStatus?.getIntExtra(BatteryManager.EXTRA_TEMPERATURE, 0) ?: 0
+//        chargeRemaining =
         isCharging = isChargingGet ?: false
         batteryLevel = batteryPct!!.toInt()
     }
@@ -268,7 +273,11 @@ fun HTBatteryLevel(
 //                            width = 1f,
 //                        )
 //                    )
-                    Icon(Icons.Default.ElectricBolt,"")
+                    Icon(
+                        imageVector = Icons.Default.ElectricBolt,
+                        contentDescription = "",
+                        tint = textFillColor
+                    )
                 }
                 OutlinedText(
                     text = "${batteryLevel}",

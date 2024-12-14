@@ -124,6 +124,7 @@ class HTViewModel(
 
         viewModelScope.launch {
             setIsReady(into = false)
+            var initing:Boolean = uiStating.inited
             if(force){
                 // clear everything
                 uiStating.pageList.clear()
@@ -131,6 +132,7 @@ class HTViewModel(
 //                uiStating.coreConfig = null
 //                uiStating.coreConfigJson = null
                 uiStating.inited = false
+                initing = false
             }
 
 //        val launch = viewModelScope.launch {
@@ -142,235 +144,249 @@ class HTViewModel(
             // You must Folders!!
             val homeSafData:HomepagesWeHave = HTLauncherHardcodes.HOMESCREEN_FILE
             var homeSafFileUri:Uri = Uri.EMPTY
-            if(uiStating.selectedSaveDir != null && uiStating.selectedSaveDir.toString().isNotEmpty()){
-                for(a in listOfFolder){
-                    folders[a] = getADirectory(uiStating.selectedSaveDir!!, context, a)
-                    Log.d("FolderQuery", "Folder ${folders[a]} queried")
-                }
-                for(i in folders){
-                    Log.d("InitFileLoader","Folder ${i.key} we have ${i.value}")
-                }
+            if(!initing) {
+                if (uiStating.selectedSaveDir != null && uiStating.selectedSaveDir.toString()
+                        .isNotEmpty()
+                ) {
+                    for (a in listOfFolder) {
+                        folders[a] = getADirectory(uiStating.selectedSaveDir!!, context, a)
+                        Log.d("FolderQuery", "Folder ${folders[a]} queried")
+                    }
+                    for (i in folders) {
+                        Log.d("InitFileLoader", "Folder ${i.key} we have ${i.value}")
+                    }
 //            getADirectory(htuiState.selectedSaveDir!!, context, "Items")
 //            getADirectory(htuiState.selectedSaveDir!!, context, "Themes")
 //            getADirectory(htuiState.selectedSaveDir!!, context, "Medias")
 
 
-                val homeSaf:String = json.encodeToString<HomepagesWeHave>(homeSafData)
-                homeSafFileUri = getATextFile(
-                    dirUri = uiStating.selectedSaveDir!!,
-                    context = context,
-                    fileName = "${context.resources.getString(R.string.home_screen_file)}.json",
-                    initData = homeSaf,
-                    hardOverwrite = true,
-                )
-                Log.d("InitFileLoader", "Pls Homescreen ${homeSafFileUri}:\n${homeSaf}")
-                setHomeScreenJson(
-                    homeSafFileUri
-                )
-                setHomeScreenJson(
-                    homeSafFileUri
-                )
-                Log.d("InitFileLoader", "Pls the file Homescreen ${uiStating.coreConfig} fill ${homeSafFileUri}")
+                    val homeSaf: String = json.encodeToString<HomepagesWeHave>(homeSafData)
+                    homeSafFileUri = getATextFile(
+                        dirUri = uiStating.selectedSaveDir!!,
+                        context = context,
+                        fileName = "${context.resources.getString(R.string.home_screen_file)}.json",
+                        initData = homeSaf,
+                        hardOverwrite = true,
+                    )
+                    Log.d("InitFileLoader", "Pls Homescreen ${homeSafFileUri}:\n${homeSaf}")
+                    setHomeScreenJson(
+                        homeSafFileUri
+                    )
+                    setHomeScreenJson(
+                        homeSafFileUri
+                    )
+                    Log.d(
+                        "InitFileLoader",
+                        "Pls the file Homescreen ${uiStating.coreConfig} fill ${homeSafFileUri}"
+                    )
 
 
-            } else {
-                Log.d("InitFileLoader", "Save Dir Not Selected")
+                } else {
+                    Log.d("InitFileLoader", "Save Dir Not Selected")
+                }
             }
 
-
-            if(uiStating.selectedSaveDir != null && uiStating.selectedSaveDir.toString().isNotEmpty()) {
-                // https://dev.to/vtsen/how-to-debug-jetpack-compose-recomposition-with-logging-k7g
-                // https://developer.android.com/reference/android/util/Log
-                // https://stackoverflow.com/a/74044617/9079640
-                Log.d("DebugHomescreen", "Will check ${uiStating.selectedSaveDir}, the ${homeSafFileUri}")
-                if (homeSafFileUri.toString().isNotEmpty()) {
+            if(!initing) {
+                if (uiStating.selectedSaveDir != null && uiStating.selectedSaveDir.toString()
+                        .isNotEmpty()
+                ) {
+                    // https://dev.to/vtsen/how-to-debug-jetpack-compose-recomposition-with-logging-k7g
+                    // https://developer.android.com/reference/android/util/Log
+                    // https://stackoverflow.com/a/74044617/9079640
+                    Log.d(
+                        "DebugHomescreen",
+                        "Will check ${uiStating.selectedSaveDir}, the ${homeSafFileUri}"
+                    )
+                    if (homeSafFileUri.toString().isNotEmpty()) {
 //                if (uiStating.coreConfig != null && uiStating.coreConfig.toString().isNotEmpty()) {
-                    Log.d("DebugHomescreen", "There is something!")
-                    val fileStream:String = openATextFile(
-                        uri = homeSafFileUri,
+                        Log.d("DebugHomescreen", "There is something!")
+                        val fileStream: String = openATextFile(
+                            uri = homeSafFileUri,
 //                        uri = uiStating.coreConfig!!,
-                        contentResolver = contentResolver
-                    )
-                    Log.d("DebugHomescreen", "It contains:\n${fileStream}")
-                    loadHomeScreenJsonElements(
-                        json.decodeFromString<HomepagesWeHave>(
-                            fileStream
+                            contentResolver = contentResolver
                         )
-                    )
+                        Log.d("DebugHomescreen", "It contains:\n${fileStream}")
+                        loadHomeScreenJsonElements(
+                            json.decodeFromString<HomepagesWeHave>(
+                                fileStream
+                            )
+                        )
+                    } else {
+                        Log.d("DebugHomescreen", "There is nothing!")
+                        loadHomeScreenJsonElements(
+                            homeSafData
+                        )
+                    }
                 } else {
-                    Log.d("DebugHomescreen", "There is nothing!")
+                    // DONE: when not select, add dummy demo page
+                    Log.d("DebugHomescreen", "Literally nothing!")
                     loadHomeScreenJsonElements(
                         homeSafData
                     )
                 }
-            } else {
-                // DONE: when not select, add dummy demo page
-                Log.d("DebugHomescreen", "Literally nothing!")
-                loadHomeScreenJsonElements(
-                    homeSafData
-                )
             }
 
             // Load Pages & Items
-            if(uiStating.testPreloadAll && uiStating.coreConfigJson != null && folders[context.resources.getString(R.string.pages_folder)] != null){
-                var pageFolder:Uri = getADirectory(
-                    dirUri = uiStating.selectedSaveDir!!,
-                    context = context,
-                    dirName = context.resources.getString(R.string.pages_folder)
-                )
-                val pageFiles:List<DocumentFile> = DocumentFile.fromTreeUri(context,pageFolder)?.listFiles()?.toList() ?: emptyList()
-                var pageFileNames:List<String> = pageFiles.map { removeDotExtensions(it.name ?: "") }.toList()
+            if(!initing){
+                if(uiStating.testPreloadAll && uiStating.coreConfigJson != null && folders[context.resources.getString(R.string.pages_folder)] != null){
+                    var pageFolder:Uri = getADirectory(
+                        dirUri = uiStating.selectedSaveDir!!,
+                        context = context,
+                        dirName = context.resources.getString(R.string.pages_folder)
+                    )
+                    val pageFiles:List<DocumentFile> = DocumentFile.fromTreeUri(context,pageFolder)?.listFiles()?.toList() ?: emptyList()
+                    var pageFileNames:List<String> = pageFiles.map { removeDotExtensions(it.name ?: "") }.toList()
 //                var pageFileNames:List<String> = pageFiles.map { it.name?.substring(0, it.name?.lastIndexOf('.') ?: 0) ?: "" }.toList()
 //                var pageFileNames:List<String> = pageFiles.map { it.name ?: "" }.toList()
-                // but also pls add the built-in things!
+                    // but also pls add the built-in things!
 
 
-                val itemFolder:Uri = getADirectory(
-                    dirUri = uiStating.selectedSaveDir!!,
-                    context = context,
-                    dirName = context.resources.getString(R.string.items_folder)
-                )
-                val itemFiles:List<DocumentFile> = DocumentFile.fromTreeUri(context,itemFolder)?.listFiles()?.toList() ?: emptyList()
-                val itemFileNames:List<String> = itemFiles.map { removeDotExtensions(it.name ?: "") }.toList()
+                    val itemFolder:Uri = getADirectory(
+                        dirUri = uiStating.selectedSaveDir!!,
+                        context = context,
+                        dirName = context.resources.getString(R.string.items_folder)
+                    )
+                    val itemFiles:List<DocumentFile> = DocumentFile.fromTreeUri(context,itemFolder)?.listFiles()?.toList() ?: emptyList()
+                    val itemFileNames:List<String> = itemFiles.map { removeDotExtensions(it.name ?: "") }.toList()
 //                val itemFileNames:List<String> = itemFiles.map { it.name?.substring(0, it.name?.lastIndexOf('.') ?: 0) ?: "" }.toList()
 
-                // fill rest
-                Log.d("FolderQuery","Loading Rest of the items now!")
-                // https://medium.com/@cepv2010/how-to-easily-choose-files-in-android-compose-28f4637d1c21 not this
-                // https://medium.easyread.co/android-data-and-file-storage-cheatsheet-for-media-95f7f66080e3 not that
-                for(i in pageFiles){
-                    Log.d("PageQuery","Check $i")
-                    val pageingUri:Uri = getATextFile(
-                        dirUri = folders[context.resources.getString(R.string.pages_folder)]!!,
-                        context = context,
-                        initData = json.encodeToString<PageData>(PageData(
-                            name = i.name?.replaceAfterLast(".json","") ?: "anItem"
-                        )),
-                        fileName = i.name ?: "",
-//                            fileName = i,
-                        hardOverwrite = false,
-                    )
-                    try {
-                        val pageingData:PageData = json.decodeFromString<PageData>(
-                            openATextFile(
-                                uri = pageingUri,
-                                contentResolver = contentResolver,
-                            )
-                        )
-                        uiStating.pageList[pageingData.name] = pageingData
-                    } catch (e: Exception) {
-//                        Log.d("PageQuery","Error $e")
-                    }
-                }
-                for(i in itemFiles){
-                    Log.d("ItemQuery","Check $i")
-                    val itemingUri:Uri = getATextFile(
-                        dirUri = folders[context.resources.getString(R.string.items_folder)]!!,
-                        context = context,
-                        initData = json.encodeToString<ItemData>(ItemData(
-                            name = i.name?.replaceAfterLast(".json","") ?: "anItem"
-                        )),
-                        fileName = i.name ?: "",
-                        hardOverwrite = false,
-                    )
-                    try {
-                        val itemingData:ItemData = json.decodeFromString<ItemData>(
-                            openATextFile(
-                                uri = itemingUri,
-                                contentResolver = contentResolver,
-                            )
-                        )
-                        uiStating.itemList[itemingData.name] = itemingData
-                    } catch (e: Exception) {
-//                        Log.d("ItemQuery","Error $e")
-                    }
-                }
-
-                // in page
-                Log.d("OnQuery","Now checking files now!")
-                for(i in uiStating.coreConfigJson!!.pagesPath){
-//                for(i in pageFileNames){
-                    Log.d("PageLoader","Checking page ${i}")
-                    Log.d("PageLoader","Eval context ${context}")
-                    Log.d("PageLoader","Eval resource name ${context.resources.getString(R.string.pages_folder)}")
-                    Log.d("PageLoader","Eval dirUri ${folders[context.resources.getString(R.string.pages_folder)]}")
-
-                    val predeterminedPage: PageData = when(i){
-                        context.resources.getString(R.string.home_screen_page_file) -> HTLauncherHardcodes.HOMEPAGE_FILE
-                        "Settings" -> HTLauncherHardcodes.SETTINGS_PAGE_FILE
-                        else -> PageData(
-                            name = i,
-                            isHome = i.contains("Home")
-                        )
-                    }
-                    var aPage: PageData = predeterminedPage
-
-                    if(uiStating.pageList.contains(i) && uiStating.pageList[i] != null){
-                        Log.d("PageLoader", "Already Exist ${uiStating.itemList[i]}")
-                        aPage = uiStating.pageList[i]!!
-                    } else {
-                        val aPageUri: Uri = getATextFile(
+                    // fill rest
+                    Log.d("FolderQuery","Loading Rest of the items now!")
+                    // https://medium.com/@cepv2010/how-to-easily-choose-files-in-android-compose-28f4637d1c21 not this
+                    // https://medium.easyread.co/android-data-and-file-storage-cheatsheet-for-media-95f7f66080e3 not that
+                    for(i in pageFiles){
+                        Log.d("PageQuery","Check $i")
+                        val pageingUri:Uri = getATextFile(
                             dirUri = folders[context.resources.getString(R.string.pages_folder)]!!,
                             context = context,
-                            initData = json.encodeToString<PageData>(predeterminedPage),
-                            fileName = "$i.json",
+                            initData = json.encodeToString<PageData>(PageData(
+                                name = i.name?.replaceAfterLast(".json","") ?: "anItem"
+                            )),
+                            fileName = i.name ?: "",
 //                            fileName = i,
                             hardOverwrite = false,
                         )
-                        Log.d("PageLoader", "Page URI in total ${aPageUri}")
-                        aPage = json.decodeFromString<PageData>(
-                            openATextFile(
-                                uri = aPageUri,
-                                contentResolver = contentResolver,
+                        try {
+                            val pageingData:PageData = json.decodeFromString<PageData>(
+                                openATextFile(
+                                    uri = pageingUri,
+                                    contentResolver = contentResolver,
+                                )
                             )
+                            uiStating.pageList[pageingData.name] = pageingData
+                        } catch (e: Exception) {
+//                        Log.d("PageQuery","Error $e")
+                        }
+                    }
+                    for(i in itemFiles){
+                        Log.d("ItemQuery","Check $i")
+                        val itemingUri:Uri = getATextFile(
+                            dirUri = folders[context.resources.getString(R.string.items_folder)]!!,
+                            context = context,
+                            initData = json.encodeToString<ItemData>(ItemData(
+                                name = i.name?.replaceAfterLast(".json","") ?: "anItem"
+                            )),
+                            fileName = i.name ?: "",
+                            hardOverwrite = false,
                         )
+                        try {
+                            val itemingData:ItemData = json.decodeFromString<ItemData>(
+                                openATextFile(
+                                    uri = itemingUri,
+                                    contentResolver = contentResolver,
+                                )
+                            )
+                            uiStating.itemList[itemingData.name] = itemingData
+                        } catch (e: Exception) {
+//                        Log.d("ItemQuery","Error $e")
+                        }
+                    }
+
+                    // in page
+                    Log.d("OnQuery","Now checking files now!")
+                    for(i in uiStating.coreConfigJson!!.pagesPath){
+//                for(i in pageFileNames){
+                        Log.d("PageLoader","Checking page ${i}")
+                        Log.d("PageLoader","Eval context ${context}")
+                        Log.d("PageLoader","Eval resource name ${context.resources.getString(R.string.pages_folder)}")
+                        Log.d("PageLoader","Eval dirUri ${folders[context.resources.getString(R.string.pages_folder)]}")
+
+                        val predeterminedPage: PageData = when(i){
+                            context.resources.getString(R.string.home_screen_page_file) -> HTLauncherHardcodes.HOMEPAGE_FILE
+                            "Settings" -> HTLauncherHardcodes.SETTINGS_PAGE_FILE
+                            else -> PageData(
+                                name = i,
+                                isHome = i.contains("Home")
+                            )
+                        }
+                        var aPage: PageData = predeterminedPage
+
+                        if(uiStating.pageList.contains(i) && uiStating.pageList[i] != null){
+                            Log.d("PageLoader", "Already Exist ${uiStating.itemList[i]}")
+                            aPage = uiStating.pageList[i]!!
+                        } else {
+                            val aPageUri: Uri = getATextFile(
+                                dirUri = folders[context.resources.getString(R.string.pages_folder)]!!,
+                                context = context,
+                                initData = json.encodeToString<PageData>(predeterminedPage),
+                                fileName = "$i.json",
+//                            fileName = i,
+                                hardOverwrite = false,
+                            )
+                            Log.d("PageLoader", "Page URI in total ${aPageUri}")
+                            aPage = json.decodeFromString<PageData>(
+                                openATextFile(
+                                    uri = aPageUri,
+                                    contentResolver = contentResolver,
+                                )
+                            )
 //                        if (uiStating.pageList.contains(i)) {
 //                            // https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-map/contains-key.html
 //                            Log.d("PageLoader", "Key $i Exist!")
 //                        } else {
 //                            Log.d("PageLoader", "Key $i 404 NOT FOUND!")
 //                        }
-                    }
-                    uiStating.pageList[i] = aPage
+                        }
+                        uiStating.pageList[i] = aPage
 
-                    // item
-                    for (j in aPage.items) {
+                        // item
+                        for (j in aPage.items) {
 //                    for (j in itemFileNames) {
-                        Log.d("ItemLoader", "Checking item ${j}")
+                            Log.d("ItemLoader", "Checking item ${j}")
 
-                        val itemIsInternalCommand:Boolean =
-                            j == ActionInternalCommand.AllApps.name ||
-                            j == ActionInternalCommand.Camera.name ||
-                            j == ActionInternalCommand.Telephone.name ||
-                            j == ActionInternalCommand.GoToPage.name ||
-                            j == ActionInternalCommand.Gallery.name ||
-                            j == ActionInternalCommand.Clock.name ||
-                            j == ActionInternalCommand.Contacts.name ||
-                            j == ActionInternalCommand.Emergency.name ||
-                            j == context.resources.getString(ActionInternalCommand.Emergency.id) ||
-                            j == "SOS" ||
-                            j == ActionInternalCommand.Messages.name ||
-                            j == ActionInternalCommand.Settings.name ||
-                            j == ActionInternalCommand.SystemSettings.name ||
-                            j == ActionInternalCommand.Preferences.name ||
-                                    j == InternalCategories.SettingsSystem.name ||
-                                    j == InternalCategories.SettingsOverall.name
+                            val itemIsInternalCommand:Boolean =
+                                j == ActionInternalCommand.AllApps.name ||
+                                        j == ActionInternalCommand.Camera.name ||
+                                        j == ActionInternalCommand.Telephone.name ||
+                                        j == ActionInternalCommand.GoToPage.name ||
+                                        j == ActionInternalCommand.Gallery.name ||
+                                        j == ActionInternalCommand.Clock.name ||
+                                        j == ActionInternalCommand.Contacts.name ||
+                                        j == ActionInternalCommand.Emergency.name ||
+                                        j == context.resources.getString(ActionInternalCommand.Emergency.id) ||
+                                        j == "SOS" ||
+                                        j == ActionInternalCommand.Messages.name ||
+                                        j == ActionInternalCommand.Settings.name ||
+                                        j == ActionInternalCommand.SystemSettings.name ||
+                                        j == ActionInternalCommand.Preferences.name ||
+                                        j == InternalCategories.SettingsSystem.name ||
+                                        j == InternalCategories.SettingsOverall.name
 //                        Log.d("ItemLoader","Item is internal command $j")
 //                        val itemIsCategory:Boolean =
 //                            j == InternalCategories.SettingsSystem.name ||
 //                                    j == InternalCategories.SettingsOverall.name
-                        val predeterminedItem: ItemData = when{
-                            itemIsInternalCommand -> ItemData(
-                                name = j,
-                                label = j,
-                                action = listOf(
-                                    ActionData(
-                                        name = j,
-                                        action = j,
-                                        type = ActionDataLaunchType.Internal,
-                                    )
-                                ),
-                            )
+                            val predeterminedItem: ItemData = when{
+                                itemIsInternalCommand -> ItemData(
+                                    name = j,
+                                    label = j,
+                                    action = listOf(
+                                        ActionData(
+                                            name = j,
+                                            action = j,
+                                            type = ActionDataLaunchType.Internal,
+                                        )
+                                    ),
+                                )
 //                            itemIsCategory -> ItemData(
 //                                name = j,
 //                                label = j,
@@ -382,28 +398,28 @@ class HTViewModel(
 //                                    )
 //                                ),
 //                            )
-                            else -> ItemData()
-                        }
-                        var aItem: ItemData = ItemData()
+                                else -> ItemData()
+                            }
+                            var aItem: ItemData = ItemData()
 
-                        if (uiStating.itemList.contains(j) && uiStating.itemList[j] != null) {
-                            Log.d("ItemLoader", "Already Exist ${uiStating.itemList[j]}")
-                            aItem = uiStating.itemList[j]!!
-                        } else {
-                            val aItemUri: Uri = getATextFile(
-                                dirUri = folders[context.resources.getString(R.string.items_folder)]!!,
-                                context = context,
-                                initData = json.encodeToString<ItemData>(predeterminedItem),
-                                fileName = "$j.json",
+                            if (uiStating.itemList.contains(j) && uiStating.itemList[j] != null) {
+                                Log.d("ItemLoader", "Already Exist ${uiStating.itemList[j]}")
+                                aItem = uiStating.itemList[j]!!
+                            } else {
+                                val aItemUri: Uri = getATextFile(
+                                    dirUri = folders[context.resources.getString(R.string.items_folder)]!!,
+                                    context = context,
+                                    initData = json.encodeToString<ItemData>(predeterminedItem),
+                                    fileName = "$j.json",
 //                                fileName = j,
-                                hardOverwrite = true,
-                            )
-                            aItem = json.decodeFromString<ItemData>(
-                                openATextFile(
-                                    uri = aItemUri,
-                                    contentResolver = contentResolver,
+                                    hardOverwrite = true,
                                 )
-                            )
+                                aItem = json.decodeFromString<ItemData>(
+                                    openATextFile(
+                                        uri = aItemUri,
+                                        contentResolver = contentResolver,
+                                    )
+                                )
 //                            if (uiStating.itemList.contains(j)) {
 //                                // https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-map/contains-key.html
 //                                Log.d("ItemLoader", "Key $j Exist!")
@@ -411,12 +427,14 @@ class HTViewModel(
 //                                Log.d("ItemLoader", "Key $j 404 NOT FOUND!")
 //                            }
 
+                            }
+                            uiStating.itemList[j] = aItem
                         }
-                        uiStating.itemList[j] = aItem
                     }
                 }
             }
             setIsReady(into = true)
+            initing = true
             uiStating.inited = true
 //        }
         }

@@ -7,7 +7,9 @@ package com.perkedel.htlauncher.widgets
 import android.content.Context
 import android.speech.tts.TextToSpeech
 import android.widget.Toast
+import androidx.annotation.DrawableRes
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -16,6 +18,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.LteMobiledata
 import androidx.compose.material.icons.filled.QuestionMark
@@ -40,6 +43,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.hapticfeedback.HapticFeedback
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
@@ -47,6 +51,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil3.compose.AsyncImage
 import com.perkedel.htlauncher.R
 import com.perkedel.htlauncher.func.SignalStrength
 import com.perkedel.htlauncher.func.SignalType
@@ -56,6 +61,7 @@ import com.perkedel.htlauncher.modules.ttsSpeakOrStop
 import com.perkedel.htlauncher.ui.bars.HTAppBar
 import com.perkedel.htlauncher.ui.previews.HTPreviewAnnotations
 import com.perkedel.htlauncher.ui.theme.HTLauncherTheme
+import com.perkedel.htlauncher.ui.theme.rememberColorScheme
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 
@@ -65,6 +71,7 @@ fun HTSignalStrength(
     context:Context = LocalContext.current,
     forWhichSim:Int = 0,
     showNumbers:Boolean = false,
+    showCarrier:Boolean = false,
     coroutineScope: CoroutineScope = rememberCoroutineScope(),
     tts: MutableState<TextToSpeech?> = rememberTextToSpeech(),
     onClick: ()->Unit = {},
@@ -95,6 +102,15 @@ fun HTSignalStrength(
         4 -> context.resources.getString(R.string.action_signal_4)
         else -> context.resources.getString(R.string.action_signal_unknown)
     }
+    val cellBarDrawing:Int = when(signalStatus.signalLevel){
+        // wtf Google, why no these icon in extended even?!??!?!??!??!?!
+        0 -> R.drawable.sharp_signal_cellular_0_bar_24
+        1 -> R.drawable.sharp_signal_cellular_1_bar_24
+        2 -> R.drawable.sharp_signal_cellular_2_bar_24
+        3 -> R.drawable.sharp_signal_cellular_3_bar_24
+        4 -> R.drawable.sharp_signal_cellular_4_bar_24
+        else -> R.drawable.sharp_signal_cellular_null_24
+    }
     val cellNetwork:ImageVector = when(signalStatus.signalType){
         SignalType.LTE -> Icons.Default.LteMobiledata
         else -> Icons.Default.QuestionMark
@@ -108,7 +124,14 @@ fun HTSignalStrength(
 
                 },
                 onLongClick = {
-                    val readout = context.resources.getString(R.string.action_tellsignal,cellBarSay,signalStatus.signalDbm,signalStatus.signalAsu)
+                    val readout = "${context.resources.getString(R.string.action_tellcarrier, signalStatus.carrier)}, ${
+                        context.resources.getString(
+                            R.string.action_tellsignal,
+                            cellBarSay,
+                            signalStatus.signalDbm,
+                            signalStatus.signalAsu
+                        )
+                    }"
                     ttsSpeakOrStop(
                         handover = tts,
                         message = readout
@@ -123,24 +146,42 @@ fun HTSignalStrength(
                         .show()
                     onLongClick()
                 },
-            )
-        ,
+            ),
     ) {
 //        Row {
 //            Text(text = "Signal: ${signalStatus.signalLevel}\n(${signalStatus.signalDbm}, ${signalStatus.signalType.name})")
 //        }
         Row {
-            Box(){
+            Box(
+                modifier = Modifier
+//                    .size(48.dp)
+                    .sizeIn(
+                        minHeight = 0.dp,
+                        minWidth = 0.dp,
+                        maxHeight = 48.dp,
+                        maxWidth = 48.dp,
+                    )
+                ,
+            ){
                 Text(
                     text = cellNetworkSay,
 //                    fontSize = 24.sp,
                 )
-                Icon(
+//                Icon(
+//                    modifier = Modifier
+//                        .size(48.dp)
+//                    ,
+//                    imageVector = cellBar,
+//                    contentDescription = "",
+//                )
+                AsyncImage(
                     modifier = Modifier
-                        .size(48.dp)
+//                        .size(48.dp)
+//                        .fillMaxSize()
                     ,
-                    imageVector = cellBar,
+                    model = cellBarDrawing,
                     contentDescription = "",
+                    colorFilter = ColorFilter.tint(rememberColorScheme().onBackground)
                 )
             }
             if(showNumbers) {
@@ -148,6 +189,18 @@ fun HTSignalStrength(
                     Text(text = "${signalStatus.signalDbm} dBm")
                     Text(text = "${signalStatus.signalAsu} asu")
                 }
+            }
+            if(showCarrier){
+                Column {
+                    Text(
+                        modifier = Modifier
+//                            .weight(1f)
+                            .basicMarquee()
+                        ,
+                        text = signalStatus.carrier
+                    )
+                }
+
             }
         }
     }
@@ -177,6 +230,7 @@ fun HTSignalStrengthPreview(){
                         Row {
                             HTSignalStrength(
                                 showNumbers = true,
+                                showCarrier = true,
                             )
                         }
 

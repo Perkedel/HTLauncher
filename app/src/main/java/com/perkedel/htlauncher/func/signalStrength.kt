@@ -20,7 +20,8 @@ import java.util.concurrent.Executor
 import kotlin.concurrent.thread
 
 fun signalStrength(
-    context: Context
+    context: Context,
+    forWhichSim:Int = 0,
 ): SignalStrength {
     // https://wiki.teltonika-networks.com/view/Mobile_Signal_Strength_Recommendations
     // https://stackoverflow.com/questions/19805880/get-signal-strength-in-android
@@ -39,6 +40,7 @@ fun signalStrength(
     var signalBest: Int = 0
     var signalWorst:Int = -100
     var signalType: SignalType = SignalType.NONE
+    var signalCarrier:String = telephonyManager.networkOperatorName.ifBlank { "???" }
     val signalExecutor:java.util.concurrent.Executor = Executor {
         fun execute(runnable: Runnable){
             Thread(runnable).start()
@@ -66,6 +68,7 @@ fun signalStrength(
         } catch (e: Exception) {
             e.printStackTrace()
         }
+        signalCarrier = telephonyManager.networkOperatorName.ifBlank { "???" }
         if (listOfCellInfo.isNotEmpty()) {
             for (cellInfo in listOfCellInfo) {
                 when {
@@ -134,6 +137,18 @@ fun signalStrength(
                         }
                     }
                 }
+//                if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.R){
+//                    when {
+//                        cellInfo is CellInfo -> {
+//                            signalResult = cellInfo.cellSignalStrength.level
+//                            signalDbm = cellInfo.cellSignalStrength.dbm
+//                            signalAsu = cellInfo.cellSignalStrength.asuLevel
+//                            signalType = SignalType.NONE
+//                            signalBest =   -80
+//                            signalWorst = -100
+//                        }
+//                        else -> {}
+//                }
             }
         }
     }
@@ -148,6 +163,7 @@ fun signalStrength(
         signalType = signalType,
         signalBest = signalBest,
         signalWorst = signalWorst,
+        carrier = signalCarrier,
     )
 }
 
@@ -165,12 +181,13 @@ class SignalStrengthCallback(
 }
 
 data class SignalStrength(
-    val signalLevel:Int = 0,
+    val signalLevel:Int = 3,
     val signalDbm:Int = 0,
     val signalAsu:Int = 0,
     val signalType: SignalType = SignalType.NONE,
     val signalBest:Int = 0,
     val signalWorst:Int = -100,
+    val carrier:String = "???",
 )
 
 enum class SignalType(val value:Int = 0, val sayFull:String = "", val sayShort:String = ""){

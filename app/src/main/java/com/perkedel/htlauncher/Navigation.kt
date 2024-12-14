@@ -62,6 +62,7 @@ import androidx.compose.ui.hapticfeedback.HapticFeedback
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -157,6 +158,7 @@ fun Navigation(
     },
     tts: MutableState<TextToSpeech?> = rememberTextToSpeech(),
     view: View = LocalView.current,
+    inspectionMode:Boolean = LocalInspectionMode.current,
 ){
     var homePagerState: PagerState = rememberPagerState(pageCount = {10})
 
@@ -207,11 +209,16 @@ fun Navigation(
     // https://stackoverflow.com/questions/6589797/how-to-get-package-name-from-anywhere
 //    try {
         val packageName: String = context.packageName
-        val packageInfo:PackageInfo = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            pm.getPackageInfo(packageName, PackageManager.PackageInfoFlags.of(0))
-        } else {
-            pm.getPackageInfo(packageName, 0)
-        }
+        val packageInfo:PackageInfo =
+//        if(!inspectionMode) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                pm.getPackageInfo(packageName, PackageManager.PackageInfoFlags.of(0))
+            } else {
+                pm.getPackageInfo(packageName, 0)
+            }
+//        } else {
+//            PackageInfo()
+//        }
         val versionName: String = packageInfo.versionName!!
         val versionNumber: Long = PackageInfoCompat.getLongVersionCode(packageInfo)
 //    } catch (e : Exception) {
@@ -396,7 +403,7 @@ fun Navigation(
 
 
     LaunchedEffect(htuiState.selectedSaveDir) {
-
+        val initing = htuiState.inited
 //        val preloadThing = async {
 //            // https://medium.com/@rajputmukesh748/mastering-async-and-await-in-kotlin-coroutines-833e57fa0e8f
 ////            delay(5000)
@@ -420,7 +427,7 @@ fun Navigation(
 //        )
 //        preloadThing
         coroutineScope.launch {
-            if(!htuiState.inited) {
+            if(!initing) {
                 anViewModel.preloadFiles(
                     context = context,
                     contentResolver = saveDirResolver,
@@ -749,6 +756,7 @@ fun Navigation(
                                 navController = navController,
                                 viewModel = anViewModel,
                                 uiState = htuiState,
+                                inspectionMode = inspectionMode,
                             )
                         }
                     )
@@ -814,6 +822,7 @@ fun Navigation(
                                 navController = navController,
                                 viewModel = anViewModel,
                                 uiState = htuiState,
+                                inspectionMode = inspectionMode,
                             )
                         }
                     )
@@ -1619,6 +1628,7 @@ fun onLaunchAction(
     navController: NavHostController,
     viewModel:HTViewModel,
     uiState:HTUIState,
+    inspectionMode: Boolean = false,
 ){
     coroutineScope.launch {
         when(data[0].type){
@@ -1654,6 +1664,7 @@ fun onLaunchAction(
                 }
             }
             ActionDataLaunchType.Internal -> {
+
                 try {
                     when(data[0].action){
                         context.resources.getString(ActionInternalCommand.AllApps.id)->{
@@ -1683,16 +1694,18 @@ fun onLaunchAction(
 //                            )
                             var foundApp:Boolean = false
                             var targetApp:PackageInfo = PackageInfo()
-                            for(i in HTLauncherHardcodes.ALARM_APP_IMPLEMENTATIONS){
-                                try {
-                                    targetApp = pm.getPackageInfo(i.value.packageName,0)
-                                    foundApp = true
-                                    break
-                                } catch (e:NameNotFoundException){
+                            if(!inspectionMode) {
+                                for (i in HTLauncherHardcodes.ALARM_APP_IMPLEMENTATIONS) {
+                                    try {
+                                        targetApp = pm.getPackageInfo(i.value.packageName, 0)
+                                        foundApp = true
+                                        break
+                                    } catch (e: NameNotFoundException) {
 //                                    e.printStackTrace()
-                                    foundApp = false
-                                } catch (e:Exception){
+                                        foundApp = false
+                                    } catch (e: Exception) {
 //                                    e.printStackTrace()
+                                    }
                                 }
                             }
                             if(foundApp){

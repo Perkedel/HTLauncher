@@ -51,7 +51,8 @@
     <!--  too lazy! tell codeium to do these labours!  -->
     <string name="action_telltime">Clock is at %s, %s</string>
     <string name="action_tellbattery">Battery level currently is as %d%%</string>
-    <string name="action_tellsignal">Signal Strength is %s, which are RSSI of %d dBm and ASU %d asu</string>
+    <string name="action_tellcarrier">Operator is %s</string>
+    <string name="action_tellsignal">Signal Strength is %s, which are RSSI of %d dBm and ASU %d unit</string>
     <string name="action_batterymedium">Medium Battery, charging recommended.</string>
     <string name="action_batterylow">Low Battery, recharge immediately!</string>
     <string name="action_batteryfull">Battery Fully Charged, please unplug charger.</string>

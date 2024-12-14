@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.ir.backend.js.compile
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -193,6 +195,9 @@ dependencies {
 
     // https://github.com/Calvin-LL/Reorderable
     implementation(libs.reorderable)
+
+    // https://github.com/lvabarajithan/BatteryStatsLibrary
+//    implementation(libs.batterystatslibrary)
 }
 
 //composeCompiler {

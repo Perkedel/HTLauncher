@@ -28,7 +28,7 @@ val WarnColorDarkContainer = Color(0xFF362700)
 
 val primaryLight = Color(0xFF0040BB)
 val onPrimaryLight = Color(0xFFFFFFFF)
-val primaryContainerLight = Color(0xFF2763FA)
+val primaryContainerLight = Color(0xFF80A3FF)
 val onPrimaryContainerLight = Color(0xFFFFFFFF)
 val secondaryLight = Color(0xFF475B9D)
 val onSecondaryLight = Color(0xFFFFFFFF)
