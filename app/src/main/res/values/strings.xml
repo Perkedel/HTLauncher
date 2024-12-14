@@ -45,7 +45,10 @@
     <string name="action_remove">Remove</string>
     <string name="action_decrease">Decrease</string>
     <string name="action_increase">Increase</string>
+    <string name="action_undo">Undo</string>
+    <string name="action_redo">Redo</string>
     <string name="action_remove_detailed">Remove %s</string>
+    <string name="action_removed_detailed">Removed %s</string>
 
     <!--  Clock  -->
     <!--  too lazy! tell codeium to do these labours!  -->
@@ -56,6 +59,7 @@
     <string name="action_batterymedium">Medium Battery, charging recommended.</string>
     <string name="action_batterylow">Low Battery, recharge immediately!</string>
     <string name="action_batteryfull">Battery Fully Charged, please unplug charger.</string>
+    <string name="action_batterycharging">Battery is charging.</string>
     <string name="action_signal_0">Drop</string>
     <string name="action_signal_1">Poor</string>
     <string name="action_signal_2">Average</string>

@@ -11,9 +11,11 @@ import androidx.annotation.DrawableRes
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -49,6 +51,7 @@ import androidx.compose.ui.hapticfeedback.HapticFeedback
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
@@ -151,7 +154,9 @@ fun HTSignalStrength(
 //        Row {
 //            Text(text = "Signal: ${signalStatus.signalLevel}\n(${signalStatus.signalDbm}, ${signalStatus.signalType.name})")
 //        }
-        Row {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
             Box(
                 modifier = Modifier
 //                    .size(48.dp)
@@ -181,17 +186,26 @@ fun HTSignalStrength(
                     ,
                     model = cellBarDrawing,
                     contentDescription = "",
-                    colorFilter = ColorFilter.tint(rememberColorScheme().onBackground)
+                    colorFilter = ColorFilter.tint(rememberColorScheme().onBackground),
+                    error = painterResource(R.drawable.mavrickle),
+                    placeholder = painterResource(R.drawable.sharp_signal_cellular_null_24)
                 )
             }
             if(showNumbers) {
-                Column {
+                Column(
+                    modifier = Modifier
+//                        .fillMaxHeight()
+                    ,
+                    verticalArrangement = Arrangement.Center,
+                ) {
                     Text(text = "${signalStatus.signalDbm} dBm")
                     Text(text = "${signalStatus.signalAsu} asu")
                 }
             }
             if(showCarrier){
-                Column {
+                Column(
+                    verticalArrangement = Arrangement.Center,
+                ) {
                     Text(
                         modifier = Modifier
 //                            .weight(1f)

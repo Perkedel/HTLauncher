@@ -14,8 +14,10 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
@@ -35,6 +37,9 @@ import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -42,6 +47,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -69,12 +75,18 @@ import com.perkedel.htlauncher.data.viewmodels.ItemEditorViewModel
 import com.perkedel.htlauncher.enumerations.PageViewStyle
 import com.perkedel.htlauncher.func.WindowInfo
 import com.perkedel.htlauncher.func.rememberWindowInfo
+import com.perkedel.htlauncher.ui.dialog.HTAlertDialog
+import com.perkedel.htlauncher.ui.previews.HTPreviewAnnotations
+import com.perkedel.htlauncher.ui.theme.HTLauncherTheme
 import com.perkedel.htlauncher.widgets.HTButton
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import me.zhanghai.compose.preference.ProvidePreferenceLocals
 import my.nanihadesuka.compose.LazyColumnScrollbar
 import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.rememberReorderableLazyGridState
 import sh.calvin.reorderable.rememberReorderableLazyListState
+import java.util.UUID
 
 @Composable
 fun EditHomePageOrders(
@@ -97,15 +109,23 @@ fun EditHomePageOrders(
     isCompact: Boolean = windowInfo.screenWidthInfo is WindowInfo.WindowType.Compact,
     isOrientation: Int = configuration.orientation,
     onTryAdd: ()->Unit = {},
+    snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
+    coroutineScope: CoroutineScope = rememberCoroutineScope(),
 ){
     var list:List<String> by remember { mutableStateOf(data?.pagesPath ?: HomepagesWeHave().pagesPath) }
+    var uniqueList:MutableMap<String,String> by remember { mutableStateOf(linkedMapOf()) }
     LaunchedEffect(
         key1 = data
     ) {
         list = data?.pagesPath ?: PageData().items
+        uniqueList.clear()
+        for(thing in list){
+            uniqueList[UUID.randomUUID().toString()] = thing
+        }
     }
     var areYouSureToRemove:Boolean by remember { mutableStateOf(false) }
     var toRemove:Int by remember { mutableStateOf(-1) }
+    var theRemovedItem:List<String> by remember { mutableStateOf(emptyList()) }
 
     val lazyListState = rememberLazyGridState()
     val lazyColumnState = rememberLazyListState()
@@ -122,6 +142,13 @@ fun EditHomePageOrders(
 
         bakeData()
     }
+    val addItemToIndex:(String,Int) -> Unit = { name:String, index:Int ->
+        list = list.toMutableList().apply {
+            add(index, name)
+        }
+
+        bakeData()
+    }
     val removeItemFromHere: (String)->Unit = { name:String ->
         if(toRemove >= 0) {
             list = list.toMutableList().apply {
@@ -132,9 +159,35 @@ fun EditHomePageOrders(
         }
     }
     val removeItemFromHereIndex: (Int)-> Unit = {
-        list = list.toMutableList().apply {
-            removeAt(it)
+        coroutineScope.launch {
+            var theItem:String = ""
+            var andIndex:Int = 0
+            list = list.toMutableList().apply {
+                andIndex = it
+                theItem = removeAt(it)
+            }
+            theRemovedItem = theRemovedItem.toMutableList().apply {
+                add(theItem)
+            }
+            val snackbarActionResult: SnackbarResult = snackbarHostState.showSnackbar(
+                message = "Removed ${theItem}",
+                actionLabel = "Undo",
+                duration = SnackbarDuration.Short
+            )
+            when(snackbarActionResult){
+                SnackbarResult.Dismissed -> {
+
+                }
+                SnackbarResult.ActionPerformed -> {
+                    theRemovedItem = theRemovedItem.toMutableList().apply{
+                        addItemToIndex(theItem, andIndex)
+                        remove(theItem)
+                    }
+                }
+                else -> {}
+            }
         }
+
         bakeData()
     }
     val askRemoveItemFromHereIndex:(Int)->Unit = {
@@ -238,8 +291,8 @@ fun EditHomePageOrders(
         }
     }
 
-    val columnViewStyle: @Composable (PageData?) -> Unit ={ pageData:PageData?->
-        pageData?.let {
+    val columnViewStyle: @Composable (HomepagesWeHave?) -> Unit ={ homeScreen:HomepagesWeHave?->
+        homeScreen?.let {
             LazyColumnScrollbar(
                 state = lazyColumnState
             ) {
@@ -252,182 +305,189 @@ fun EditHomePageOrders(
                     ) {
                         majorActionCard()
                     }
-                    items(
-                        items = list,
-                        key = { it }
-                    ){
-                        ReorderableItem(
-                            state = reorderableLazyColumnState,
-                            key = it,
-                            modifier = Modifier
-                                .semantics {
-                                    customActions = listOf(
-                                        CustomAccessibilityAction(
-                                            label = context.resources.getString(R.string.action_move_top_detailed,it),
-                                            action = {
-                                                moveItemToExtreme(it,true)
-                                                true
-                                            }
-                                        ),
-                                        CustomAccessibilityAction(
-                                            label = context.resources.getString(R.string.action_move_up_detailed,it),
-                                            action = {
-                                                moveItemToWhere(it,-1)
-                                                true
-                                            }
-                                        ),
-                                        CustomAccessibilityAction(
-                                            label = context.resources.getString(R.string.action_move_down_detailed,it),
-                                            action = {
-                                                moveItemToWhere(it,1)
-                                                true
-                                            }
-                                        ),
-                                        CustomAccessibilityAction(
-                                            label = context.resources.getString(R.string.action_move_bottom_detailed,it),
-                                            action = {
-                                                moveItemToExtreme(it,false)
-                                                true
-                                            }
-                                        ),
-                                        CustomAccessibilityAction(
-                                            label = context.resources.getString(R.string.action_remove_detailed,it),
-                                            action = {
-                                                askRemoveItemFromHereIndex(list.indexOf(it))
-                                                true
-                                            }
-                                        ),
-                                    )
-                                }
-                            ,
-                        ) { isDragging ->
-                            // appear pop up menu of action move up or down
-                            // https://github.com/zhanghai/ComposePreference/blob/master/library/src/main/java/me/zhanghai/compose/preference/ListPreference.kt
-                            // https://youtu.be/QCSJfMqQY9A Philipp Lackner
-                            // https://youtu.be/HeZ1ftQTBgY
-                            // https://github.com/philipplackner/ComposeContextDropDown
-                            // https://github.com/philipplackner/ComposeContextDropDown/blob/master/app/src/main/java/com/plcoding/composecontextdropdown/PersonItem.kt
-                            var openSelector by remember{ mutableStateOf(false) }
-                            val dropdownOptions: List<DropdownMenuOptions> = listOf(
-                                DropdownMenuOptions(
-                                    key = "move_top",
-                                    label = stringResource(R.string.action_move_top),
-                                    onClick = {
-                                        moveItemToExtreme(it,true)
-                                    },
-                                    icon = Icons.Default.VerticalAlignTop
-                                ),
-                                DropdownMenuOptions(
-                                    key = "move_up",
-                                    label = stringResource(R.string.action_move_up),
-                                    onClick = {
-                                        moveItemToWhere(it,-1)
-                                    },
-                                    icon = Icons.Default.KeyboardArrowUp
-                                ),
-                                DropdownMenuOptions(
-                                    key = "move_down",
-                                    label = stringResource(R.string.action_move_down),
-                                    onClick = {
-                                        moveItemToWhere(it,1)
-                                    },
-                                    icon = Icons.Default.KeyboardArrowDown
-                                ),
-                                DropdownMenuOptions(
-                                    key = "move_bottom",
-                                    label = stringResource(R.string.action_move_bottom),
-                                    onClick = {
-                                        moveItemToExtreme(it,false)
-                                    },
-                                    icon = Icons.Default.VerticalAlignBottom
-                                ),
-                                DropdownMenuOptions(
-                                    key = "remove",
-                                    label = stringResource(R.string.action_remove),
-                                    onClick = {
-                                        askRemoveItemFromHereIndex(list.indexOf(it))
-                                    },
-                                    icon = Icons.Default.Delete
-                                ),
-                            )
-                            val elevation by animateDpAsState(if (isDragging) 4.dp else 0.dp,
-                                label = "DraggingItem"
-                            )
-                            val itemData: ItemData = htViewModel.getItemData(
-                                of = it,
-                                context = context,
-                            )
-                            Surface(shadowElevation = elevation) {
-                                Row(
-                                    verticalAlignment = Alignment.CenterVertically,
-                                ) {
-                                    AsyncImage(
-                                        modifier = Modifier.size(72.dp),
-                                        placeholder = painterResource(R.drawable.placeholder),
-                                        error = painterResource(R.drawable.mavrickle),
-                                        model = htViewModel.getItemIcon(
-                                            of = itemData.name,
-                                            context = context,
-                                            ignoreFile = false,
-                                            pm = pm,
-                                            forceReload = false,
-                                        ),
-                                        contentDescription = "",
-                                    )
-                                    Text(
-                                        text = itemData.label,
-                                        modifier = Modifier
-                                            .weight(1f)
-                                            .padding(horizontal = 8.dp)
-                                    )
-                                    IconButton(
-                                        modifier = Modifier.draggableHandle(
-                                            onDragStarted = {
-                                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
-                                                    view.performHapticFeedback(
-                                                        HapticFeedbackConstants.DRAG_START)
-                                                } else {
-                                                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                    repeat(times = list.size){
+//                        val uid:String = UUID.randomUUID().toString()
+//                        val uid:String = uniqueList.keys.toList()[it]
+                        val unKey:String = list[it]
+                        item(
+                            key = unKey,
+                        ){
+                            ReorderableItem(
+                                state = reorderableLazyColumnState,
+//                                key = it.hashCode(),
+                                key = unKey,
+                                modifier = Modifier
+                                    .semantics {
+                                        customActions = listOf(
+                                            CustomAccessibilityAction(
+                                                label = context.resources.getString(R.string.action_move_top_detailed,list[it]),
+                                                action = {
+                                                    moveItemToExtreme(list[it],true)
+                                                    true
                                                 }
-                                            },
-                                            onDragStopped = {
-                                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
-                                                    view.performHapticFeedback(
-                                                        HapticFeedbackConstants.GESTURE_END)
-                                                } else {
-                                                    haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                                            ),
+                                            CustomAccessibilityAction(
+                                                label = context.resources.getString(R.string.action_move_up_detailed,list[it]),
+                                                action = {
+                                                    moveItemToWhere(list[it],-1)
+                                                    true
                                                 }
-                                            },
-                                        ),
+                                            ),
+                                            CustomAccessibilityAction(
+                                                label = context.resources.getString(R.string.action_move_down_detailed,list[it]),
+                                                action = {
+                                                    moveItemToWhere(list[it],1)
+                                                    true
+                                                }
+                                            ),
+                                            CustomAccessibilityAction(
+                                                label = context.resources.getString(R.string.action_move_bottom_detailed,list[it]),
+                                                action = {
+                                                    moveItemToExtreme(list[it],false)
+                                                    true
+                                                }
+                                            ),
+                                            CustomAccessibilityAction(
+                                                label = context.resources.getString(R.string.action_remove_detailed,list[it]),
+                                                action = {
+//                                                    askRemoveItemFromHereIndex(list.indexOf(it))
+                                                    askRemoveItemFromHereIndex(it)
+                                                    true
+                                                }
+                                            ),
+                                        )
+                                    }
+                                ,
+                            ) { isDragging ->
+                                // appear pop up menu of action move up or down
+                                // https://github.com/zhanghai/ComposePreference/blob/master/library/src/main/java/me/zhanghai/compose/preference/ListPreference.kt
+                                // https://youtu.be/QCSJfMqQY9A Philipp Lackner
+                                // https://youtu.be/HeZ1ftQTBgY
+                                // https://github.com/philipplackner/ComposeContextDropDown
+                                // https://github.com/philipplackner/ComposeContextDropDown/blob/master/app/src/main/java/com/plcoding/composecontextdropdown/PersonItem.kt
+                                var openSelector by remember{ mutableStateOf(false) }
+                                val dropdownOptions: List<DropdownMenuOptions> = listOf(
+                                    DropdownMenuOptions(
+                                        key = "move_top",
+                                        label = stringResource(R.string.action_move_top),
                                         onClick = {
-                                            view.playSoundEffect(SoundEffectConstants.CLICK)
-                                            openSelector = true
+                                            moveItemToExtreme(list[it],true)
                                         },
+                                        icon = Icons.Default.VerticalAlignTop
+                                    ),
+                                    DropdownMenuOptions(
+                                        key = "move_up",
+                                        label = stringResource(R.string.action_move_up),
+                                        onClick = {
+                                            moveItemToWhere(list[it],-1)
+                                        },
+                                        icon = Icons.Default.KeyboardArrowUp
+                                    ),
+                                    DropdownMenuOptions(
+                                        key = "move_down",
+                                        label = stringResource(R.string.action_move_down),
+                                        onClick = {
+                                            moveItemToWhere(list[it],1)
+                                        },
+                                        icon = Icons.Default.KeyboardArrowDown
+                                    ),
+                                    DropdownMenuOptions(
+                                        key = "move_bottom",
+                                        label = stringResource(R.string.action_move_bottom),
+                                        onClick = {
+                                            moveItemToExtreme(list[it],false)
+                                        },
+                                        icon = Icons.Default.VerticalAlignBottom
+                                    ),
+                                    DropdownMenuOptions(
+                                        key = "remove",
+                                        label = stringResource(R.string.action_remove),
+                                        onClick = {
+//                                            askRemoveItemFromHereIndex(list.indexOf(it))
+                                            askRemoveItemFromHereIndex(it)
+                                        },
+                                        icon = Icons.Default.Delete
+                                    ),
+                                )
+                                val elevation by animateDpAsState(if (isDragging) 4.dp else 0.dp,
+                                    label = "DraggingItem"
+                                )
+                                val pageData: PageData = htViewModel.getPageData(
+                                    of = list[it],
+                                    context = context,
+                                )
+                                Surface(shadowElevation = elevation) {
+                                    Row(
+                                        verticalAlignment = Alignment.CenterVertically,
                                     ) {
-                                        Icon(Icons.Default.DragHandle, contentDescription = "Reorder")
-                                    }
-                                    DropdownMenu(
-                                        expanded = openSelector,
-                                        onDismissRequest = {
-                                            openSelector = false
-                                        }
-                                    ) {
-                                        dropdownOptions.forEach(){ dropItem ->
-                                            DropdownMenuItem(
-                                                onClick = {
-                                                    dropItem.onClick()
-                                                    view.playSoundEffect(SoundEffectConstants.CLICK)
-                                                    openSelector = false
+                                        AsyncImage(
+                                            modifier = Modifier.size(72.dp),
+                                            placeholder = painterResource(R.drawable.placeholder),
+                                            error = painterResource(R.drawable.mavrickle),
+                                            model = htViewModel.getPageIcon(
+                                                of = pageData.name,
+                                                context = context,
+                                                ignoreFile = false,
+                                                pm = pm,
+                                                forceReload = false,
+                                            ),
+                                            contentDescription = "",
+                                        )
+                                        Text(
+                                            text = pageData.name,
+                                            modifier = Modifier
+                                                .weight(1f)
+                                                .padding(horizontal = 8.dp)
+                                        )
+                                        IconButton(
+                                            modifier = Modifier.draggableHandle(
+                                                onDragStarted = {
+                                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+                                                        view.performHapticFeedback(
+                                                            HapticFeedbackConstants.DRAG_START)
+                                                    } else {
+                                                        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                                                    }
                                                 },
-                                                text = { Text(dropItem.label) },
-                                                leadingIcon = { Icon(dropItem.icon,"") },
-                                            )
+                                                onDragStopped = {
+                                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+                                                        view.performHapticFeedback(
+                                                            HapticFeedbackConstants.GESTURE_END)
+                                                    } else {
+                                                        haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                                                    }
+                                                },
+                                            ),
+                                            onClick = {
+                                                view.playSoundEffect(SoundEffectConstants.CLICK)
+                                                openSelector = true
+                                            },
+                                        ) {
+                                            Icon(Icons.Default.DragHandle, contentDescription = "Reorder")
                                         }
+                                        DropdownMenu(
+                                            expanded = openSelector,
+                                            onDismissRequest = {
+                                                openSelector = false
+                                            }
+                                        ) {
+                                            dropdownOptions.forEach(){ dropItem ->
+                                                DropdownMenuItem(
+                                                    onClick = {
+                                                        dropItem.onClick()
+                                                        view.playSoundEffect(SoundEffectConstants.CLICK)
+                                                        openSelector = false
+                                                    },
+                                                    text = { Text(dropItem.label) },
+                                                    leadingIcon = { Icon(dropItem.icon,"") },
+                                                )
+                                            }
+                                        }
+                                        Spacer(
+                                            modifier = Modifier
+                                                .padding(24.dp)
+                                        )
                                     }
-                                    Spacer(
-                                        modifier = Modifier
-                                            .padding(24.dp)
-                                    )
                                 }
                             }
                         }
@@ -438,6 +498,61 @@ fun EditHomePageOrders(
     }
 
     ProvidePreferenceLocals {
+        data?.let {
+            columnViewStyle(data)
+        }
+    }
+    if(areYouSureToRemove) {
+        if (toRemove >= 0) {
+            HTAlertDialog(
+                title = stringResource(R.string.remove_dialog_title, list[toRemove]),
+                context = context,
+                text = "${
+                    stringResource(
+                        R.string.remove_dialog_content,
+                        list[toRemove]
+                    )
+                }\n${stringResource(R.string.will_not_delete_item_itself)}",
+                onDismissRequest = {
+                    areYouSureToRemove = false
+                    toRemove = -1
+                },
+                onConfirm = {
+                    removeItemFromHereIndex(toRemove)
+                    areYouSureToRemove = false
+                    toRemove = -1
+                }
+            )
+        } else {
+            LaunchedEffect(
+                key1 = toRemove,
+                key2 = areYouSureToRemove
+            ) {
+                coroutineScope.launch {
+                    snackbarHostState.showSnackbar(
+                        message = context.resources.getString(R.string.not_found, list[toRemove]),
+                        duration = SnackbarDuration.Short
+                    )
+                }
+            }
+            areYouSureToRemove = false
+        }
+    }
+}
 
+@HTPreviewAnnotations
+@Composable
+fun PreviewEditHomePageOrders() {
+    HTLauncherTheme {
+        Surface(
+            modifier = Modifier
+                .fillMaxSize()
+                .statusBarsPadding()
+                .navigationBarsPadding()
+        ){
+            EditHomePageOrders(
+                data = HomepagesWeHave(),
+            )
+        }
     }
 }

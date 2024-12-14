@@ -759,6 +759,24 @@ class HTViewModel(
 
         return _uiState.value.itemList[of] ?: predeterminedItem
     }
+    fun getIconFile(of:String, context: Context, pm:PackageManager):Uri?{
+        if(uiState.value.selectedSaveDir == null) return null
+        val selectMediaFolder: Uri = getADirectory(
+            dirUri = _uiState.value.selectedSaveDir!!,
+            dirName = context.resources.getString(R.string.medias_folder),
+            context = context
+        )
+        try {
+            return getAFile(
+                dirUri = selectMediaFolder,
+                fileName = of,
+                context = context,
+            )
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+        return null
+    }
     fun getItemIcon(of:String, json:Json = Json{
         prettyPrint = true
         encodeDefaults = true
@@ -777,6 +795,22 @@ class HTViewModel(
                 target.action[0].action ?: "") else R.drawable.all_apps
             ActionDataLaunchType.Internal -> HTLauncherHardcodes.getInternalActionIcon(target.action[0].action)
             else -> R.drawable.placeholder
+        }
+    }
+    fun getPageIcon(of: String, json: Json = Json{
+        prettyPrint = true
+        encodeDefaults = true
+    }, context: Context, ignoreFile:Boolean = false, forceReload:Boolean = false, pm:PackageManager): Any?{
+        val target:PageData = getPageData(
+            of = of,
+            json = json,
+            context = context,
+            ignoreFile = ignoreFile,
+            forceReload = forceReload
+        )
+        return when{
+            target.iconPath.isNotBlank() -> getIconFile(of, context, pm)
+            else -> R.drawable.open_a_page
         }
     }
 }

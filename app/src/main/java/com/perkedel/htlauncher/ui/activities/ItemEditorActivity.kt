@@ -693,6 +693,7 @@ fun ItemEditorGreeting(
                                         onClose = {
                                             saveNow()
                                             viewModel.selectDetailNavigate(ItemDetailPaneNavigate.Default)
+                                            navigator.navigateBack()
                                         },
                                         onSwap = {
 //                                            viewModel.changePageOrders(it)
@@ -764,6 +765,7 @@ fun ItemEditorGreeting(
                                 data = when(viewModel.editType){
                                     EditWhich.Home -> {
                                         // view all things in Page folder
+                                        Log.d("SelectAddIntoList","Home Edit add the file! Save ${viewModel.saveDirUri}")
                                         viewModel.getPageFolderContents(
                                             saveDirUri = viewModel.saveDirUri ?: Uri.EMPTY,
                                             context = context,
@@ -771,6 +773,7 @@ fun ItemEditorGreeting(
                                     }
                                     EditWhich.Pages -> {
                                         // view all things in Page folder
+                                        Log.d("SelectAddIntoList","Page Edit add the file! Save ${viewModel.saveDirUri}")
                                         viewModel.getItemFolderContents(
                                             saveDirUri = viewModel.saveDirUri ?: Uri.EMPTY,
                                             context = context,

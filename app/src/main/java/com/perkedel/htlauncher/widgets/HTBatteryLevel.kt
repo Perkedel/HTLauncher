@@ -102,7 +102,7 @@ fun HTBatteryLevel(
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
                 intent.getBooleanExtra(BatteryManager.EXTRA_CHARGING_STATUS, false)
             } else {
-                intent.getIntExtra(BatteryManager.EXTRA_PLUGGED, -1) == BatteryManager.BATTERY_PLUGGED_AC
+                intent.getIntExtra(BatteryManager.EXTRA_PLUGGED, -1) >= BatteryManager.BATTERY_PLUGGED_AC
             }
         }
         temperature = batteryStatus?.getIntExtra(BatteryManager.EXTRA_TEMPERATURE, 0) ?: 0
@@ -189,7 +189,7 @@ fun HTBatteryLevel(
     val sayShouldCharge:String = if(isCharging) {
         when{
             batteryLevel >= 100 -> context.getString(R.string.action_batteryfull)
-            else -> ""
+            else -> context.getString(R.string.action_batterycharging)
         }
     }
     else {

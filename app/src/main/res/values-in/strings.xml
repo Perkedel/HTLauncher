@@ -24,6 +24,7 @@
     <string name="action_batterymedium">Baterai sedang, pengecasan disarankan.</string>
     <string name="action_batterylow">Baterai mau habis, segera cas!</string>
     <string name="action_batteryfull">Baterai sudah penuh, silahkan cabut charger.</string>
+    <string name="action_batterycharging">Baterai sedang dicas.</string>
     <string name="action_signal_0">Putus</string>
     <string name="action_signal_1">Lemah</string>
     <string name="action_signal_2">Sedang</string>
@@ -338,8 +339,11 @@
     <string name="action_decrease">Kurangi</string>
     <string name="action_increase">Tambahkan</string>
     <string name="category_bar">Kategori</string>
+    <string name="action_undo">Urung</string>
+    <string name="action_redo">Ulangi</string>
     <string name="category_bar_fill">Kategori %s</string>
     <string name="action_remove_detailed">Hapus %s</string>
+    <string name="action_removed_detailed">%s Dihapus</string>
 
     <!--  Internal Commmands  -->
     <string name="internal_commands_all_apps_label" translatable="true">Semua Aplikasi</string>

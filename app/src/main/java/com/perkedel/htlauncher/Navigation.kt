@@ -757,6 +757,7 @@ fun Navigation(
                                 viewModel = anViewModel,
                                 uiState = htuiState,
                                 inspectionMode = inspectionMode,
+                                handoverPagerState = homePagerState,
                             )
                         }
                     )
@@ -823,6 +824,7 @@ fun Navigation(
                                 viewModel = anViewModel,
                                 uiState = htuiState,
                                 inspectionMode = inspectionMode,
+                                handoverPagerState = homePagerState,
                             )
                         }
                     )
@@ -1248,6 +1250,7 @@ fun Navigation(
                                     toIntent.putExtra(
                                         "uri", theUri
                                     )
+                                    toIntent.putExtra("saveDirUri", htuiState.selectedSaveDir)
                                     toIntent.putExtra(Intent.EXTRA_STREAM, theUri)
 //                                toIntent.putExtra("editType", editType as? Parcelable)
                                     toIntent.putExtra("editType", EditWhich.Home.name)
@@ -1522,7 +1525,16 @@ public fun isFileExist(dirUri:Uri, context: Context, fileName:String = "text.txt
     Log.d("IsFileExist","File ${fileName} ${if(thingieTree.findFile(fileName) != null) "Exist" else "404 NOT FOUND"}")
     return thingieTree.findFile(fileName) != null
 }
-
+public fun getAFile(dirUri:Uri, context: Context, fileName:String): Uri?{
+    Log.d("GetFile","Starting to get file: ${fileName} from ${dirUri}")
+    val thingieTree:DocumentFile = DocumentFile.fromTreeUri(context,dirUri)!!
+    Log.d("GetFile","File ${fileName} ${if(thingieTree.findFile(fileName) != null) "Exist" else "404 NOT FOUND"}")
+    return if(thingieTree.findFile(fileName) != null){
+        thingieTree.findFile(fileName)!!.uri
+    } else {
+        null
+    }
+}
 public fun getATextFile(dirUri:Uri, context: Context, fileName:String = "text.txt", mimeType:String = "text/plain", initData:String = "", hardOverwrite:Boolean = false): Uri{
 //    println("Starting to get file: ${fileName} (mime: ${mimeType}) from ${dirUri}")
     Log.d("GetTextFile","Starting to get file: ${fileName} (mime: ${mimeType}) from ${dirUri}")
@@ -1629,6 +1641,7 @@ fun onLaunchAction(
     viewModel:HTViewModel,
     uiState:HTUIState,
     inspectionMode: Boolean = false,
+    handoverPagerState: PagerState,
 ){
     coroutineScope.launch {
         when(data[0].type){
@@ -1759,7 +1772,14 @@ fun onLaunchAction(
 
                         }
                         context.resources.getString(ActionInternalCommand.GoToPage.id) -> {
-
+                            if(data[0].args[0].isNotBlank()){
+                                uiState.coreConfigJson?.let {
+                                    val indexor = uiState.coreConfigJson?.pagesPath?.indexOf(data[0].args[0])
+                                    handoverPagerState.animateScrollToPage(indexor ?: 0)
+                                }
+                            } else {
+                                throw IllegalArgumentException("Argument 0 cannot be empty", IllegalStateException("Action ${data[0].action}: Empty Argument 0: ${data[0].args[0]}"))
+                            }
                         }
                         context.resources.getString(ActionInternalCommand.OpenAPage.id) -> {
                             if(data[0].args[0].isNotBlank()) {

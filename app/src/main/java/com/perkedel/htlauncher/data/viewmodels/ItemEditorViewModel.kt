@@ -330,7 +330,8 @@ class ItemEditorViewModel(
             // https://stackoverflow.com/questions/47871538/how-to-get-a-filename-without-extension-in-kotlin
             // https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.text/replace-after.html
             // https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.text/replace-after.html
-            Log.d("GetItemContent","Item File contents: ${itemFiles.map { it.name?.substring(0, it.name?.lastIndexOf('.') ?: 0) ?: "" }}")
+//            Log.d("GetItemContent","Item File contents: ${itemFiles.map { it.name?.substring(0, it.name?.lastIndexOf('.') ?: 0) ?: "" }}")
+            Log.d("GetItemContent","Item File contents: ${itemFiles.map { removeDotExtensions(it.name ?: "") }}")
 //            return itemFiles.map { it.name?.replaceAfter(".json","") ?: "" }.toList()
 //            return itemFiles.map {  it.name?.substring(0, it.name?.lastIndexOf('.') ?: 0) ?: "" }.toList()
             return itemFiles.map {  removeDotExtensions(it.name ?: "") }.toList()
@@ -347,6 +348,7 @@ class ItemEditorViewModel(
                 DocumentFile.fromTreeUri(context, pageFolder)?.listFiles()?.toList() ?: emptyList()
 //            return pageFiles.map { it.name?.substring(0, it.name?.lastIndexOf('.') ?: 0) ?: "" }.toList()
 //            return pageFiles.map { it.name?.replaceAfterLast(".json", "") ?: "" }.toList()
+            Log.d("GetPageFolderContent","Page Folder: ${pageFiles.map { removeDotExtensions(it.name ?: "") }.toList()}")
             return pageFiles.map { removeDotExtensions(it.name ?: "") }.toList()
         } else return emptyList()
     }
