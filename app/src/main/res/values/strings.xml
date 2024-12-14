@@ -47,6 +47,63 @@
     <string name="action_increase">Increase</string>
     <string name="action_remove_detailed">Remove %s</string>
 
+    <!--  Clock  -->
+    <!--  too lazy! tell codeium to do these labours!  -->
+    <string name="action_telltime">Clock is at %s, %s</string>
+    <string name="action_tellbattery">Battery level currently is as %d%%</string>
+    <string name="action_tellsignal">Signal Strength is %s, which are RSSI of %d dBm and ASU %d asu</string>
+    <string name="action_batterymedium">Medium Battery, charging recommended.</string>
+    <string name="action_batterylow">Low Battery, recharge immediately!</string>
+    <string name="action_batteryfull">Battery Fully Charged, please unplug charger.</string>
+    <string name="action_signal_0">Drop</string>
+    <string name="action_signal_1">Poor</string>
+    <string name="action_signal_2">Average</string>
+    <string name="action_signal_3">Good</string>
+    <string name="action_signal_4">Excellent</string>
+    <string name="action_signal_unknown">Unknown</string>
+    <string name="action_weekDay_1_full">Sunday</string>
+    <string name="action_weekDay_2_full">Monday</string>
+    <string name="action_weekDay_3_full">Tuesday</string>
+    <string name="action_weekDay_4_full">Wednesday</string>
+    <string name="action_weekDay_5_full">Thursday</string>
+    <string name="action_weekDay_6_full">Friday</string>
+    <string name="action_weekDay_7_full">Saturday</string>
+    <string name="action_weekDay_0_full">Unknown</string>
+    <string name="action_weekDay_1_short">SUN</string>
+    <string name="action_weekDay_2_short">MON</string>
+    <string name="action_weekDay_3_short">TUE</string>
+    <string name="action_weekDay_4_short">WED</string>
+    <string name="action_weekDay_5_short">THU</string>
+    <string name="action_weekDay_6_short">FRI</string>
+    <string name="action_weekDay_7_short">SAT</string>
+    <string name="action_weekDay_0_short">\?\?\?</string>
+    <string name="action_month_0_full">Unknown</string>
+    <string name="action_month_1_full">January</string>
+    <string name="action_month_2_full">February</string>
+    <string name="action_month_3_full">March</string>
+    <string name="action_month_4_full">April</string>
+    <string name="action_month_5_full">May</string>
+    <string name="action_month_6_full">June</string>
+    <string name="action_month_7_full">July</string>
+    <string name="action_month_8_full">August</string>
+    <string name="action_month_9_full">September</string>
+    <string name="action_month_10_full">October</string>
+    <string name="action_month_11_full">November</string>
+    <string name="action_month_12_full">December</string>
+    <string name="action_month_0_short">\?\?\?</string>
+    <string name="action_month_1_short">JAN</string>
+    <string name="action_month_2_short">FEB</string>
+    <string name="action_month_3_short">MAR</string>
+    <string name="action_month_4_short">APR</string>
+    <string name="action_month_5_short">MAY</string>
+    <string name="action_month_6_short">JUN</string>
+    <string name="action_month_7_short">JUL</string>
+    <string name="action_month_8_short">AUG</string>
+    <string name="action_month_9_short">SEP</string>
+    <string name="action_month_10_short">OCT</string>
+    <string name="action_month_11_short">NOV</string>
+    <string name="action_month_12_short">DEC</string>
+
     <!--  Home Screen  -->
     <string name="home_screen">Home</string>
     <string name="default_screen">Default</string>

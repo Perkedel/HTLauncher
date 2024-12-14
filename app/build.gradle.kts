@@ -107,7 +107,7 @@ dependencies {
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.library)
     implementation("me.zhanghai.compose.preference:library:1.1.1")
-    implementation(libs.androidx.material.icons.extended) // https://youtu.be/Vj9k0cmBqZE
+    implementation(libs.androidx.material.icons.extended) // https://youtu.be/Vj9k0cmBqZE https://stackoverflow.com/a/65665564/9079640
 //    implementation(libs.xicon.pack.z) // https://github.com/DevSrSouza/compose-icons
 //    implementation("br.com.devsrsouza.compose.icons:font-awesome:1.1.1") // https://github.com/DevSrSouza/compose-icons
 //    implementation("br.com.devsrsouza.compose.icons:simple-icons:1.1.1") // https://github.com/DevSrSouza/compose-icons

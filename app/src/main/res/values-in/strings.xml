@@ -15,6 +15,63 @@
 
     <!--  Site  -->
 
+    <!--  Clock  -->
+    <!--  too lazy! but do not ask AI to translate, embarrassing!  -->
+    <string name="action_telltime">Waktu menunjukan pukul %s, %s</string>
+    <string name="action_tellbattery">Baterai kini berada dalam tingkat %d%%</string>
+    <string name="action_tellsignal">Kekuatan sinyal %s, yaitu RSSI %d dBm dan ASU %d</string>
+    <string name="action_batterymedium">Baterai sedang, pengecasan disarankan.</string>
+    <string name="action_batterylow">Baterai mau habis, segera cas!</string>
+    <string name="action_batteryfull">Baterai sudah penuh, silahkan cabut charger.</string>
+    <string name="action_signal_0">Putus</string>
+    <string name="action_signal_1">Buruk</string>
+    <string name="action_signal_2">Sedang</string>
+    <string name="action_signal_3">Bagus</string>
+    <string name="action_signal_4">Maksimal</string>
+    <string name="action_signal_unknown">Entahlah</string>
+    <string name="action_weekDay_1_full">Minggu</string>
+    <string name="action_weekDay_2_full">Senin</string>
+    <string name="action_weekDay_3_full">Selasa</string>
+    <string name="action_weekDay_4_full">Rabu</string>
+    <string name="action_weekDay_5_full">Kamis</string>
+    <string name="action_weekDay_6_full">Jumat</string>
+    <string name="action_weekDay_7_full">Sabtu</string>
+    <string name="action_weekDay_0_full">Entahlah</string>
+    <string name="action_weekDay_1_short">MIN</string>
+    <string name="action_weekDay_2_short">SEN</string>
+    <string name="action_weekDay_3_short">SEL</string>
+    <string name="action_weekDay_4_short">RAB</string>
+    <string name="action_weekDay_5_short">KAM</string>
+    <string name="action_weekDay_6_short">JUM</string>
+    <string name="action_weekDay_7_short">SAB</string>
+    <string name="action_weekDay_0_short">\?\?\?</string>
+    <string name="action_month_0_full">Unknown</string>
+    <string name="action_month_1_full">Januari</string>
+    <string name="action_month_2_full">Februari</string>
+    <string name="action_month_3_full">Maret</string>
+    <string name="action_month_4_full">April</string>
+    <string name="action_month_5_full">Mei</string>
+    <string name="action_month_6_full">Juni</string>
+    <string name="action_month_7_full">Juli</string>
+    <string name="action_month_8_full">Agustus</string>
+    <string name="action_month_9_full">September</string>
+    <string name="action_month_10_full">Oktober</string>
+    <string name="action_month_11_full">November</string>
+    <string name="action_month_12_full">Desember</string>
+    <string name="action_month_0_short">\?\?\?</string>
+    <string name="action_month_1_short">JAN</string>
+    <string name="action_month_2_short">FEB</string>
+    <string name="action_month_3_short">MAR</string>
+    <string name="action_month_4_short">APR</string>
+    <string name="action_month_5_short">MEI</string>
+    <string name="action_month_6_short">JUN</string>
+    <string name="action_month_7_short">JUL</string>
+    <string name="action_month_8_short">AGU</string>
+    <string name="action_month_9_short">SEP</string>
+    <string name="action_month_10_short">OKT</string>
+    <string name="action_month_11_short">NOV</string>
+    <string name="action_month_12_short">DES</string>
+
     <!--  Home Screen  -->
     <string name="action_load">Muat</string>
     <string name="action_retry">Retry</string>

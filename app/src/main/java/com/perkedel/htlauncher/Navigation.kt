@@ -105,8 +105,11 @@ import com.perkedel.htlauncher.ui.dialog.CameraPermissionTextProvider
 import com.perkedel.htlauncher.ui.dialog.HTAlertDialog
 import com.perkedel.htlauncher.ui.dialog.PermissionDialog
 import com.perkedel.htlauncher.ui.dialog.PhoneCallPermissionTextProvider
+import com.perkedel.htlauncher.ui.dialog.PhoneStatePermissionTextProvider
+import com.perkedel.htlauncher.ui.dialog.ReadFilePermissionTextProvider
 import com.perkedel.htlauncher.ui.dialog.RecordAudioPermissionTextProvider
 import com.perkedel.htlauncher.ui.dialog.TextInputDialog
+import com.perkedel.htlauncher.ui.dialog.WriteFilePermissionTextProvider
 import com.perkedel.htlauncher.ui.navigation.AboutTerms
 import com.perkedel.htlauncher.ui.navigation.AllAppsScreen
 import com.perkedel.htlauncher.ui.navigation.Configurationing
@@ -1064,6 +1067,12 @@ fun Navigation(
                         .forEach{ permission ->
                             PermissionDialog(
                                 permissionsTextProvider = when(permission){
+                                    Manifest.permission.READ_EXTERNAL_STORAGE -> {
+                                        ReadFilePermissionTextProvider()
+                                    }
+                                    Manifest.permission.WRITE_EXTERNAL_STORAGE -> {
+                                        WriteFilePermissionTextProvider()
+                                    }
                                     Manifest.permission.CAMERA -> {
                                         CameraPermissionTextProvider()
                                     }
@@ -1072,6 +1081,9 @@ fun Navigation(
                                     }
                                     Manifest.permission.CALL_PHONE -> {
                                         PhoneCallPermissionTextProvider()
+                                    }
+                                    Manifest.permission.READ_PHONE_STATE -> {
+                                        PhoneStatePermissionTextProvider()
                                     }
                                     else -> return@forEach
                                 },

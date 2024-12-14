@@ -110,6 +110,18 @@ class PhoneCallPermissionTextProvider: PermissionTextProvider {
     }
 }
 
+class PhoneStatePermissionTextProvider: PermissionTextProvider {
+    override fun getDescription(isPermanentlyDeclined: Boolean): String {
+        return if(isPermanentlyDeclined) {
+            "It seems you permanently declined phone state permission. " +
+                    "You can go to the app settings to grant it."
+        } else {
+            "This app needs phone state permission so that you can see " +
+                    "your signal strength & cellular network type"
+        }
+    }
+}
+
 @HTPreviewAnnotations
 @Composable
 fun PermissionDialogPreview(){

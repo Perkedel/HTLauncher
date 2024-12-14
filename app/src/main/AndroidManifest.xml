@@ -2,6 +2,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.INTERNET" /> <!-- <uses-sdk -->
     <!-- https://github.com/Neamar/KISS/blob/master/app/src/main/AndroidManifest.xml -->
     <uses-permission
@@ -16,6 +20,7 @@
     <uses-permission android:name="android.permission.READ_MEDIA_AUDIO" />
     <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" />
     <uses-permission android:name="android.permission.READ_MEDIA_VISUAL_USER_SELECTED" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission
         android:name="android.permission.WRITE_EXTERNAL_STORAGE"
         android:maxSdkVersion="32"
@@ -24,10 +29,14 @@
     <uses-permission android:name="android.permission.BIND_APPWIDGET"
         tools:ignore="ProtectedPermissions" />
     <uses-permission android:name="com.android.alarm.permission.SET_ALARM"/>
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
 
 
     <uses-feature
         android:name="android.hardware.touchscreen"
+        android:required="false" />
+    <uses-feature
+        android:name="android.hardware.faketouch"
         android:required="false" />
     <uses-feature
         android:name="android.software.leanback"
@@ -48,12 +57,26 @@
     <uses-feature
         android:name="android.hardware.type.automotive"
         android:required="false" />
+    <!--  https://developer.android.com/games/playgames/input-mouse#disable_input_translation_mode  -->
+    <uses-feature
+        android:name="android.hardware.type.pc"
+        android:required="false"/>
     <uses-feature
         android:name="android.hardware.screen.portrait"
         android:required="false"/>
     <uses-feature
         android:name="android.hardware.screen.landscape"
         android:required="false"/>
+    <!--  https://developer.android.com/guide/topics/manifest/uses-feature-element#screen-interface-sw-features  -->
+    <uses-feature
+        android:name="android.software.home_screen"
+        android:required="false" />
+    <uses-feature
+        android:name="android.software.app_widgets"
+        android:required="false" />
+    <uses-feature
+        android:name="android.hardware.location.gps"
+        android:required="false" />
 
     <application
         android:allowBackup="true"

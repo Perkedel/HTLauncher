@@ -125,6 +125,7 @@ fun FirstPageCard(
                 Spacer(
                     modifier = Modifier.weight(1f)
                 )
+                HTSignalStrength()
                 HTBatteryLevel(
                     circular = true,
                 )
@@ -165,11 +166,15 @@ fun FirstPageCard(
                         }
                     )
                 }
-                Text("CLOCK")
+                HTViewClock(
+                    modifier = Modifier,
+                )
                 HTBatteryLevel(
                     circular = false,
                 )
-                Text("SIGNAL")
+                HTSignalStrength(
+                    showNumbers = true,
+                )
                 Spacer(
                     modifier = Modifier
                         .weight(1f)

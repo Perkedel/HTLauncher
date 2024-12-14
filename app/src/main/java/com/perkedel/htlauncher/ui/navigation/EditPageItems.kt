@@ -152,20 +152,23 @@ fun EditPageItems(
     var toRemove:Int by remember { mutableStateOf(-1) }
 
     viewModel.saveDirUri?.let {
-        htViewModel.selectSaveDirUri(it)
+//        htViewModel.selectSaveDirUri(it)
     }
 
     val lazyListState = rememberLazyGridState()
     val lazyColumnState = rememberLazyListState()
+    val bakeData: ()->Unit = {
+        onSwap(list)
+        data?.copy(
+            items = list
+        )?.let { onRebuild(it) }
+    }
     val addItemToHere:(String,Boolean) -> Unit = { name:String, intoTop:Boolean ->
         list = list.toMutableList().apply {
             add(if(intoTop) 0 else list.size-1, name)
         }
 
-        onSwap(list)
-        data?.copy(
-            items = list
-        )?.let { onRebuild(it) }
+        bakeData()
     }
     val removeItemFromHere: (String)->Unit = { name:String ->
         if(toRemove >= 0) {
@@ -173,20 +176,14 @@ fun EditPageItems(
                 remove(name)
             }
 
-            onSwap(list)
-            data?.copy(
-                items = list
-            )?.let { onRebuild(it) }
+            bakeData()
         }
     }
     val removeItemFromHereIndex: (Int)-> Unit = {
         list = list.toMutableList().apply {
             removeAt(it)
         }
-        onSwap(list)
-        data?.copy(
-            items = list
-        )?.let { onRebuild(it) }
+        bakeData()
     }
     val askRemoveItemFromHereIndex:(Int)->Unit = {
         toRemove = it
@@ -205,10 +202,7 @@ fun EditPageItems(
             haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
         }
 
-        onSwap(list)
-        data?.copy(
-            items = list
-        )?.let { onRebuild(it) }
+        bakeData()
     }
     val moveItemToExtreme:(String, Boolean)->Unit = {whichIs:String, toTop:Boolean ->
         list = list.toMutableList().apply{
@@ -222,10 +216,7 @@ fun EditPageItems(
             haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
         }
 
-        onSwap(list)
-        data?.copy(
-            items = list
-        )?.let { onRebuild(it) }
+        bakeData()
     }
     val reorderableLazyListState = rememberReorderableLazyGridState(
         lazyGridState = lazyListState,
@@ -245,10 +236,7 @@ fun EditPageItems(
         } else {
             haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
         }
-        onSwap(list)
-        data?.copy(
-            items = list
-        )?.let { onRebuild(it) }
+        bakeData()
     }
     val reorderableLazyColumnState = rememberReorderableLazyListState(
         lazyListState =lazyColumnState,
@@ -268,10 +256,7 @@ fun EditPageItems(
         } else {
             haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
         }
-        onSwap(list)
-        data?.copy(
-            items = list
-        )?.let { onRebuild(it) }
+        bakeData()
     }
 //    val customA11yActions: List<CustomAccessibilityAction> = listOf(
 //        CustomAccessibilityAction(

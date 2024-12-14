@@ -1,4 +1,6 @@
-@file:OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterial3Api::class)
+@file:OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterial3Api::class,
+    ExperimentalFoundationApi::class
+)
 
 package com.perkedel.htlauncher.widgets
 
@@ -7,8 +9,12 @@ import android.content.Context.BATTERY_SERVICE
 import android.content.Intent
 import android.os.BatteryManager
 import android.os.Build
+import android.speech.tts.TextToSpeech
+import android.widget.Toast
 import androidx.annotation.IntRange
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -33,6 +39,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -42,10 +49,17 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.hapticfeedback.HapticFeedback
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.LocalInspectionMode
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.perkedel.htlauncher.R
 import com.perkedel.htlauncher.func.SystemBroadcastReceiver
+import com.perkedel.htlauncher.modules.rememberTextToSpeech
+import com.perkedel.htlauncher.modules.ttsSpeakOrStop
 import com.perkedel.htlauncher.ui.bars.HTAppBar
 import com.perkedel.htlauncher.ui.previews.HTPreviewAnnotations
 import com.perkedel.htlauncher.ui.theme.HTLauncherTheme
@@ -60,6 +74,10 @@ fun HTBatteryLevel(
     modifier: Modifier = Modifier,
     context: Context = LocalContext.current,
     circular:Boolean = false,
+    tts: MutableState<TextToSpeech?> = rememberTextToSpeech(),
+    onClick: ()->Unit = {},
+    onLongClick: ()->Unit= {},
+    haptic: HapticFeedback = LocalHapticFeedback.current,
 ){
     // https://cs.android.com/androidx/platform/frameworks/support/+/androidx-main:compose/material3/material3/samples/src/main/java/androidx/compose/material3/samples/ProgressIndicatorSamples.kt
     // https://www.geeksforgeeks.org/get-battery-level-in-android-using-jetpack-compose/
@@ -163,8 +181,44 @@ fun HTBatteryLevel(
         else
             rememberColorScheme().tertiaryContainer
 
+    val sayShouldCharge:String = if(isCharging) {
+        when{
+            batteryLevel >= 100 -> context.getString(R.string.action_batteryfull)
+            else -> ""
+        }
+    }
+    else {
+        when {
+            batteryLevel in 16..39 -> context.getString(R.string.action_batterymedium)
+            batteryLevel < 15 -> context.getString(R.string.action_batterylow)
+            else -> ""
+        }
+    }
+
     Box(
-        modifier = modifier,
+        modifier = modifier
+            .combinedClickable(
+                onClick = {
+                    onClick()
+                },
+                onLongClick = {
+                    val readout = context.resources.getString(R.string.action_tellbattery,batteryLevel) + ". $sayShouldCharge"
+                    ttsSpeakOrStop(
+                        handover = tts,
+                        message = readout
+                    )
+                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                    Toast
+                        .makeText(
+                            context,
+                            readout,
+                            Toast.LENGTH_SHORT
+                        )
+                        .show()
+                    onLongClick()
+                },
+            )
+        ,
         contentAlignment = Alignment.Center,
     ){
         if(circular){

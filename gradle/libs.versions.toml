@@ -1,6 +1,6 @@
 [versions]
 accompanistSystemuicontroller = "0.28.0"
-agp = "8.7.2"
+agp = "8.7.3"
 coilCompose = "3.0.2"
 coilNetworkOkhttp = "3.0.2"
 coilSvg = "3.0.4"
@@ -28,7 +28,7 @@ lazycolumnscrollbar = "2.2.0"
 library = "1.1.1"
 lifecycleRuntimeKtx = "2.8.7"
 activityCompose = "1.9.3"
-composeBom = "2024.11.00"
+composeBom = "2024.12.01"
 leanback = "1.0.0"
 glide = "4.11.0"
 appcompat = "1.7.0"
@@ -36,20 +36,21 @@ material = "1.12.0"
 constraintlayout = "2.2.0"
 lifecycleLivedataKtx = "2.8.7"
 lifecycleViewmodelKtx = "2.8.7"
-navigationCompose = "2.8.4"
-navigationFragmentKtx = "2.8.4"
-navigationUiKtx = "2.8.4"
+navigationCompose = "2.8.5"
+navigationFragmentKtx = "2.8.5"
+navigationUiKtx = "2.8.5"
 retrofit = "2.11.0"
 tvFoundation = "1.0.0-alpha11"
 xicon_pack_z = "1.1.1"
-composeMaterial3 = "1.0.0-alpha29"
+composeMaterial3 = "1.0.0-alpha30"
 adaptiveNavigationSuite = "1.3.1"
 material3-adaptive = "1.0.0"
 cascade = "2.3.0"
 koin = "4.1.0-Beta1"
-uiTextGoogleFonts = "1.7.5"
+uiTextGoogleFonts = "1.7.6"
 foundationDesktop = "1.7.0"
 reorderable = "2.4.0"
+material-icons-extended = "1.7.6"
 
 [libraries]
 accompanist-adaptive = { module = "com.google.accompanist:accompanist-adaptive" }
@@ -62,7 +63,7 @@ androidx-datastore-preferences = { module = "androidx.datastore:datastore-prefer
 androidx-datastore-preferences-core = { module = "androidx.datastore:datastore-preferences-core", version.ref = "datastorePreferences" }
 androidx-documentfile = { module = "androidx.documentfile:documentfile", version.ref = "documentfile" }
 androidx-lifecycle-viewmodel-compose = { module = "androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "lifecycleRuntimeKtx" }
-androidx-material-icons-extended = { module = "androidx.compose.material:material-icons-extended" }
+androidx-material-icons-extended = { module = "androidx.compose.material:material-icons-extended", version.ref = "material-icons-extended" }
 androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigationCompose" }
 androidx-tv-foundation = { module = "androidx.tv:tv-foundation", version.ref = "tvFoundation" }
 cascade = { module = "me.saket.cascade:cascade", version.ref = "cascade" }

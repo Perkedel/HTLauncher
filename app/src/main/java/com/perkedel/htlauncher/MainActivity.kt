@@ -57,6 +57,7 @@ class MainActivity : ComponentActivity() {
             Manifest.permission.READ_MEDIA_AUDIO,
             Manifest.permission.READ_MEDIA_VIDEO,
             Manifest.permission.READ_MEDIA_IMAGES,
+
         )
     } else {
         arrayOf(
@@ -64,6 +65,9 @@ class MainActivity : ComponentActivity() {
             Manifest.permission.WRITE_EXTERNAL_STORAGE,
         )
     }
+    private val restOfPermission:Array<String> = arrayOf(
+        Manifest.permission.READ_PHONE_STATE,
+    )
 
     val htViewModel:HTViewModel = HTViewModel()
 
@@ -115,7 +119,11 @@ class MainActivity : ComponentActivity() {
                 0
             )
         }
-
+        ActivityCompat.requestPermissions(
+            this,
+            restOfPermission,
+            0
+        )
 
 
         setContent {
