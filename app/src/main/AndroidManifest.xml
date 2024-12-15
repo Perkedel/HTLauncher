@@ -77,8 +77,13 @@
     <uses-feature
         android:name="android.hardware.location.gps"
         android:required="false" />
+    <uses-feature
+        android:name="android.software.input_methods"
+        android:required="false" />
 
     <application
+        android:appCategory="productivity"
+        android:description="@string/app_description"
         android:allowBackup="true"
         android:banner="@mipmap/ic_launcher"
         android:dataExtractionRules="@xml/data_extraction_rules"

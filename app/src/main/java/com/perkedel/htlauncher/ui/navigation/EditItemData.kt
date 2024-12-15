@@ -230,7 +230,10 @@ fun EditItemData(
                         ) {
                             HTButton(
                                 title = "Add",
-                                leftIcon = Icons.Default.Add
+                                leftIcon = Icons.Default.Add,
+                                onClick = {
+                                    // TODO: add an ActionData
+                                }
                             )
                         }
                         if (inspectionMode) {

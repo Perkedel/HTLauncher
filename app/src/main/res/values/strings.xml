@@ -6,6 +6,7 @@
     <!--  https://www.happyfresh.id/ HUH?  -->
 
     <string name="app_name" translatable="false">HT Launcher</string>
+    <string name="app_description">Launcher for Handy Talkies without touchscreen</string>
     <string name="title_activity_main2">Leanback MainActivity2</string>
     <string name="browse_title">Videos by Your Company</string>
     <string name="related_movies">Related Videos</string>
