@@ -186,7 +186,7 @@ fun ItemCell(
     // Done:
     var selectImage:Any = itemOfIt.imagePath
     var selectLabel:String = if(itemOfIt.label.isNotEmpty()) itemOfIt.label else handoverText
-    if(itemOfIt.action[0].type != ActionDataLaunchType.Internal && itemOfIt.action[0].type != ActionDataLaunchType.Category) {
+    if(itemOfIt.action.isNotEmpty() && itemOfIt.action[0].type != ActionDataLaunchType.Internal && itemOfIt.action[0].type != ActionDataLaunchType.Category) {
         try {
             selectImage = when (itemOfIt.showWhichIcon) {
                 ShowWhichIcon.Default -> if (itemOfIt.action[0].action.isNotEmpty()) pm.getApplicationIcon(

@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.os.Build
+import android.util.Log
 import android.view.HapticFeedbackConstants
 import android.view.SoundEffectConstants
 import android.view.View
@@ -55,6 +56,7 @@ import androidx.compose.ui.hapticfeedback.HapticFeedback
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalGraphicsContext
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
@@ -133,7 +135,11 @@ fun EditHomePageOrders(
         onSwap(list)
         data?.copy(
             pagesPath = list
-        )?.let { onRebuild(it) }
+        )?.let {
+            Log.d("Rebuild","Rebuild: ${it}")
+            Log.d("Rebuild","Of List: ${list}")
+            onRebuild(it)
+        }
     }
     val addItemToHere:(String,Boolean) -> Unit = { name:String, intoTop:Boolean ->
         list = list.toMutableList().apply {
@@ -159,16 +165,16 @@ fun EditHomePageOrders(
         }
     }
     val removeItemFromHereIndex: (Int)-> Unit = {
+        var theItem:String = ""
+        var andIndex:Int = 0
+        list = list.toMutableList().apply {
+            andIndex = it
+            theItem = removeAt(it)
+        }
+        theRemovedItem = theRemovedItem.toMutableList().apply {
+            add(theItem)
+        }
         coroutineScope.launch {
-            var theItem:String = ""
-            var andIndex:Int = 0
-            list = list.toMutableList().apply {
-                andIndex = it
-                theItem = removeAt(it)
-            }
-            theRemovedItem = theRemovedItem.toMutableList().apply {
-                add(theItem)
-            }
             val snackbarActionResult: SnackbarResult = snackbarHostState.showSnackbar(
                 message = "Removed ${theItem}",
                 actionLabel = "Undo",
@@ -187,7 +193,6 @@ fun EditHomePageOrders(
                 else -> {}
             }
         }
-
         bakeData()
     }
     val askRemoveItemFromHereIndex:(Int)->Unit = {

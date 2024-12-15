@@ -158,24 +158,30 @@ fun AddIntoTheListOf(
                             onClose()
                         },
                         icon = {
-//                            AsyncImage(
-//                                model = when (addIntoWhich) {
-//                                    EditWhich.Pages -> {
-//                                        htViewModel.getItemIcon(
-//                                            of = filterList[it],
-//                                            context = context,
-//                                            pm = pm,
-//                                        )
-//                                    }
-//
-//                                    else -> R.drawable.placeholder
-//                                },
-//                                contentDescription = "",
-//                                modifier = Modifier
-//                                    .size(75.dp),
-//                                error = painterResource(id = R.drawable.mavrickle),
-//                                placeholder = painterResource(id = R.drawable.placeholder),
-//                            )
+                            AsyncImage(
+                                model = when (addIntoWhich) {
+                                    EditWhich.Pages -> {
+                                        htViewModel.getItemIcon(
+                                            of = filterList[it],
+                                            context = context,
+                                            pm = pm,
+                                        )
+                                    }
+                                    EditWhich.Home -> {
+                                        htViewModel.getPageIcon(
+                                            of = filterList[it],
+                                            context = context,
+                                            pm = pm,
+                                        )
+                                    }
+                                    else -> R.drawable.placeholder
+                                },
+                                contentDescription = "",
+                                modifier = Modifier
+                                    .size(75.dp),
+                                error = painterResource(id = R.drawable.mavrickle),
+                                placeholder = painterResource(id = R.drawable.placeholder),
+                            )
                         }
                     )
                 }

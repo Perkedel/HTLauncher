@@ -195,7 +195,7 @@ fun HTBatteryLevel(
     else {
         when {
             batteryLevel in 16..39 -> context.getString(R.string.action_batterymedium)
-            batteryLevel < 15 -> context.getString(R.string.action_batterylow)
+            batteryLevel <= 15 -> context.getString(R.string.action_batterylow)
             else -> ""
         }
     }

@@ -17,6 +17,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -61,7 +62,8 @@ fun EditItemData(
     isOrientation: Int = configuration.orientation,
     onRebuildItem:(ItemData)->Unit = {},
     onEditActionData: (ActionData,Int)->Unit = { actionData: ActionData, i: Int -> {}},
-    inspectionMode: Boolean = LocalInspectionMode.current
+    inspectionMode: Boolean = LocalInspectionMode.current,
+    snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
     ){
     // https://stackoverflow.com/a/71261790/9079640
     val toChange by remember { mutableStateOf(data) }

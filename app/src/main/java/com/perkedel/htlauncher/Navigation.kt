@@ -160,6 +160,8 @@ fun Navigation(
     view: View = LocalView.current,
     inspectionMode:Boolean = LocalInspectionMode.current,
 ){
+    // https://developer.android.com/codelabs/large-screens/add-keyboard-and-mouse-support-with-compose#0
+
     var homePagerState: PagerState = rememberPagerState(pageCount = {10})
 
     //permission
@@ -1774,8 +1776,10 @@ fun onLaunchAction(
                         context.resources.getString(ActionInternalCommand.GoToPage.id) -> {
                             if(data[0].args[0].isNotBlank()){
                                 uiState.coreConfigJson?.let {
-                                    val indexor = uiState.coreConfigJson?.pagesPath?.indexOf(data[0].args[0])
-                                    handoverPagerState.animateScrollToPage(indexor ?: 0)
+                                    if(uiState.coreConfigJson?.pagesPath?.contains(data[0].args[0]) == true){
+                                        val indexor = uiState.coreConfigJson?.pagesPath?.indexOf(data[0].args[0])
+                                        handoverPagerState.animateScrollToPage(indexor ?: 0)
+                                    }
                                 }
                             } else {
                                 throw IllegalArgumentException("Argument 0 cannot be empty", IllegalStateException("Action ${data[0].action}: Empty Argument 0: ${data[0].args[0]}"))

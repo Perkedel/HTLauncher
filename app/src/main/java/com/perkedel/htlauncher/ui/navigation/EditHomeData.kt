@@ -12,9 +12,11 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Reorder
 import androidx.compose.material3.Icon
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.hapticfeedback.HapticFeedback
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
@@ -52,7 +54,8 @@ fun EditHomeData(
     inspectionMode: Boolean = LocalInspectionMode.current,
     haptic: HapticFeedback = LocalHapticFeedback.current,
     tts: MutableState<TextToSpeech?> = rememberTextToSpeech(),
-    onSelectedKey: (String)->Unit = {}
+    onSelectedKey: (String)->Unit = {},
+    snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
 ){
     var rebuild: () -> Unit = {
         data?.copy()?.let { onRebuildItem(it) }

@@ -23,6 +23,15 @@ val WarnColorDark = Color(0xFFB76A00)
 val WarnColorLightContainer = Color(0xFFFFD7A2)
 val WarnColorDarkContainer = Color(0xFF362700)
 
+val FocusColorLight = Color(0xFF32CD32)
+val FocusColorDark = Color(0xFF1ABC9C)
+val FocusColorLightContainer = Color(0xFFA2FFA2)
+val FocusColorDarkContainer = Color(0xFF00B33C)
+val UnfocusColorLight = Color(0xFFB0C4DE)
+val UnfocusColorDark = Color(0xFF708090)
+val UnfocusColorLightContainer = Color(0xFFD6EAF8)
+val UnfocusColorDarkContainer = Color(0xFF34495E)
+
 // INCOMING MATERIAL DESIGN GENERATOR!!!
 // http://material-foundation.github.io?primary=%230052EB&bodyFont=Ubuntu&displayFont=Ubuntu&colorMatch=true
 

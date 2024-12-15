@@ -2,6 +2,7 @@
     ExperimentalMaterial3Api::class,
     ExperimentalMaterial3AdaptiveApi::class,
     ExperimentalMaterial3Api::class,
+    ExperimentalMaterial3AdaptiveApi::class, ExperimentalMaterial3AdaptiveApi::class,
     ExperimentalMaterial3AdaptiveApi::class,
 )
 
@@ -56,6 +57,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.PlainTooltip
+import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.TooltipBox
 import androidx.compose.material3.TooltipDefaults
@@ -493,6 +495,13 @@ fun ItemEditorGreeting(
                 }
             )
         },
+        snackbarHost = {
+            // https://developer.android.com/develop/ui/compose/components/snackbar
+            // https://youtu.be/_yON9d9if6g?si=l5HVadsldckAuErk
+            SnackbarHost(
+                hostState = snackbarHostState
+            )
+        }
     ){ innerPadding ->
         NavigableListDetailPaneScaffold(
             modifier = modifier.padding(innerPadding),
@@ -516,7 +525,8 @@ fun ItemEditorGreeting(
                         onRebuildItem = {
                             viewModel.updateItemData(it)
                             viewModel.updateRawContent(json.encodeToString<ItemData>(it))
-                        }
+                        },
+                        snackbarHostState = snackbarHostState,
                     )
                     EditWhich.Pages -> EditPageData(
                         modifier = Modifier,
@@ -560,6 +570,7 @@ fun ItemEditorGreeting(
                                     else -> {}
                                 }
                             },
+                            snackbarHostState = snackbarHostState
                         )
                     }
                     else -> {
@@ -650,7 +661,8 @@ fun ItemEditorGreeting(
                                                 pane = ListDetailPaneScaffoldRole.Extra,
                                                 content = "select action aaa ${viewModel.rawContent}"
                                             )
-                                        }
+                                        },
+                                        snackbarHostState = snackbarHostState,
                                     )
                                 }
                                 viewModel.itemDetailPaneNavigate == ItemDetailPaneNavigate.ReorderItems -> {
@@ -683,7 +695,8 @@ fun ItemEditorGreeting(
                                                 pane = ListDetailPaneScaffoldRole.Extra,
                                                 content = "Add Item to Page"
                                             )
-                                        }
+                                        },
+                                        snackbarHostState = snackbarHostState,
                                     )
                                 }
                                 viewModel.itemDetailPaneNavigate == ItemDetailPaneNavigate.ReorderPages -> {
@@ -709,7 +722,8 @@ fun ItemEditorGreeting(
                                                 pane = ListDetailPaneScaffoldRole.Extra,
                                                 content = "Add Page to Home"
                                             )
-                                        }
+                                        },
+                                        snackbarHostState = snackbarHostState,
                                     )
                                 }
                                 viewModel.editType == EditWhich.Items -> {
@@ -753,7 +767,8 @@ fun ItemEditorGreeting(
                                     viewModel.selectExtraNavigate(ItemExtraPaneNavigate.Default)
 //                                    viewModel.resyncItemDataAction()
                                     navigator.navigateBack()
-                                }
+                                },
+                                snackbarHostState = snackbarHostState,
                             )
                         }
                         viewModel.itemExtraPaneNavigate == ItemExtraPaneNavigate.AddItem -> {
@@ -799,6 +814,7 @@ fun ItemEditorGreeting(
                                     navigator.navigateBack()
                                 },
                                 pm = context.packageManager,
+                                snackbarHostState = snackbarHostState,
                             )
                         }
                         else -> {

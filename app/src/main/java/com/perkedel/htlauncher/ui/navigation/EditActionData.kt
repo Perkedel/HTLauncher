@@ -26,6 +26,7 @@ import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MenuAnchorType
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -68,6 +69,7 @@ fun EditActionData(
     onRebuild: (ActionData,Int) -> Unit = { actionData: ActionData, i: Int -> },
     onClose: ()->Unit = {},
     onSelectAction: ()->Unit = {},
+    snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
 ){
     Column(
         modifier = modifier.verticalScroll(rememberScrollState())

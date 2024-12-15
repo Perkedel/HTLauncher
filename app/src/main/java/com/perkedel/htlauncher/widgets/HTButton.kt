@@ -7,7 +7,9 @@ import android.view.View
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.focusable
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
@@ -27,12 +29,22 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.FocusState
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.onFocusEvent
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
+import androidx.compose.ui.unit.dp
 import com.perkedel.htlauncher.enumerations.ButtonTypes
 import com.perkedel.htlauncher.ui.previews.BooleanPreviewParameter
 import com.perkedel.htlauncher.ui.previews.ButtonPreviewParams
@@ -41,7 +53,16 @@ import com.perkedel.htlauncher.ui.previews.CombinedButtonPreviewParameter
 import com.perkedel.htlauncher.ui.previews.HTPreviewAnnotations
 import com.perkedel.htlauncher.ui.previews.HTPreviewAnnotationsPOC
 import com.perkedel.htlauncher.ui.previews.PreviewButtons
+import com.perkedel.htlauncher.ui.theme.FocusColorDark
+import com.perkedel.htlauncher.ui.theme.FocusColorDarkContainer
+import com.perkedel.htlauncher.ui.theme.FocusColorLight
+import com.perkedel.htlauncher.ui.theme.FocusColorLightContainer
 import com.perkedel.htlauncher.ui.theme.HTLauncherTheme
+import com.perkedel.htlauncher.ui.theme.UnfocusColorDark
+import com.perkedel.htlauncher.ui.theme.UnfocusColorDarkContainer
+import com.perkedel.htlauncher.ui.theme.UnfocusColorLight
+import com.perkedel.htlauncher.ui.theme.UnfocusColorLightContainer
+import com.perkedel.htlauncher.ui.theme.rememberColorScheme
 
 @Composable
 fun HTButton(
@@ -67,6 +88,7 @@ fun HTButton(
     },
 
     enabled:Boolean = true,
+    focusThisFirst:Boolean = false,
     shape: Shape = when(buttonType){
         ButtonTypes.OutlineButton -> ButtonDefaults.outlinedShape
         ButtonTypes.TextButton -> ButtonDefaults.textShape
@@ -123,18 +145,89 @@ fun HTButton(
 //        onClick = {},
 //        onLongClick = onLongClick,
 //    ) else null
+    // https://stackoverflow.com/a/75701959/9079640
+    // https://developer.android.com/develop/ui/compose/touch-input/focus/react-to-focus
+    val darkCheck:Boolean = isSystemInDarkTheme()
+    var backgroundFocusColor by remember { mutableStateOf(
+        if(darkCheck){
+            FocusColorDarkContainer
+        } else {
+            FocusColorLightContainer
+        }
+    ) }
+    var borderFocusColor by remember { mutableStateOf(
+        if(darkCheck){
+            FocusColorDark
+        } else {
+            FocusColorLight
+        }
+    ) }
+    var thereforeInFocus:Boolean by remember { mutableStateOf(false) }
+    var focusButtonColor:ButtonColors = ButtonDefaults.buttonColors(
+        containerColor = backgroundFocusColor
+    )
+    var focusIconButtonColors:IconButtonColors = IconButtonDefaults.iconButtonColors(
+        containerColor = backgroundFocusColor
+    )
+    fun applyFocusColors(focusState: FocusState) {
+        borderFocusColor = if (focusState.isFocused) {
+            if(darkCheck){
+                FocusColorDark
+            } else {
+                FocusColorLight
+            }
+        } else {
+            if(darkCheck){
+                UnfocusColorDark
+            } else {
+                UnfocusColorLight
+            }
+        }
+        backgroundFocusColor = if (focusState.isFocused) {
+            if(darkCheck){
+                FocusColorDarkContainer
+            } else {
+                FocusColorLightContainer
+            }
+        } else {
+            if(darkCheck){
+                UnfocusColorDarkContainer
+            } else {
+                UnfocusColorLightContainer
+            }
+        }
+        thereforeInFocus = focusState.isFocused
+    }
+    val focusAugmentModifier:Modifier = if (focusThisFirst) {
+        val focusRequester = remember { FocusRequester() }
+        LaunchedEffect(Unit) {
+            focusRequester.requestFocus()
+        }
+        modifier
+            .onFocusEvent(::applyFocusColors)
+            .focusRequester(focusRequester)
+            .focusable()
+    }else {
+        modifier
+            .onFocusEvent(::applyFocusColors)
+            .focusable()
+    }
+
+    val totalModifier:Modifier = focusAugmentModifier
+
+
     when(buttonType){
         ButtonTypes.OutlineButton -> OutlinedButton(
-            modifier = modifier.combinedClickable(
+            modifier = totalModifier.combinedClickable(
                 enabled = enabled,
                 onClick = {},
                 onLongClick = onLongClick
             ),
             enabled = enabled,
             shape = shape,
-            colors = colors,
+            colors = if(thereforeInFocus) focusButtonColor else colors,
             elevation = elevation,
-            border = border,
+            border = if (thereforeInFocus) BorderStroke(2.dp,borderFocusColor) else border,
             contentPadding = contentPadding,
             interactionSource = interactionSource,
             onClick = {
@@ -144,14 +237,14 @@ fun HTButton(
             content = content,
         )
         ButtonTypes.TextButton-> TextButton(
-            modifier = modifier.combinedClickable(
+            modifier = totalModifier.combinedClickable(
                 enabled = enabled,
                 onClick = {},
                 onLongClick = onLongClick
             ),
             enabled = enabled,
             shape = shape,
-            colors = colors,
+            colors = if(thereforeInFocus) focusButtonColor else colors,
             elevation = elevation,
             border = border,
             contentPadding = contentPadding,
@@ -163,7 +256,7 @@ fun HTButton(
             content = content,
         )
         ButtonTypes.IconButton -> IconButton(
-            modifier = modifier.combinedClickable(
+            modifier = totalModifier.combinedClickable(
                 enabled = enabled,
                 onClick = {},
                 onLongClick = onLongClick,
@@ -172,7 +265,7 @@ fun HTButton(
             ),
             enabled = enabled,
 
-            colors = iconButtonColors,
+            colors = if(thereforeInFocus) focusIconButtonColors else iconButtonColors,
 
             interactionSource = interactionSource,
             onClick = {
@@ -193,7 +286,7 @@ fun HTButton(
         )
 
         else -> Button(
-            modifier = modifier.combinedClickable(
+            modifier = totalModifier.combinedClickable(
                 enabled = enabled,
                 onClick = {},
                 onLongClick = onLongClick,
@@ -202,7 +295,7 @@ fun HTButton(
             ),
             enabled = enabled,
             shape = shape,
-            colors = colors,
+            colors = if(thereforeInFocus) focusButtonColor else colors,
             elevation = elevation,
             border = border,
             contentPadding = contentPadding,
