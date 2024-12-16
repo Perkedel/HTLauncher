@@ -217,70 +217,117 @@ fun ItemCell(
         // CRASH
 //        selectImage = ActionInternalCommand.valueOf(itemOfIt.action[0].action).icon
 //        selectLabel = stringResource(ActionInternalCommand.valueOf(itemOfIt.action[0].action).label)
-        selectImage = when(itemOfIt.action[0].action){
-            // https://stackoverflow.com/questions/68932422/loading-local-drawables-with-coil-compose
-            // WOW Codeium you got it!! (Result these to refer ActionInternalCommand.???.image as the first two)
-            stringResource(ActionInternalCommand.AllApps.id) -> ActionInternalCommand.AllApps.image
-            stringResource(ActionInternalCommand.Camera.id) -> ActionInternalCommand.Camera.image
-            stringResource(ActionInternalCommand.Telephone.id) -> ActionInternalCommand.Telephone.image
-            stringResource(ActionInternalCommand.Gallery.id) -> ActionInternalCommand.Gallery.image
-            stringResource(ActionInternalCommand.Clock.id) -> ActionInternalCommand.Clock.image
-            stringResource(ActionInternalCommand.Contacts.id) -> ActionInternalCommand.Contacts.image
-            stringResource(ActionInternalCommand.Messages.id) -> ActionInternalCommand.Messages.image
-            stringResource(ActionInternalCommand.Emergency.id) -> ActionInternalCommand.Emergency.image
-            stringResource(ActionInternalCommand.Settings.id) -> ActionInternalCommand.Settings.image
-            stringResource(ActionInternalCommand.SystemSettings.id) -> ActionInternalCommand.SystemSettings.image
-            stringResource(ActionInternalCommand.Preferences.id) -> ActionInternalCommand.Preferences.image
-            stringResource(ActionInternalCommand.GoToPage.id) -> ActionInternalCommand.GoToPage.image
-            stringResource(ActionInternalCommand.OpenAPage.id) -> ActionInternalCommand.OpenAPage.image
-            stringResource(ActionInternalCommand.Aria.id) -> ActionInternalCommand.Aria.image
-            stringResource(InternalCategories.SettingsSystem.id) -> InternalCategories.SettingsSystem.image
-            stringResource(InternalCategories.SettingsOverall.id) -> InternalCategories.SettingsOverall.image
-            else -> R.drawable.placeholder
-        }
-        selectLabel = when(itemOfIt.action[0].action){
-            stringResource(ActionInternalCommand.AllApps.id)-> stringResource(ActionInternalCommand.AllApps.label)
-            stringResource(ActionInternalCommand.Camera.id)-> stringResource(ActionInternalCommand.Camera.label)
-            stringResource(ActionInternalCommand.Telephone.id)-> stringResource(ActionInternalCommand.Telephone.label)
-            stringResource(ActionInternalCommand.Clock.id)-> stringResource(ActionInternalCommand.Clock.label)
-            stringResource(ActionInternalCommand.Messages.id)-> stringResource(ActionInternalCommand.Messages.label)
-            stringResource(ActionInternalCommand.Emergency.id)-> stringResource(ActionInternalCommand.Emergency.label)
-            stringResource(ActionInternalCommand.Gallery.id)-> stringResource(ActionInternalCommand.Gallery.label)
-            stringResource(ActionInternalCommand.Settings.id)-> stringResource(ActionInternalCommand.Settings.label)
-            stringResource(ActionInternalCommand.SystemSettings.id)-> stringResource(ActionInternalCommand.SystemSettings.label)
-            stringResource(ActionInternalCommand.Preferences.id)-> stringResource(ActionInternalCommand.Preferences.label)
-            stringResource(ActionInternalCommand.Contacts.id)-> stringResource(ActionInternalCommand.Contacts.label)
-            stringResource(InternalCategories.SettingsSystem.id) -> stringResource(InternalCategories.SettingsSystem.label)
-            stringResource(InternalCategories.SettingsOverall.id) -> stringResource(InternalCategories.SettingsOverall.label)
-            else -> itemOfIt.action[0].action
-        }
+        selectImage =
+            if(itemOfIt.action.isNotEmpty() && itemOfIt.action[0].action.isNotBlank()) {
+                when (itemOfIt.action[0].action) {
+                    // https://stackoverflow.com/questions/68932422/loading-local-drawables-with-coil-compose
+                    // WOW Codeium you got it!! (Result these to refer ActionInternalCommand.???.image as the first two)
+                    stringResource(ActionInternalCommand.AllApps.id) -> ActionInternalCommand.AllApps.image
+                    stringResource(ActionInternalCommand.Camera.id) -> ActionInternalCommand.Camera.image
+                    stringResource(ActionInternalCommand.Telephone.id) -> ActionInternalCommand.Telephone.image
+                    stringResource(ActionInternalCommand.Gallery.id) -> ActionInternalCommand.Gallery.image
+                    stringResource(ActionInternalCommand.Clock.id) -> ActionInternalCommand.Clock.image
+                    stringResource(ActionInternalCommand.Contacts.id) -> ActionInternalCommand.Contacts.image
+                    stringResource(ActionInternalCommand.Messages.id) -> ActionInternalCommand.Messages.image
+                    stringResource(ActionInternalCommand.Emergency.id) -> ActionInternalCommand.Emergency.image
+                    stringResource(ActionInternalCommand.Settings.id) -> ActionInternalCommand.Settings.image
+                    stringResource(ActionInternalCommand.SystemSettings.id) -> ActionInternalCommand.SystemSettings.image
+                    stringResource(ActionInternalCommand.Preferences.id) -> ActionInternalCommand.Preferences.image
+                    stringResource(ActionInternalCommand.GoToPage.id) -> ActionInternalCommand.GoToPage.image
+                    stringResource(ActionInternalCommand.OpenAPage.id) -> ActionInternalCommand.OpenAPage.image
+                    stringResource(ActionInternalCommand.Aria.id) -> ActionInternalCommand.Aria.image
+                    stringResource(InternalCategories.SettingsSystem.id) -> InternalCategories.SettingsSystem.image
+                    stringResource(InternalCategories.SettingsOverall.id) -> InternalCategories.SettingsOverall.image
+                    else -> R.drawable.placeholder
+                }
+            } else R.drawable.mavrickle
+        selectLabel = if(itemOfIt.action.isNotEmpty() && itemOfIt.action[0].action.isNotBlank()) {
+            when (itemOfIt.action[0].action) {
+                stringResource(ActionInternalCommand.AllApps.id) -> stringResource(
+                    ActionInternalCommand.AllApps.label
+                )
+
+                stringResource(ActionInternalCommand.Camera.id) -> stringResource(
+                    ActionInternalCommand.Camera.label
+                )
+
+                stringResource(ActionInternalCommand.Telephone.id) -> stringResource(
+                    ActionInternalCommand.Telephone.label
+                )
+
+                stringResource(ActionInternalCommand.Clock.id) -> stringResource(
+                    ActionInternalCommand.Clock.label
+                )
+
+                stringResource(ActionInternalCommand.Messages.id) -> stringResource(
+                    ActionInternalCommand.Messages.label
+                )
+
+                stringResource(ActionInternalCommand.Emergency.id) -> stringResource(
+                    ActionInternalCommand.Emergency.label
+                )
+
+                stringResource(ActionInternalCommand.Gallery.id) -> stringResource(
+                    ActionInternalCommand.Gallery.label
+                )
+
+                stringResource(ActionInternalCommand.Settings.id) -> stringResource(
+                    ActionInternalCommand.Settings.label
+                )
+
+                stringResource(ActionInternalCommand.SystemSettings.id) -> stringResource(
+                    ActionInternalCommand.SystemSettings.label
+                )
+
+                stringResource(ActionInternalCommand.Preferences.id) -> stringResource(
+                    ActionInternalCommand.Preferences.label
+                )
+
+                stringResource(ActionInternalCommand.Contacts.id) -> stringResource(
+                    ActionInternalCommand.Contacts.label
+                )
+
+                stringResource(InternalCategories.SettingsSystem.id) -> stringResource(
+                    InternalCategories.SettingsSystem.label
+                )
+
+                stringResource(InternalCategories.SettingsOverall.id) -> stringResource(
+                    InternalCategories.SettingsOverall.label
+                )
+
+                else -> itemOfIt.action[0].action
+            }
+        } else handoverText
     }
-    val selectCompartmentType:String = when(itemOfIt.action[0].type){
-        ActionDataLaunchType.LauncherActivity -> stringResource(R.string.aria_label_LauncherActivity,selectLabel)
-        ActionDataLaunchType.ShellOpen -> stringResource(R.string.aria_label_ShellOpen,selectLabel)
-        ActionDataLaunchType.Activity -> stringResource(R.string.aria_label_Activity,selectLabel)
-        ActionDataLaunchType.Internal ->{
-            // NO SOLUTION
-            // if enum not found, crash
-            // https://stackoverflow.com/questions/69163458/java-lang-illegalargumentexception-no-enum-constant-found
-            // https://www.reddit.com/r/JetpackCompose/comments/1fvyftg/help_im_creating_an_app_just_to_practice_im/
-            // https://www.reddit.com/r/JetpackCompose/comments/1fvyftg/help_im_creating_an_app_just_to_practice_im/
-            // https://stackoverflow.com/questions/77933152/using-mutablestateof-with-enums-kotlin-jetpack-composable
-            // https://stackoverflow.com/questions/74860799/how-to-catch-an-error-in-jetpack-compose
+    val selectCompartmentType:String = if(itemOfIt.action.isNotEmpty()){
+        when(itemOfIt.action[0].type){
+            ActionDataLaunchType.LauncherActivity -> stringResource(R.string.aria_label_LauncherActivity,selectLabel)
+            ActionDataLaunchType.ShellOpen -> stringResource(R.string.aria_label_ShellOpen,selectLabel)
+            ActionDataLaunchType.Activity -> stringResource(R.string.aria_label_Activity,selectLabel)
+            ActionDataLaunchType.Internal ->{
+                // NO SOLUTION
+                // if enum not found, crash
+                // https://stackoverflow.com/questions/69163458/java-lang-illegalargumentexception-no-enum-constant-found
+                // https://www.reddit.com/r/JetpackCompose/comments/1fvyftg/help_im_creating_an_app_just_to_practice_im/
+                // https://www.reddit.com/r/JetpackCompose/comments/1fvyftg/help_im_creating_an_app_just_to_practice_im/
+                // https://stackoverflow.com/questions/77933152/using-mutablestateof-with-enums-kotlin-jetpack-composable
+                // https://stackoverflow.com/questions/74860799/how-to-catch-an-error-in-jetpack-compose
 
 //            try {
 //                stringResource(ActionInternalCommand.valueOf(itemOfIt.action[0].action).label)
 //            } catch (e:Exception){
 //                ""
 //            }
-            when(itemOfIt.action[0].action){
-                stringResource(ActionInternalCommand.AllApps.id)-> stringResource(ActionInternalCommand.AllApps.label)
-                else -> selectLabel
+                when(itemOfIt.action[0].action){
+                    stringResource(ActionInternalCommand.AllApps.id)-> stringResource(ActionInternalCommand.AllApps.label)
+                    else -> selectLabel
+                }
             }
-        }
 
-        else -> selectLabel
-    }
+            else -> selectLabel
+        }
+    } else selectLabel
+
     val selectAria:String = if(itemOfIt.useAria && itemOfIt.aria.isNotEmpty()) itemOfIt.aria else selectCompartmentType
 
     val gridViewStyle: @Composable ()->Unit = {

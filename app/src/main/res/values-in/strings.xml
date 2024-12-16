@@ -159,6 +159,7 @@
 
     <!--  Filename & Directory label  -->
     <string name="home_screen_file_label" >Rumah</string>
+    <string name="home_screen_file_description">Terdapat %s. Atur Halaman, Item, dan lainnya.</string>
     <string name="test_file_label" >tes</string>
     <string name="pages_folder_label">Halaman</string>
     <string name="items_folder_label" >Item</string>
@@ -307,6 +308,9 @@
     <string name="pieces_unit">butir</string>
     <plurals name="pieces_units">
         <item quantity="other">%d butir</item>
+    </plurals>
+    <plurals name="pages_units">
+        <item quantity="other">%d halaman</item>
     </plurals>
     <plurals name="animals_units">
         <item quantity="other">%d ekor</item>

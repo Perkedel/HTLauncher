@@ -115,14 +115,14 @@ class HTViewModel(
 //            )
 //        }
     }
-    fun preloadFiles(context: Context, contentResolver: ContentResolver, uiStating:HTUIState = uiState.value, listOfFolder:List<String>, folders: MutableMap<String,Uri>, json: Json = Json{
+    suspend fun preloadFiles(context: Context, contentResolver: ContentResolver, uiStating:HTUIState = uiState.value, listOfFolder:List<String>, folders: MutableMap<String,Uri>, json: Json = Json{
         // https://coldfusion-example.blogspot.com/2022/03/jetpack-compose-kotlinx-serialization_79.html
         prettyPrint = true
         encodeDefaults = true
     }, force:Boolean = false){
         // https://programmingheadache.com/2024/02/13/effortless-loading-screen-with-state-flows-and-jetpack-compose-just-4-easy-steps/
 
-//        viewModelScope.launch {
+        viewModelScope.launch {
             setIsReady(into = false)
             var initing:Boolean = uiStating.inited
             Log.d("PreloadFiles","Inited is ${initing}")
@@ -434,7 +434,7 @@ class HTViewModel(
                     updateIniting(initing)
                 }
             }
-//        }
+        }
 
     }
 

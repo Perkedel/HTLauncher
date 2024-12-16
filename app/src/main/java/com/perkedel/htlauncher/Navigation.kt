@@ -26,6 +26,7 @@ import android.speech.tts.TextToSpeech
 import android.util.Log
 import android.view.SoundEffectConstants
 import android.view.View
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -57,6 +58,8 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.hapticfeedback.HapticFeedback
 import androidx.compose.ui.platform.LocalConfiguration
@@ -65,6 +68,8 @@ import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.intl.Locale
+import java.util.Locale as JavaLocale
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewDynamicColors
 import androidx.compose.ui.tooling.preview.PreviewFontScale
@@ -97,6 +102,8 @@ import com.perkedel.htlauncher.enumerations.EditWhich
 import com.perkedel.htlauncher.enumerations.Screen
 import com.perkedel.htlauncher.func.createDataStore
 import com.perkedel.htlauncher.modules.rememberTextToSpeech
+import com.perkedel.htlauncher.modules.ttsSpeakInterrupt
+import com.perkedel.htlauncher.modules.ttsSpeakOrStop
 import com.perkedel.htlauncher.ui.activities.ItemEditorActivity
 //import androidx.wear.compose.material3.ScaffoldState
 import com.perkedel.htlauncher.ui.dialog.HomeMoreMenu
@@ -161,6 +168,8 @@ fun Navigation(
     inspectionMode:Boolean = LocalInspectionMode.current,
 ){
     // https://developer.android.com/codelabs/large-screens/add-keyboard-and-mouse-support-with-compose#0
+
+    // TODO: go back to page 0 if on Homescreen, and press back button.
 
     var homePagerState: PagerState = rememberPagerState(pageCount = {10})
 
@@ -239,6 +248,7 @@ fun Navigation(
             it[saveDir] ?: ""
         }
         .collectAsState("")
+    val ramSaveDir by rememberSaveable { mutableStateOf(selectedSaveDir) }
     LaunchedEffect(
         selectedSaveDir,
 //        prefs.data.map {
@@ -403,9 +413,12 @@ fun Navigation(
 
 
 
-
+    var initing:Boolean by rememberSaveable { mutableStateOf(false) }
     LaunchedEffect(htuiState.selectedSaveDir) {
-        val initing = htuiState.inited
+//        val initing = htuiState.inited
+//        initing = htuiState.inited
+        initing = false
+        Log.d("Recompose","Recompose Inited is ${initing}")
 //        val preloadThing = async {
 //            // https://medium.com/@rajputmukesh748/mastering-async-and-await-in-kotlin-coroutines-833e57fa0e8f
 ////            delay(5000)
@@ -437,7 +450,11 @@ fun Navigation(
                     listOfFolder = listOfFolder,
                     folders = folders,
                     json = json,
+//                    force = true,
                 )
+                initing = true
+            } else {
+                anViewModel.setIsReady(true)
             }
         }
 //        coroutineScope.launch {
@@ -760,6 +777,7 @@ fun Navigation(
                                 uiState = htuiState,
                                 inspectionMode = inspectionMode,
                                 handoverPagerState = homePagerState,
+                                tts = tts,
                             )
                         }
                     )
@@ -827,6 +845,7 @@ fun Navigation(
                                 uiState = htuiState,
                                 inspectionMode = inspectionMode,
                                 handoverPagerState = homePagerState,
+                                tts = tts,
                             )
                         }
                     )
@@ -1469,15 +1488,22 @@ private fun goBackHome(
     navController.popBackStack(Screen.HomeScreen.name, inclusive = false)
 }
 
-public fun startIntent(context: Context, what: String){
+public fun startIntent(context: Context, what: String, extras:Map<String,String> = mapOf()){
     // https://www.geeksforgeeks.org/android-jetpack-compose-open-specific-settings-screen/
     val i : Intent = Intent(what)
+//    i.putExtra()
+    for(extra in extras){
+        i.putExtra(extra.key,extra.value)
+    }
     context.startActivity(i)
 }
 
-public fun startIntent(context: Context, what: Intent){
+public fun startIntent(context: Context, what: Intent, extras:Map<String,String> = mapOf()){
     // https://www.geeksforgeeks.org/android-jetpack-compose-open-specific-settings-screen/
     val i : Intent = what
+    for(extra in extras){
+        i.putExtra(extra.key,extra.value)
+    }
     context.startActivity(i)
 }
 
@@ -1486,11 +1512,11 @@ public fun startIntent(context: Context, what: Intent){
 //}
 
 @Throws(Exception::class)
-public fun startApplication(context: Context, what: String, pm: PackageManager = context.packageManager){
+public fun startApplication(context: Context, what: String, pm: PackageManager = context.packageManager, extras:Map<String,String> = mapOf()){
     // https://developer.android.com/reference/android/content/pm/PackageManager.html#getLaunchIntentForPackage(java.lang.String)
     // https://stackoverflow.com/questions/3422758/start-application-knowing-package-name
     val launchIntent : Intent = pm.getLaunchIntentForPackage(what)!!
-    startIntent(context,launchIntent)
+    startIntent(context,launchIntent,extras)
 }
 
 @Throws(IOException::class)
@@ -1644,21 +1670,24 @@ fun onLaunchAction(
     uiState:HTUIState,
     inspectionMode: Boolean = false,
     handoverPagerState: PagerState,
+    selectAction:Int = 0,
+    tts: MutableState<TextToSpeech?>,
 ){
     coroutineScope.launch {
-        when(data[0].type){
+        when(data[selectAction].type){
             ActionDataLaunchType.LauncherActivity -> {
                 try {
-                    if (data[0].action.isNotEmpty()) {
+                    if (data[selectAction].action.isNotEmpty()) {
                         startApplication(
                             context = context,
                             pm = pm,
-                            what = data[0].action
+                            what = data[selectAction].action,
+                            extras = data[selectAction].extras ?: mapOf()
                         )
                     } else {
                         throw IllegalArgumentException(
                             "Action command cannot be empty",
-                            IllegalStateException("Action LauncherActivity ${data[0].action}")
+                            IllegalStateException("Action LauncherActivity ${data[selectAction].action}")
                         )
                     }
                 } catch (e:IllegalArgumentException) {
@@ -1681,7 +1710,7 @@ fun onLaunchAction(
             ActionDataLaunchType.Internal -> {
 
                 try {
-                    when(data[0].action){
+                    when(data[selectAction].action){
                         context.resources.getString(ActionInternalCommand.AllApps.id)->{
                             navController.navigate(Screen.AllAppsScreen.name)
                         }
@@ -1692,7 +1721,8 @@ fun onLaunchAction(
                                 context = context,
                                 what = Intent(
                                     "android.media.action.STILL_IMAGE_CAMERA"
-                                )
+                                ),
+                                extras = data[selectAction].extras ?: mapOf()
                             )
                         }
                         context.resources.getString(ActionInternalCommand.Clock.id) -> {
@@ -1774,7 +1804,7 @@ fun onLaunchAction(
 
                         }
                         context.resources.getString(ActionInternalCommand.GoToPage.id) -> {
-                            if(data[0].args[0].isNotBlank()){
+                            if(data[selectAction].args[0].isNotBlank()){
                                 uiState.coreConfigJson?.let {
                                     if(uiState.coreConfigJson?.pagesPath?.contains(data[0].args[0]) == true){
                                         val indexor = uiState.coreConfigJson?.pagesPath?.indexOf(data[0].args[0])
@@ -1782,24 +1812,42 @@ fun onLaunchAction(
                                     }
                                 }
                             } else {
-                                throw IllegalArgumentException("Argument 0 cannot be empty", IllegalStateException("Action ${data[0].action}: Empty Argument 0: ${data[0].args[0]}"))
+                                throw IllegalArgumentException("Argument 0 cannot be empty", IllegalStateException("Action ${data[selectAction].action}: Empty Argument 0: ${data[selectAction].args[0]}"))
                             }
                         }
                         context.resources.getString(ActionInternalCommand.OpenAPage.id) -> {
-                            if(data[0].args[0].isNotBlank()) {
+                            if(data[selectAction].args[0].isNotBlank()) {
                                 navController.navigate<PageData>(
                                     viewModel.getPageData(
-                                        of = data[0].args[0],
+                                        of = data[selectAction].args[0],
                                         context = context
                                     )
                                 )
                             } else {
                                 // https://kotlinlang.org/docs/exceptions.html#throw-exceptions-with-precondition-functions
-                                throw IllegalArgumentException("Argument 0 cannot be empty", IllegalStateException("Action ${data[0].action}: Empty Argument 0: ${data[0].args[0]}"))
+                                throw IllegalArgumentException("Argument 0 cannot be empty", IllegalStateException("Action ${data[selectAction].action}: Empty Argument 0: ${data[selectAction].args[0]}"))
                             }
                         }
                         context.resources.getString(ActionInternalCommand.Aria.id) -> {
-
+                            // arg 0 = select language. blank is auto
+                            // extras Lang, Read of this language. first is default. Recommended start from EN
+                            val listOfLocales:Array<JavaLocale> = JavaLocale.getAvailableLocales()
+                            val saySelectLocale:String = data[selectAction].args[0]
+                            val selectLocale:JavaLocale = if(saySelectLocale.isNotEmpty()) JavaLocale.forLanguageTag(data[selectAction].args[0]) else JavaLocale.getDefault()
+                            val thereforeChosenLocale:String = selectLocale.language
+                            val readout:String = (if(data[selectAction].extras?.contains(thereforeChosenLocale) == true)
+                                data[selectAction].extras?.get(thereforeChosenLocale) ?: "" else "")
+                            Toast
+                                .makeText(
+                                    context,
+                                    readout,
+                                    Toast.LENGTH_SHORT
+                                )
+                                .show()
+                            ttsSpeakInterrupt(
+                                handover = tts,
+                                message = readout,
+                            )
                         }
                         else -> {}
                     }

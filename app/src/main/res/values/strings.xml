@@ -213,6 +213,7 @@
 
     <!--  Filename & Directory label  -->
     <string name="home_screen_file_label">Home Screen</string>
+    <string name="home_screen_file_description">There are %s. Manage Pages, Items, and more.</string>
     <string name="test_file_label">test</string>
     <string name="pages_folder_label">Pages</string>
     <string name="items_folder_label">Items</string>
@@ -363,6 +364,11 @@
         <item quantity="zero">%d pc</item>
         <item quantity="one">%d pc</item>
         <item quantity="other">%d pcs</item>
+    </plurals>
+    <plurals name="pages_units">
+        <item quantity="zero">%d page</item>
+        <item quantity="one">%d page</item>
+        <item quantity="other">%d pages</item>
     </plurals>
     <plurals name="animals_units">
         <item quantity="zero">%d unit</item>

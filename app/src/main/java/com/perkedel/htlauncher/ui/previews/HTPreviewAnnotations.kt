@@ -190,6 +190,24 @@ annotation class PreviewGoogleTV
 )
 annotation class PreviewVR
 
+@Preview(
+    name = "Indonesian Portrait",
+    group = "locale",
+    locale = "id",
+    device = "spec:width=1344px,height=2992px,dpi=480,cutout=punch_hole", showSystemUi = true, showBackground = true,
+    backgroundColor = 0xFFFF9494,
+    uiMode = Configuration.UI_MODE_NIGHT_YES or Configuration.UI_MODE_TYPE_UNDEFINED,
+)
+@Preview(
+    name = "Indonesian Landscape",
+    group = "locale",
+    locale = "id",
+    device = "spec:width=1344px,height=2992px,dpi=480,orientation=landscape,cutout=punch_hole", showSystemUi = true,
+    showBackground = true, backgroundColor = 0xFFFF9494,
+    uiMode = Configuration.UI_MODE_NIGHT_YES or Configuration.UI_MODE_TYPE_UNDEFINED,
+)
+annotation class PreviewLocales
+
 @PreviewWearOS
 @PreviewWearOsRectangular
 @PreviewWearOsSquare
@@ -228,6 +246,7 @@ annotation class PreviewAndroidX
 @PreviewDynamicColorsWorkaroundLight
 @PreviewDynamicColorsWorkaroundDark
 @PreviewAndroidX
+@PreviewLocales
 annotation class HTPreviewAnnotations
 
 @PreviewDynamicColorsWorkaroundLight

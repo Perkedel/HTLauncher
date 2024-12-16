@@ -21,6 +21,7 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
@@ -76,6 +77,20 @@ fun EditItemData(
     var showWhichIcon:ShowWhichIcon by remember { mutableStateOf(data?.showWhichIcon ?: ShowWhichIcon.Default) }
     var useAria:Boolean by remember { mutableStateOf(data?.useAria ?: false) }
     var useLabel:Boolean by remember { mutableStateOf(data?.useLabel ?: false) }
+
+    LaunchedEffect(
+        key1 = data
+    ) {
+        name = data?.name ?: "anItem"
+        label = data?.label ?: ""
+        aria = data?.aria ?: ""
+        imagePath = data?.imagePath ?: ""
+        action = data?.action ?: emptyList<ActionData>()
+        showLabel = data?.showLabel ?: false
+        showWhichIcon = data?.showWhichIcon ?: ShowWhichIcon.Default
+        useAria = data?.useAria ?: false
+        useLabel = data?.useLabel ?: false
+    }
 
     val rebuildNow: ()->Unit = {
         data?.copy(
@@ -151,6 +166,7 @@ fun EditItemData(
         Column(
             modifier = Modifier.verticalScroll(rememberScrollState())
         ) {
+            Text(text = "Item Data $data")
             data?.let {
                 Row(
                     modifier = Modifier.fillMaxWidth()
@@ -244,11 +260,13 @@ fun EditItemData(
                         }
 
                         repeat(
-                            times = viewModel.itemData?.action?.size ?: 0,
+                            times = action.size,
+//                            times = viewModel.itemData?.action?.size ?: 0,
                             action = {id ->
                                 ActionDataBox(
                                     id = id,
-                                    actionData = viewModel.itemData?.action?.get(id) ?: ActionData(),
+                                    actionData = action[id] ?: ActionData(),
+//                                    actionData = viewModel.itemData?.action?.get(id) ?: ActionData(),
                                     onClick = {
                                         onEditActionData(viewModel.itemData?.action?.get(id) ?: ActionData(), id)
                                     }

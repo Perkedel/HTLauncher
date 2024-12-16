@@ -8,16 +8,21 @@ import android.content.res.Configuration
 import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.ChevronRight
+import androidx.compose.material3.Card
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -31,6 +36,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -71,6 +77,40 @@ fun EditActionData(
     onSelectAction: ()->Unit = {},
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
 ){
+    LaunchedEffect(
+        key1 = data,
+    )
+    {
+
+    }
+
+    val majorActionCard: @Composable () -> Unit = {
+        Card(
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Row {
+                HTButton(
+                    modifier = Modifier,
+                    title = stringResource(R.string.action_close),
+                    leftIcon = Icons.Default.Check,
+                    onClick = onClose
+                )
+                Spacer(
+                    modifier = Modifier.weight(1f)
+                )
+//                HTButton(
+//                    modifier = Modifier,
+//                    title = stringResource(R.string.action_add),
+//                    rightIcon = Icons.Default.Add,
+//                    onClick = {
+//                        onTryAdd()
+//                    }
+//                )
+            }
+
+        }
+    }
+
     Column(
         modifier = modifier.verticalScroll(rememberScrollState())
     ){
@@ -89,6 +129,7 @@ fun EditActionData(
         var name:String by remember { mutableStateOf(data?.name ?: "Launcher") }
         var action:String by remember { mutableStateOf(data?.action ?: "") }
         var args:List<String> by remember { mutableStateOf(data?.args ?: emptyList<String>()) }
+        var extras:Map<String,String> by remember { mutableStateOf(data?.extras ?: mapOf()) }
         var type:ActionDataLaunchType by remember { mutableStateOf(data?.type ?: ActionDataLaunchType.LauncherActivity) }
 
         var typeMenuExpanded by remember { mutableStateOf(false) }
@@ -106,7 +147,7 @@ fun EditActionData(
                 newActionData, id
             )
         }
-
+        majorActionCard()
         data?.let {
             // Name
             OutlinedTextField(
@@ -132,7 +173,9 @@ fun EditActionData(
                 onExpandedChange = {typeMenuExpanded = !typeMenuExpanded}
             ) {
                 OutlinedTextField(
-                    modifier = Modifier.menuAnchor(MenuAnchorType.PrimaryEditable).fillMaxWidth(),
+                    modifier = Modifier
+                        .menuAnchor(MenuAnchorType.PrimaryEditable)
+                        .fillMaxWidth(),
                     label = {
                         Text("Type")
                     },
@@ -220,7 +263,9 @@ fun EditActionData(
                         onExpandedChange = {actionSelectMenuExpanded = !actionSelectMenuExpanded}
                     ) {
                         OutlinedTextField(
-                            modifier = Modifier.menuAnchor(MenuAnchorType.PrimaryEditable).fillMaxWidth(),
+                            modifier = Modifier
+                                .menuAnchor(MenuAnchorType.PrimaryEditable)
+                                .fillMaxWidth(),
                             label = {
                                 Text("Command")
                             },
@@ -259,12 +304,40 @@ fun EditActionData(
             }
 
         }
-        HTButton(
-            modifier = Modifier.fillMaxWidth(),
-            title = stringResource(R.string.action_close),
-            leftIcon = Icons.Default.Check,
-            onClick = onClose
-        )
+//        HTButton(
+//            modifier = Modifier.fillMaxWidth(),
+//            title = stringResource(R.string.action_close),
+//            leftIcon = Icons.Default.Check,
+//            onClick = onClose
+//        )
+        Card(
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Column {
+                repeat(
+                    times = extras.size
+                ){
+                    Row {
+                        Text(text = extras.keys.toList()[it])
+                        OutlinedTextField(
+                            modifier = Modifier.weight(1f),
+                            label = {
+                                Text("Content")
+                            },
+                            value = extras.values.toList()[it],
+                            readOnly = true,
+                            onValueChange = {
+
+                            },
+                            keyboardOptions = KeyboardOptions(
+                                showKeyboardOnFocus = false,
+                            )
+                        )
+                    }
+                }
+            }
+        }
+
     }
 }
 
@@ -273,7 +346,9 @@ fun EditActionData(
 fun EditActionDataPreview(){
     HTLauncherTheme {
         Surface(
-            modifier = Modifier.navigationBarsPadding().statusBarsPadding()
+            modifier = Modifier
+                .navigationBarsPadding()
+                .statusBarsPadding()
         ) {
             EditActionData(
                 data = ActionData(),

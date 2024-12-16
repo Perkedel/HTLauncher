@@ -11,6 +11,11 @@ data class ActionData(// Items will do something out of these:
         "",
         "",
     ), // Arguments of it this
+    val extras:(Map<String,String>)? = mapOf(
+        Pair("AAAa", "BBB1"),
+        Pair("AAAb", "BBB2"),
+        Pair("AAAc", "BBB3"),
+    ), // Extra arguments
     val type:ActionDataLaunchType = ActionDataLaunchType.LauncherActivity, //Type of this action.
 
     /*

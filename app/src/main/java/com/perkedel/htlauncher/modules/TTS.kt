@@ -32,6 +32,7 @@ fun rememberTextToSpeech(
             val textToSpeech = TextToSpeech(context) { status ->
                 if (status == TextToSpeech.SUCCESS) {
                     tts.value?.language = locale
+                    // tts.value?.language = Locale.US
                 }
             }
             tts.value = textToSpeech
@@ -63,7 +64,7 @@ fun ttsSpeakOrStop(handover:MutableState<TextToSpeech?>, message:String = "",que
     }
 }
 
-fun ttsSpeakInterupt(handover:MutableState<TextToSpeech?>, message:String = "",queueMode: Int = TextToSpeech.QUEUE_FLUSH, params:Bundle? = null, utteranceId:String = ""){
+fun ttsSpeakInterrupt(handover:MutableState<TextToSpeech?>, message:String = "",queueMode: Int = TextToSpeech.QUEUE_FLUSH, params:Bundle? = null, utteranceId:String = ""){
     // If the TTS is speaking, it stops then speak the new one
     if(handover.value?.isSpeaking == true){
         handover.value?.stop()
