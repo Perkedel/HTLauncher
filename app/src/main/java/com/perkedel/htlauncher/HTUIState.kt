@@ -35,6 +35,7 @@ data class HTUIState(
     // https://www.baeldung.com/kotlin/maps
     // https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-map/
     val folders:MutableMap<String,Uri> = LinkedHashMap<String,Uri>(),
+    val currentPageIconModel:Any? = null,
     val pageList:MutableMap<String,PageData> = LinkedHashMap<String,PageData>(),
     val itemList:MutableMap<String,ItemData> = LinkedHashMap<String,ItemData>(),
 //    val themesList:MutableMap<String,ItemData> = LinkedHashMap<String,ItemData>(),

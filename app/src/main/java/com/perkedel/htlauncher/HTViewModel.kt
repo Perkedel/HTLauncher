@@ -7,11 +7,13 @@ import android.content.ContentResolver
 import android.content.Context
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
+import android.content.pm.ResolveInfo
 import android.graphics.pdf.PdfDocument.Page
 import android.net.Uri
 import android.os.Build
 import android.util.Log
 import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -46,9 +48,13 @@ import kotlinx.serialization.json.Json
 class HTViewModel(
     private val asyncService: AsyncService = AsyncService()
 ) : ViewModel() {
+    // eltaroba
     // https://developer.android.com/codelabs/basic-android-kotlin-compose-viewmodel-and-state#11
     private val _uiState = MutableStateFlow(HTUIState())
     val uiState : StateFlow<HTUIState> = _uiState.asStateFlow()
+
+//    var _currentPageIconModel: MutableStateFlow<Any?> = MutableStateFlow<Any?>(null)
+//    val currentPageIconModel:StateFlow<Any?> = _currentPageIconModel.asStateFlow()
 
     val visiblePermissionDialogQueue = mutableStateListOf<String>()
 
@@ -58,6 +64,8 @@ class HTViewModel(
     val _appSearchActive = MutableStateFlow(false)
     val appSearchActive = _appSearchActive.asStateFlow()
 
+    val _appReadyToShow = MutableStateFlow(false)
+    val appReadyToShow = _appReadyToShow.asStateFlow()
 
     val _appAll = MutableStateFlow(listOf<SearchableApps>())
     val appAll = appSearchText
@@ -65,11 +73,15 @@ class HTViewModel(
         .onEach { _appSearchActive.update { true } }
         .combine(_appAll){ text, apps ->
             if(text.isBlank()){
-                apps
+                apps.sortedBy {
+                    it.label
+                }
             } else {
                 apps.filter {
 //                    it.packageName.contains(text)
                     it.doesMatchSearchQuery(text)
+                }.sortedBy {
+                    it.label
                 }
             }
         }
@@ -98,15 +110,43 @@ class HTViewModel(
             }
         )
     }
-    fun initializeAllApps(with:List<PackageInfo>, packageManager: PackageManager){
-        viewModelScope.launch {
+    suspend fun initializeAllApps(with:List<PackageInfo>, packageManager: PackageManager){
+//        viewModelScope.launch {
+            _appReadyToShow.value = false
 //            installAllApps(with,packageManager)
             _appAll.value = asyncService.getSearchableApps(with,packageManager)
-        }
+            _appReadyToShow.value = true
+//        }
+    }
+    suspend fun initializeAllAppsResolve(with:List<ResolveInfo>, packageManager: PackageManager){
+//        viewModelScope.launch {
+            _appReadyToShow.value = false
+//            installAllApps(with,packageManager)
+            _appAll.value = asyncService.getSearchableAppsResolve(with,packageManager)
+            _appReadyToShow.value = true
+//        }
+    }
+    suspend fun appendAllApps(base:List<SearchableApps>, with:List<PackageInfo>, packageManager: PackageManager){
+//        viewModelScope.launch {
+            _appReadyToShow.value = false
+//            installAllApps(with,packageManager)
+            _appAll.value = asyncService.appendSearchableApps(base, with,packageManager)
+            _appReadyToShow.value = true
+//        }
+    }
+    suspend fun appendAllAppsResolve(base:List<SearchableApps>, with:List<ResolveInfo>, packageManager: PackageManager){
+//        viewModelScope.launch {
+            _appReadyToShow.value = false
+//            installAllApps(with,packageManager)
+            _appAll.value = asyncService.appendSearchableAppsResolve(base, with,packageManager)
+            _appReadyToShow.value = true
+//        }
     }
     fun getSearchableApps(){
 
     }
+
+
 
     suspend fun preloadApps(context: Context, packageManager: PackageManager){
 //        _uiState.update {
@@ -253,12 +293,14 @@ class HTViewModel(
                     // https://medium.com/@cepv2010/how-to-easily-choose-files-in-android-compose-28f4637d1c21 not this
                     // https://medium.easyread.co/android-data-and-file-storage-cheatsheet-for-media-95f7f66080e3 not that
                     for(i in pageFiles){
+                        if(uiStating.pageList.contains(removeDotExtensions(i.name ?: ""))) continue
                         Log.d("PageQuery","Check $i")
                         val pageingUri:Uri = getATextFile(
                             dirUri = folders[context.resources.getString(R.string.pages_folder)]!!,
                             context = context,
                             initData = json.encodeToString<PageData>(PageData(
-                                name = i.name?.replaceAfterLast(".json","") ?: "anItem"
+                                name = removeDotExtensions(i.name ?: "anItem")
+//                                name = i.name?.replaceAfterLast(".json","") ?: "anItem"
                             )),
                             fileName = i.name ?: "",
 //                            fileName = i,
@@ -277,12 +319,14 @@ class HTViewModel(
                         }
                     }
                     for(i in itemFiles){
+                        if(uiStating.itemList.contains(removeDotExtensions(i.name ?: ""))) continue
                         Log.d("ItemQuery","Check $i")
                         val itemingUri:Uri = getATextFile(
                             dirUri = folders[context.resources.getString(R.string.items_folder)]!!,
                             context = context,
                             initData = json.encodeToString<ItemData>(ItemData(
-                                name = i.name?.replaceAfterLast(".json","") ?: "anItem"
+                                name = removeDotExtensions(i.name ?: "anItem")
+//                                name = i.name?.replaceAfterLast(".json","") ?: "anItem"
                             )),
                             fileName = i.name ?: "",
                             hardOverwrite = false,
@@ -304,6 +348,7 @@ class HTViewModel(
                     Log.d("OnQuery","Now checking files now!")
                     for(i in uiStating.coreConfigJson!!.pagesPath){
 //                for(i in pageFileNames){
+                        if(uiStating.pageList.contains(i) && i != "Home") continue
                         Log.d("PageLoader","Checking page ${i}")
                         Log.d("PageLoader","Eval context ${context}")
                         Log.d("PageLoader","Eval resource name ${context.resources.getString(R.string.pages_folder)}")
@@ -530,6 +575,15 @@ class HTViewModel(
         }
     }
 
+    fun updateCurrentPageIconModel(with:Any?){
+//        _currentPageIconModel.value = with
+        _uiState.update { currentState ->
+            currentState.copy(
+                currentPageIconModel = with
+            )
+        }
+    }
+
     fun openTheMoreMenu(opened:Boolean = true){
 //        _uiState.value.openMoreMenu = opened
         _uiState.update {
@@ -640,6 +694,7 @@ class HTViewModel(
                 isHome = of.contains("Home")
             )
         }
+        if(_uiState.value.pageList.contains(of)) return _uiState.value.pageList[of] ?: predeterminedPage
         var aPage: PageData = predeterminedPage
         if(_uiState.value.selectedSaveDir != null && _uiState.value.selectedSaveDir.toString().isNotBlank() && !ignoreFile) {
             if(_uiState.value.pageList.contains(of) && _uiState.value.pageList[of] != null || forceReload){
@@ -692,7 +747,8 @@ class HTViewModel(
                     of == context.resources.getString(ActionInternalCommand.SystemSettings.id) ||
                     of == context.resources.getString(ActionInternalCommand.Preferences.id) ||
                     of == context.resources.getString(InternalCategories.SettingsSystem.id) ||
-                    of == context.resources.getString(InternalCategories.SettingsOverall.id)
+                    of == context.resources.getString(InternalCategories.SettingsOverall.id) ||
+                    of.startsWith("Settings")
 //        val itemIsCategory:Boolean =
 //            of == context.resources.getString(InternalCategories.SettingsSystem.id) ||
 //                    of == context.resources.getString(InternalCategories.SettingsOverall.id)
@@ -732,6 +788,7 @@ class HTViewModel(
                 label = of,
             )
         }
+        if(_uiState.value.itemList.contains(of)) return _uiState.value.itemList[of] ?: predeterminedItem
 
         var aItem: ItemData = predeterminedItem
         if(_uiState.value.selectedSaveDir != null && _uiState.value.selectedSaveDir.toString().isNotBlank() && !ignoreFile){
@@ -814,6 +871,8 @@ class HTViewModel(
             forceReload = forceReload
         )
         return when{
+            target.name == context.getString(R.string.internal_pages_settings) -> R.drawable.settings
+            target.name == context.getString(R.string.settings_item_file) -> R.drawable.settings
             target.iconPath.isNotBlank() -> getIconFile(of, context, pm)
             else -> R.drawable.open_a_page
         }

@@ -1,4 +1,4 @@
-@file:OptIn(ExperimentalMaterial3Api::class)
+@file:OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3Api::class)
 
 package com.perkedel.htlauncher.ui.bars
 
@@ -6,6 +6,7 @@ import android.view.SoundEffectConstants
 import android.view.View
 import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.padding
@@ -24,8 +25,10 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBarDefaults.topAppBarColors
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewDynamicColors
@@ -33,7 +36,9 @@ import androidx.compose.ui.tooling.preview.PreviewFontScale
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil3.compose.AsyncImage
 import com.perkedel.htlauncher.R
 import com.perkedel.htlauncher.enumerations.Screen
 import com.perkedel.htlauncher.ui.theme.HTLauncherTheme
@@ -45,24 +50,52 @@ fun HTAppBar(
 //    textTitle:String = stringResource(currentScreen.title),
     textTitle:String = currentScreen,
     textDescription:String? = "",
+    iconModel: Any? = null,
+    icon: (@Composable () -> Unit)? = {
+        iconModel?.let {
+            AsyncImage(
+                modifier = Modifier.padding(8.dp),
+                model = it,
+                contentDescription = "",
+                placeholder = painterResource(R.drawable.placeholder),
+                error = painterResource(R.drawable.mavrickle),
+            )
+        }
+    },
     title: @Composable () -> Unit = {
-        if(!textDescription.isNullOrEmpty()){
-            Column {
-                Text(
-                    text = textTitle
-                )
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            icon?.let {
+                it()
+            }
+            if(!textDescription.isNullOrEmpty()){
+                Column {
+                    Text(
+                        modifier = Modifier.basicMarquee(
+
+                        ),
+                        text = textTitle
+                    )
+                    Text(
+                        modifier = Modifier.basicMarquee(
+
+                        ),
+                        lineHeight = 8.sp,
+                        text = textDescription,
+                        maxLines = 1,
+                        fontSize = 12.sp,
+                    )
+                }
+            } else {
                 Text(
                     modifier = Modifier.basicMarquee(
 
                     ),
-                    text = textDescription,
-                    fontSize = 12.sp,
+                    text = textTitle
                 )
             }
-        } else {
-            Text(text = textTitle)
         }
-
     },
     canNavigateBack: Boolean = false,
     navigateUp: () -> Unit = {},
@@ -110,7 +143,7 @@ fun HTAppBar(
                         }
                     ) {
                         Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            imageVector = Icons.AutoMirrored.Default.ArrowBack,
                             contentDescription = stringResource(R.string.back_button)
                         )
                     }
@@ -152,6 +185,7 @@ fun HTAppBarPreview(){
 
             topBar = { HTAppBar(
                 currentScreen = Screen.HomeScreen.name,
+                iconModel = R.drawable.cube,
                 textTitle = "Hello",
                 textDescription = "World",
                 onMoreMenu = {},

@@ -10,6 +10,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Circle
 import androidx.compose.material3.Icon
@@ -32,6 +34,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil3.compose.AsyncImage
@@ -51,6 +54,7 @@ import com.perkedel.htlauncher.widgets.HTSearchBar
 import kotlinx.coroutines.CoroutineScope
 import me.zhanghai.compose.preference.Preference
 import me.zhanghai.compose.preference.ProvidePreferenceLocals
+import my.nanihadesuka.compose.LazyColumnScrollbar
 
 @Composable
 fun AddIntoTheListOf(
@@ -96,6 +100,7 @@ fun AddIntoTheListOf(
     var searchSay:String by remember { mutableStateOf("") }
     viewModel.updateSearchInTheWild(searchSay)
     viewModel.updateIsSearchingInTheWild(searchSay.isNotBlank())
+    var lazyListState: LazyListState = rememberLazyListState()
 //    var isSearching:Boolean by remember { mutableStateOf(false) }
 //    when(addIntoWhich){
 //        EditWhich.Pages -> {
@@ -122,71 +127,83 @@ fun AddIntoTheListOf(
     }
 
     ProvidePreferenceLocals {
-        LazyColumn {
-            item{
-                HTSearchBar(
-                    value = searchSay,
-                    onValueChange = { searchSay = it },
-                )
-            }
-            if(filterList.size <= 0){
+        LazyColumnScrollbar(
+            state = lazyListState
+        ) {
+            LazyColumn(
+                state = lazyListState
+            ) {
                 item{
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp)
-                        ,
-                        contentAlignment = Alignment.Center
-                    ){
-                        Text(
-                            "EMPTY"
+                    HTSearchBar(
+                        megaTitle = when(addIntoWhich){
+                            EditWhich.Pages -> stringResource(R.string.select_an_item)
+                            EditWhich.Home -> stringResource(R.string.select_an_page)
+                            else -> stringResource(R.string.select_an_idk)
+                        },
+                        value = searchSay,
+                        onValueChange = { searchSay = it },
+                    )
+                }
+                if(filterList.size <= 0){
+                    item{
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp)
+                            ,
+                            contentAlignment = Alignment.Center
+                        ){
+                            Text(
+                                text = stringResource(R.string.item_empty_emphasis)
+                            )
+                        }
+                    }
+                } else {
+                    items(
+                        count = filterList.size,
+                        key = { filterList[it] },
+                    ) {
+                        Preference(
+                            title = { Text(text = filterList[it]) },
+                            onClick = {
+                                previousCurrentThingList = previousCurrentThingList.toMutableList().apply{
+                                    add(index = 0, element = filterList[it])
+                                }
+                                onSelectThing(filterList[it], addIntoWhich, previousCurrentThingList)
+                                onClose()
+                            },
+                            icon = {
+                                AsyncImage(
+                                    model = when (addIntoWhich) {
+                                        EditWhich.Pages -> {
+                                            htViewModel.getItemIcon(
+                                                of = filterList[it],
+                                                context = context,
+                                                pm = pm,
+                                            )
+                                        }
+                                        EditWhich.Home -> {
+                                            htViewModel.getPageIcon(
+                                                of = filterList[it],
+                                                context = context,
+                                                pm = pm,
+                                            )
+                                        }
+                                        else -> R.drawable.placeholder
+                                    },
+                                    contentDescription = "",
+                                    modifier = Modifier
+                                        .size(75.dp),
+                                    error = painterResource(id = R.drawable.mavrickle),
+                                    placeholder = painterResource(id = R.drawable.placeholder),
+                                )
+                            }
                         )
                     }
                 }
-            } else {
-                items(
-                    count = filterList.size,
-                    key = { filterList[it] },
-                ) {
-                    Preference(
-                        title = { Text(text = filterList[it]) },
-                        onClick = {
-                            previousCurrentThingList = previousCurrentThingList.toMutableList().apply{
-                                add(index = 0, element = filterList[it])
-                            }
-                            onSelectThing(filterList[it], addIntoWhich, previousCurrentThingList)
-                            onClose()
-                        },
-                        icon = {
-                            AsyncImage(
-                                model = when (addIntoWhich) {
-                                    EditWhich.Pages -> {
-                                        htViewModel.getItemIcon(
-                                            of = filterList[it],
-                                            context = context,
-                                            pm = pm,
-                                        )
-                                    }
-                                    EditWhich.Home -> {
-                                        htViewModel.getPageIcon(
-                                            of = filterList[it],
-                                            context = context,
-                                            pm = pm,
-                                        )
-                                    }
-                                    else -> R.drawable.placeholder
-                                },
-                                contentDescription = "",
-                                modifier = Modifier
-                                    .size(75.dp),
-                                error = painterResource(id = R.drawable.mavrickle),
-                                placeholder = painterResource(id = R.drawable.placeholder),
-                            )
-                        }
-                    )
-                }
             }
         }
+
     }
 }
 

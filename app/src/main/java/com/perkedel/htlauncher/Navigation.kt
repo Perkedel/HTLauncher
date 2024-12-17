@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalSharedTransitionApi::class, ExperimentalSharedTransitionApi::class)
+
 package com.perkedel.htlauncher
 
 import android.Manifest
@@ -31,6 +33,8 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedContentTransitionScope
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionLayout
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.expandIn
 import androidx.compose.animation.scaleIn
@@ -67,6 +71,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.intl.Locale
 import java.util.Locale as JavaLocale
@@ -95,6 +100,7 @@ import com.perkedel.htlauncher.data.PageData
 import com.perkedel.htlauncher.data.TestJsonData
 import com.perkedel.htlauncher.constanta.HTLauncherHardcodes
 import com.perkedel.htlauncher.enumerations.ActionDataLaunchType
+import com.perkedel.htlauncher.enumerations.ActionGoToSystemSetting
 import com.perkedel.htlauncher.enumerations.ActionInternalCommand
 import com.perkedel.htlauncher.enumerations.ButtonTypes
 import com.perkedel.htlauncher.enumerations.ConfigSelected
@@ -126,6 +132,7 @@ import com.perkedel.htlauncher.ui.navigation.LevelEditor
 import com.perkedel.htlauncher.ui.navigation.StandalonePageScreen
 import com.perkedel.htlauncher.ui.theme.HTLauncherTheme
 import com.perkedel.htlauncher.ui.theme.rememberColorScheme
+import com.perkedel.htlauncher.widgets.ContainsSharedTransition
 import com.perkedel.htlauncher.widgets.HTButton
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.map
@@ -166,6 +173,7 @@ fun Navigation(
     tts: MutableState<TextToSpeech?> = rememberTextToSpeech(),
     view: View = LocalView.current,
     inspectionMode:Boolean = LocalInspectionMode.current,
+//    animatedContentTransitionScope: AnimatedContentTransitionScope =
 ){
     // https://developer.android.com/codelabs/large-screens/add-keyboard-and-mouse-support-with-compose#0
 
@@ -618,10 +626,15 @@ fun Navigation(
         }
     ) {
         Scaffold(
-
             topBar = {
                 HTAppBar(
                     currentScreen = currentScreen,
+                    iconModel = when{
+                        currentScreen.startsWith("${context.packageName}.data.PageData") -> {
+                            htuiState.currentPageIconModel
+                        }
+                        else -> null
+                    },
                     textTitle= when{
                         // https://www.dhiwise.com/post/the-basics-of-kotlin-string-contains-a-beginners-guide
                         currentScreen == Screen.HomeScreen.name -> stringResource(R.string.app_name)
@@ -641,8 +654,33 @@ fun Navigation(
                     },
                     textDescription = when(currentScreen){
                         Screen.HomeScreen.name -> null
-                        Screen.AllAppsScreen.name -> "${pm.getInstalledApplications(0).size} ${stringResource(R.string.unit_packages_installed)}"
-                        Screen.ConfigurationScreen.name -> "${stringResource(R.string.version_option)} ${versionName} (${stringResource(R.string.iteration)} ${versionNumber})"
+//                        Screen.AllAppsScreen.name -> "${pm.getInstalledApplications(0).size} ${stringResource(R.string.unit_packages_installed)}"
+//                        Screen.AllAppsScreen.name -> "${htuiState.installedPackageInfo} ${stringResource(R.string.unit_packages_installed)}"
+                        Screen.AllAppsScreen.name -> {
+                            val allAppThing = anViewModel._appAll.collectAsState()
+                            val sayPluralLaunchable: String = pluralStringResource(
+                                R.plurals.unit_packages_launchable,
+                                allAppThing.value.size,
+                                allAppThing.value.size,
+                            )
+                            val sayPluralAll: String = pluralStringResource(
+                                R.plurals.unit_packages_installed,
+                                pm.getInstalledApplications(0).size,
+                                pm.getInstalledApplications(0).size,
+                            )
+                            stringResource(
+                                R.string.unit_package_bridge,
+                                sayPluralLaunchable,
+                                sayPluralAll
+                            )
+                        }
+
+                        Screen.ConfigurationScreen.name -> "${stringResource(R.string.version_option)} ${versionName} (${
+                            stringResource(
+                                R.string.iteration
+                            )
+                        } ${versionNumber})"
+
                         Screen.AboutScreen.name -> "${stringResource(R.string.version_option)} ${versionName} (${stringResource(R.string.iteration)} ${versionNumber})"
                         else -> null
                     },
@@ -703,32 +741,33 @@ fun Navigation(
             // https://github.com/mohammednawas8
             // https://github.com/lofcoding/ComposeNavigationTransitions
             //        val uiState by viewModel.uiState.collectAsState()
-            NavHost(
-                navController = navController,
-                startDestination = Screen.HomeScreen.name,
-                modifier = Modifier.padding(innerPadding),
-            ) {
-                composable(route = Screen.HomeScreen.name,
-                    exitTransition = {
-                        when{
-                            // https://developer.android.com/develop/ui/compose/animation/composables-modifiers#enter-exit-transition
-//                            currentScreen.startsWith("${context.packageName}.data.PageData") ->
-                            else ->scaleOut(
-
-                            )
-                        }
-
-                    },
-                    popEnterTransition = {
-                        scaleIn()
-                    }
+            SharedTransitionLayout {
+                NavHost(
+                    navController = navController,
+                    startDestination = Screen.HomeScreen.name,
+                    modifier = Modifier.padding(innerPadding),
                 ) {
-                    LaunchedEffect(true) {
+                    composable(route = Screen.HomeScreen.name,
+                        exitTransition = {
+                            when{
+                                // https://developer.android.com/develop/ui/compose/animation/composables-modifiers#enter-exit-transition
+//                            currentScreen.startsWith("${context.packageName}.data.PageData") ->
+                                else ->scaleOut(
 
-                    }
+                                )
+                            }
+
+                        },
+                        popEnterTransition = {
+                            scaleIn()
+                        }
+                    ) {
+                        LaunchedEffect(true) {
+
+                        }
 //                    setStatusBarVisibility(false,systemUiController)
 
-                    Log.d("DebugHomescreen","pls check jsona ${htuiState.coreConfigJson}")
+//                        Log.d("DebugHomescreen","pls check jsona ${htuiState.coreConfigJson}")
 //                    try {
                         homePagerState =
 //                            rememberPagerState(pageCount = { htuiState.coreConfigJson!!.pagesPath.size })
@@ -741,514 +780,617 @@ fun Navigation(
 //                        e.printStackTrace()
 //                    }
 
-                    HomeScreen(
-                        //                    navController = navController,
-                        onAllAppButtonClicked = {
-                            navController.navigate(Screen.AllAppsScreen.name)
-                        },
-                        onMoreMenuButtonClicked = {
-                            anViewModel.openTheMoreMenu(true)
+                        ContainsSharedTransition(
+                            animatedVisibilityScope = this
+                        ){
+                            HomeScreen(
+                                onAllAppButtonClicked = {
+                                    navController.navigate(Screen.AllAppsScreen.name)
+                                },
+                                onMoreMenuButtonClicked = {
+                                    anViewModel.openTheMoreMenu(true)
 
-                        },
-                        handoverPagerState = homePagerState,
-                        context = context,
-                        configuration = configuration,
-                        colorScheme = colorScheme,
-                        haptic = haptic,
-                        // DONE: handover the homescreen file json
-                        configFile = htuiState.coreConfigJson,
-                        viewModel = anViewModel,
-                        contentResolver = saveDirResolver,
-                        systemUiController = systemUiController,
-                        uiState = htuiState,
-                        coroutineScope = coroutineScope,
-                        isReady = htuiState.isReady,
-                        tts = tts,
-                        onLaunchOneOfAction = {
-                            onLaunchAction(
-                                data = it,
-                                context = context,
-                                coroutineScope = coroutineScope,
-                                pm = pm,
-                                snackbarHostState = snackbarHostState,
-                                contentResolver = saveDirResolver,
-                                navController = navController,
-                                viewModel = anViewModel,
-                                uiState = htuiState,
-                                inspectionMode = inspectionMode,
+                                },
                                 handoverPagerState = homePagerState,
+                                context = context,
+                                configuration = configuration,
+                                colorScheme = colorScheme,
+                                haptic = haptic,
+                                // DONE: handover the homescreen file json
+                                configFile = htuiState.coreConfigJson,
+                                viewModel = anViewModel,
+                                contentResolver = saveDirResolver,
+                                systemUiController = systemUiController,
+                                uiState = htuiState,
+                                coroutineScope = coroutineScope,
+                                isReady = htuiState.isReady,
                                 tts = tts,
+                                onLaunchOneOfAction = {
+                                    onLaunchAction(
+                                        data = it,
+                                        context = context,
+                                        coroutineScope = coroutineScope,
+                                        pm = pm,
+                                        snackbarHostState = snackbarHostState,
+                                        contentResolver = saveDirResolver,
+                                        navController = navController,
+                                        viewModel = anViewModel,
+                                        uiState = htuiState,
+                                        inspectionMode = inspectionMode,
+                                        handoverPagerState = homePagerState,
+                                        tts = tts,
+                                    )
+                                }
                             )
                         }
-                    )
 
-                    LaunchedEffect(true) {
+
+                        LaunchedEffect(true) {
+
+                        }
 
                     }
-
-                }
-                composable<PageData>(
+                    composable<PageData>(
 //                composable(
 //                    route = "${Screen.OpenAPage.name}/{name}"
-                    exitTransition = {
-                        scaleOut(
+                        exitTransition = {
+                            scaleOut(
 
-                        )
-                    },
-                    enterTransition = {
-                        scaleIn(
+                            )
+                        },
+                        enterTransition = {
+                            scaleIn(
 
+                            )
+                        },
+                        popEnterTransition = {
+                            scaleIn()
+                        },
+                        popExitTransition = {
+                            scaleOut()
+                        }
+                    ) { pagingData ->
+                        // https://youtu.be/AIC_OFQ1r3k
+//                        Log.d("OpenAPage","Page Opened $currentScreen")
+                        val args = pagingData.toRoute<PageData>()
+                        StandalonePageScreen(
+                            pageData = args,
+                            onAllAppButtonClicked = {
+                                navController.navigate(Screen.AllAppsScreen.name)
+                            },
+                            onMoreMenuButtonClicked = {
+                                anViewModel.openTheMoreMenu(true)
+
+                            },
+                            context = context,
+                            configuration = configuration,
+                            colorScheme = colorScheme,
+                            haptic = haptic,
+                            // DONE: handover the homescreen file json
+                            configFile = htuiState.coreConfigJson,
+                            viewModel = anViewModel,
+                            contentResolver = saveDirResolver,
+                            systemUiController = systemUiController,
+                            uiState = htuiState,
+                            coroutineScope = coroutineScope,
+                            isReady = htuiState.isReady,
+                            tts = tts,
+                            onLaunchOneOfAction = {
+                                onLaunchAction(
+                                    data = it,
+                                    context = context,
+                                    coroutineScope = coroutineScope,
+                                    pm = pm,
+                                    snackbarHostState = snackbarHostState,
+                                    contentResolver = saveDirResolver,
+                                    navController = navController,
+                                    viewModel = anViewModel,
+                                    uiState = htuiState,
+                                    inspectionMode = inspectionMode,
+                                    handoverPagerState = homePagerState,
+                                    tts = tts,
+                                )
+                            }
                         )
-                    },
-                    popEnterTransition = {
-                        scaleIn()
-                    },
-                    popExitTransition = {
-                        scaleOut()
                     }
-                ) { pagingData ->
-                    // https://youtu.be/AIC_OFQ1r3k
-                    Log.d("OpenAPage","Page Opened $currentScreen")
-                    val args = pagingData.toRoute<PageData>()
-                    StandalonePageScreen(
-                        pageData = args,
-                        onAllAppButtonClicked = {
-                            navController.navigate(Screen.AllAppsScreen.name)
+                    composable(route = Screen.AllAppsScreen.name,
+                        enterTransition = {
+                            slideIntoContainer(
+                                towards = AnimatedContentTransitionScope.SlideDirection.Up,
+                                animationSpec = tween(),
+                            )
                         },
-                        onMoreMenuButtonClicked = {
-                            anViewModel.openTheMoreMenu(true)
-
-                        },
-                        context = context,
-                        configuration = configuration,
-                        colorScheme = colorScheme,
-                        haptic = haptic,
-                        // DONE: handover the homescreen file json
-                        configFile = htuiState.coreConfigJson,
-                        viewModel = anViewModel,
-                        contentResolver = saveDirResolver,
-                        systemUiController = systemUiController,
-                        uiState = htuiState,
-                        coroutineScope = coroutineScope,
-                        isReady = htuiState.isReady,
-                        tts = tts,
-                        onLaunchOneOfAction = {
-                            onLaunchAction(
-                                data = it,
-                                context = context,
-                                coroutineScope = coroutineScope,
-                                pm = pm,
-                                snackbarHostState = snackbarHostState,
-                                contentResolver = saveDirResolver,
-                                navController = navController,
-                                viewModel = anViewModel,
-                                uiState = htuiState,
-                                inspectionMode = inspectionMode,
-                                handoverPagerState = homePagerState,
-                                tts = tts,
+                        exitTransition = {
+                            slideOutOfContainer(
+                                towards = AnimatedContentTransitionScope.SlideDirection.Down,
+                                animationSpec = tween(),
                             )
                         }
-                    )
-                }
-                composable(route = Screen.AllAppsScreen.name,
-                    enterTransition = {
-                        slideIntoContainer(
-                            towards = AnimatedContentTransitionScope.SlideDirection.Up,
-                            animationSpec = tween(),
-                        )
-                    },
-                    exitTransition = {
-                        slideOutOfContainer(
-                            towards = AnimatedContentTransitionScope.SlideDirection.Down,
-                            animationSpec = tween(),
-                        )
-                    }
                     ) {
-                    AllAppsScreen(
-                        navController = navController,
-                        pm = pm,
-                        context = context,
-                        colorScheme = colorScheme,
-                        haptic = haptic,
-                        coroutineScope = coroutineScope,
-                        snackbarHostState = snackbarHostState,
-                        onSnackbarResult = { snackbarResult ->
-                            {
+                        AllAppsScreen(
+                            navController = navController,
+                            pm = pm,
+                            context = context,
+                            colorScheme = colorScheme,
+                            haptic = haptic,
+                            coroutineScope = coroutineScope,
+                            snackbarHostState = snackbarHostState,
+                            onSnackbarResult = { snackbarResult ->
+                                {
 
-                            }
-                        },
-                        systemUiController = systemUiController,
-                        tts = tts,
-                        onLaunchApp = {
-                            try {
-                                startApplication(context, it.packageName)
-                            } catch (e: Exception) {
-                                e.printStackTrace()
-                                coroutineScope.launch {
-                                    snackbarHostState.showSnackbar("WERROR 404! Launcher Activity undefined")
                                 }
-                            } catch (e: ActivityNotFoundException){
-                                // https://youtu.be/2hIY1xuImuQ
-                                // https://youtu.be/2hIY1xuImuQ
-                                e.printStackTrace()
-                                coroutineScope.launch {
-                                    snackbarHostState.showSnackbar("WERROR 404! Launcher Activity undefined")
+                            },
+                            systemUiController = systemUiController,
+                            tts = tts,
+                            onLaunchApp = {
+                                try {
+                                    startApplication(context, it.packageName)
+                                } catch (e: Exception) {
+                                    e.printStackTrace()
+                                    coroutineScope.launch {
+                                        snackbarHostState.showSnackbar("WERROR 404! Launcher Activity undefined")
+                                    }
+                                } catch (e: ActivityNotFoundException){
+                                    // https://youtu.be/2hIY1xuImuQ
+                                    // https://youtu.be/2hIY1xuImuQ
+                                    e.printStackTrace()
+                                    coroutineScope.launch {
+                                        snackbarHostState.showSnackbar("WERROR 404! Launcher Activity undefined")
+                                    }
                                 }
-                            }
-                        },
-                        anViewModel = anViewModel
-                    )
-                }
-                composable(route = Screen.ConfigurationScreen.name,
-                    enterTransition = {
-                        slideIntoContainer(
-                            towards = AnimatedContentTransitionScope.SlideDirection.Up,
-                            animationSpec = tween(),
-                        )
-                    },
-                    exitTransition = {
-                        slideOutOfContainer(
-                            towards = AnimatedContentTransitionScope.SlideDirection.Left,
-                            animationSpec = tween(),
-                        )
-                    },
-                    popEnterTransition = {
-                        slideIntoContainer(
-                            towards = AnimatedContentTransitionScope.SlideDirection.Right,
-                            animationSpec = tween()
-                        )
-                    },
-                    popExitTransition = {
-                        slideOutOfContainer(
-                            towards = AnimatedContentTransitionScope.SlideDirection.Down,
-                            animationSpec = tween()
+                            },
+                            anViewModel = anViewModel
                         )
                     }
-                    ) {
-                    val attemptChangeSaveDir = remember { mutableStateOf(false) }
-                    val attemptPermission = remember { mutableStateOf(false) }
-                    val areYouSureChangeSaveDir = remember { mutableStateOf(false) }
-                    LaunchedEffect(htuiState.editingLevel) {
-                        if(htuiState.editingLevel){
-                            coroutineScope.launch {
-                                anViewModel.preloadFiles(
-                                    context = context,
-                                    contentResolver = saveDirResolver,
-                                    uiStating = htuiState,
-                                    listOfFolder = listOfFolder,
-                                    folders = folders,
-                                    json = json,
-                                    force = true,
-                                )
-                            }
-                            coroutineScope.launch {
-                                snackbarHostState.showSnackbar(
-                                    message = context.resources.getString(R.string.reloading_save)
-                                )
-                            }
-                            anViewModel.setEditingLevel(false)
+                    composable(route = Screen.ConfigurationScreen.name,
+                        enterTransition = {
+                            slideIntoContainer(
+                                towards = AnimatedContentTransitionScope.SlideDirection.Up,
+                                animationSpec = tween(),
+                            )
+                        },
+                        exitTransition = {
+                            slideOutOfContainer(
+                                towards = AnimatedContentTransitionScope.SlideDirection.Left,
+                                animationSpec = tween(),
+                            )
+                        },
+                        popEnterTransition = {
+                            slideIntoContainer(
+                                towards = AnimatedContentTransitionScope.SlideDirection.Right,
+                                animationSpec = tween()
+                            )
+                        },
+                        popExitTransition = {
+                            slideOutOfContainer(
+                                towards = AnimatedContentTransitionScope.SlideDirection.Down,
+                                animationSpec = tween()
+                            )
                         }
-                    }
-                    Configurationing(
-                        navController = navController,
-                        context = context,
-                        pm = pm,
-                        saveDirResult = htuiState.selectedSaveDir,
-                        onSelectedConfigMenu = { configSelect ->
-                            view.playSoundEffect(SoundEffectConstants.CLICK)
-                            when(configSelect){
-                                ConfigSelected.Donation -> {
-
+                    ) {
+                        val attemptChangeSaveDir = remember { mutableStateOf(false) }
+                        val attemptPermission = remember { mutableStateOf(false) }
+                        val areYouSureChangeSaveDir = remember { mutableStateOf(false) }
+                        LaunchedEffect(htuiState.editingLevel) {
+                            if(htuiState.editingLevel){
+                                coroutineScope.launch {
+                                    anViewModel.preloadFiles(
+                                        context = context,
+                                        contentResolver = saveDirResolver,
+                                        uiStating = htuiState,
+                                        listOfFolder = listOfFolder,
+                                        folders = folders,
+                                        json = json,
+                                        force = true,
+                                    )
+                                    anViewModel.setEditingLevel(false)
+                                    snackbarHostState.showSnackbar(
+                                        message = context.resources.getString(R.string.reloading_save)
+                                    )
                                 }
-                                ConfigSelected.LevelEditor -> {
-                                    navController.navigate(Screen.LevelEditor.name)
-                                }
-                                ConfigSelected.ItemsExplorer -> {}
-                                else -> {}
                             }
-                        },
-                        onSelectedSaveDir = {
-                            view.playSoundEffect(SoundEffectConstants.CLICK)
+                        }
+                        Configurationing(
+                            navController = navController,
+                            context = context,
+                            pm = pm,
+                            saveDirResult = htuiState.selectedSaveDir,
+                            onSelectedConfigMenu = { configSelect ->
+                                view.playSoundEffect(SoundEffectConstants.CLICK)
+                                when(configSelect){
+                                    ConfigSelected.Donation -> {
+
+                                    }
+                                    ConfigSelected.LevelEditor -> {
+                                        navController.navigate(Screen.LevelEditor.name)
+                                    }
+                                    ConfigSelected.ItemsExplorer -> {}
+                                    else -> {}
+                                }
+                            },
+                            onSelectedSaveDir = {
+                                view.playSoundEffect(SoundEffectConstants.CLICK)
 //                            anViewModel.selectSaveDirUri(it)
-                        },
-                        onChooseSaveDir = {
-                            view.playSoundEffect(SoundEffectConstants.CLICK)
+                            },
+                            onChooseSaveDir = {
+                                view.playSoundEffect(SoundEffectConstants.CLICK)
 //                            areYouSureChangeSaveDir.value = true
-                            attemptChangeSaveDir.value = true
-                        },
-                        onOpenTextFile = { uri, contentResolver ->
-                            view.playSoundEffect(SoundEffectConstants.CLICK)
-                            openATextFile(uri = uri, contentResolver =  contentResolver)
-                        },
-                        onChooseTextFile = {
-                            view.playSoundEffect(SoundEffectConstants.CLICK)
-                            testFileLauncher.launch(arrayOf<String>("",""))
-                        },
-                        onCheckPermission = {
-                            view.playSoundEffect(SoundEffectConstants.CLICK)
-                            attemptPermission.value = true
-                        },
-                        onClickVersion = {
-                            view.playSoundEffect(SoundEffectConstants.CLICK)
-                            navController.navigate(Screen.AboutScreen.name)
-                        },
-                        testTextResult = htuiState.testResult,
-                        haptic = haptic,
-                        versionName = versionName,
-                        versionNumber = versionNumber,
-                        systemUiController = systemUiController,
-                        uiState = htuiState,
-                        viewModel = anViewModel,
-                        tts = tts,
-                    )
-                    if(attemptChangeSaveDir.value) {
-                        if (htuiState.selectedSaveDir != null && htuiState.selectedSaveDir.toString().isNotEmpty()) {
-                            areYouSureChangeSaveDir.value = true
-                        } else {
-                            saveDirLauncher.launch(null)
-                            attemptChangeSaveDir.value = false
-                        }
-                    }
-                    if (areYouSureChangeSaveDir.value) {
-                        HTAlertDialog(
-                            onDismissRequest = {
-                                areYouSureChangeSaveDir.value = false
+                                attemptChangeSaveDir.value = true
+                            },
+                            onOpenTextFile = { uri, contentResolver ->
+                                view.playSoundEffect(SoundEffectConstants.CLICK)
+                                openATextFile(uri = uri, contentResolver =  contentResolver)
+                            },
+                            onChooseTextFile = {
+                                view.playSoundEffect(SoundEffectConstants.CLICK)
+                                testFileLauncher.launch(arrayOf<String>("",""))
+                            },
+                            onCheckPermission = {
+                                view.playSoundEffect(SoundEffectConstants.CLICK)
+                                attemptPermission.value = true
+                            },
+                            onClickVersion = {
+                                view.playSoundEffect(SoundEffectConstants.CLICK)
+                                navController.navigate(Screen.AboutScreen.name)
+                            },
+                            testTextResult = htuiState.testResult,
+                            haptic = haptic,
+                            versionName = versionName,
+                            versionNumber = versionNumber,
+                            systemUiController = systemUiController,
+                            uiState = htuiState,
+                            viewModel = anViewModel,
+                            tts = tts,
+                        )
+                        if(attemptChangeSaveDir.value) {
+                            if (htuiState.selectedSaveDir != null && htuiState.selectedSaveDir.toString().isNotEmpty()) {
+                                areYouSureChangeSaveDir.value = true
+                            } else {
+                                saveDirLauncher.launch(null)
                                 attemptChangeSaveDir.value = false
-                            },
-                            swapButton = true,
-                            icon = {
-                                Icon(
-                                    Icons.Default.Folder,
-                                    contentDescription = "Folder Icon"
-                                )
-                            },
-                            title = stringResource(R.string.change_savedir_dialog),
-                            text = "${stringResource(R.string.change_savedir_description)}:"
+                            }
+                        }
+                        if (areYouSureChangeSaveDir.value) {
+                            HTAlertDialog(
+                                onDismissRequest = {
+                                    areYouSureChangeSaveDir.value = false
+                                    attemptChangeSaveDir.value = false
+                                },
+                                swapButton = true,
+                                icon = {
+                                    Icon(
+                                        Icons.Default.Folder,
+                                        contentDescription = "Folder Icon"
+                                    )
+                                },
+                                title = stringResource(R.string.change_savedir_dialog),
+                                text = "${stringResource(R.string.change_savedir_description)}:"
 //                            "Your Config Folder is currently at:\n${""
 //                                if (htuiState.selectedSaveDir != null && htuiState.selectedSaveDir.toString()
 //                                        .isNotEmpty()
 //                                ) htuiState.selectedSaveDir else stringResource(R.string.value_unselected)
 //                            +""}"
-                            ,
-                            confirmText = stringResource(R.string.change_savedir_change),
-                            dismissText = stringResource(R.string.dismiss_button),
-                            onConfirm = {
-                                saveDirLauncher.launch(null)
-                                areYouSureChangeSaveDir.value = false
-                                attemptChangeSaveDir.value = false
-                            },
-                            tts = tts,
-                        ){
-                            val decompose = stringResource(R.string.value_unselected)
-                            val say = remember {  if (htuiState.selectedSaveDir != null && htuiState.selectedSaveDir.toString()
-                                    .isNotEmpty()
-                            ) htuiState.selectedSaveDir.toString() else decompose}
-                            OutlinedTextField(
-                                value = say,
-                                trailingIcon = {
-                                    Icon(Icons.Default.Folder, "")
+                                ,
+                                confirmText = stringResource(R.string.change_savedir_change),
+                                dismissText = stringResource(R.string.dismiss_button),
+                                onConfirm = {
+                                    saveDirLauncher.launch(null)
+                                    areYouSureChangeSaveDir.value = false
+                                    attemptChangeSaveDir.value = false
                                 },
-                                label = { Text(stringResource(R.string.directory_option)) },
-                                onValueChange = {
+                                tts = tts,
+                            ){
+                                val decompose = stringResource(R.string.value_unselected)
+                                val say = remember {  if (htuiState.selectedSaveDir != null && htuiState.selectedSaveDir.toString()
+                                        .isNotEmpty()
+                                ) htuiState.selectedSaveDir.toString() else decompose}
+                                OutlinedTextField(
+                                    value = say,
+                                    trailingIcon = {
+                                        Icon(Icons.Default.Folder, "")
+                                    },
+                                    label = { Text(stringResource(R.string.directory_option)) },
+                                    onValueChange = {
 //                                    say = it
-                                },
-                                enabled = false,
-                            )
-                        }
-                    } else {
-                        // Close dialog cancel
-                        attemptChangeSaveDir.value = false
-                    }
-
-                    if (attemptPermission.value) {
-                        HTAlertDialog(
-                            title = stringResource(R.string.permission_dialog),
-                            text = stringResource(R.string.permission_description),
-                            thirdButton = true,
-                            confirmText = stringResource(R.string.permission_grant),
-                            thirdText = stringResource(R.string.permission_details),
-                            icon = {
-                                Icon(Icons.Default.Security,"")
-                            },
-                            onConfirm = {
-                                Log.d("PermissionDialog","Attempt to run permission grant!")
-                                multiplePermissionLauncher.launch(permissionRequests)
-                                Log.d("PermissionDialog","Is it done?")
-                                attemptPermission.value = false
-                            },
-                            onThirdButton = {
-                                startIntent(
-                                    context, Intent(
-                                        Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
-                                        Uri.fromParts("package", packageName, null)
-                                    )
+                                    },
+                                    enabled = false,
                                 )
-                                attemptPermission.value = false
-                            },
-                            onDismissRequest = {
-                                attemptPermission.value = false
-                            },
-                            tts = tts,
-                        )
-                    } else {
-//                        attemptPermission.value = false
-                    }
+                            }
+                        } else {
+                            // Close dialog cancel
+                            attemptChangeSaveDir.value = false
+                        }
 
-                    anViewModel.visiblePermissionDialogQueue
-                        .reversed()
-                        .forEach{ permission ->
-                            PermissionDialog(
-                                permissionsTextProvider = when(permission){
-                                    Manifest.permission.READ_EXTERNAL_STORAGE -> {
-                                        ReadFilePermissionTextProvider()
-                                    }
-                                    Manifest.permission.WRITE_EXTERNAL_STORAGE -> {
-                                        WriteFilePermissionTextProvider()
-                                    }
-                                    Manifest.permission.CAMERA -> {
-                                        CameraPermissionTextProvider()
-                                    }
-                                    Manifest.permission.RECORD_AUDIO -> {
-                                        RecordAudioPermissionTextProvider()
-                                    }
-                                    Manifest.permission.CALL_PHONE -> {
-                                        PhoneCallPermissionTextProvider()
-                                    }
-                                    Manifest.permission.READ_PHONE_STATE -> {
-                                        PhoneStatePermissionTextProvider()
-                                    }
-                                    else -> return@forEach
+                        if (attemptPermission.value) {
+                            HTAlertDialog(
+                                title = stringResource(R.string.permission_dialog),
+                                text = stringResource(R.string.permission_description),
+                                thirdButton = true,
+                                confirmText = stringResource(R.string.permission_grant),
+                                thirdText = stringResource(R.string.permission_details),
+                                icon = {
+                                    Icon(Icons.Default.Security,"")
                                 },
-                                isPermanentlyDeclined = !shouldShowRequestPermissionRationale(
-                                    activityHandOver,
-                                    permission,
-                                ),
-                                onDismiss = anViewModel::dissmissPermissionDialog,
-                                onOkClick = {
-                                    anViewModel.dissmissPermissionDialog()
-                                    multiplePermissionLauncher.launch(
-                                        arrayOf(permission)
-                                    )
+                                onConfirm = {
+                                    Log.d("PermissionDialog","Attempt to run permission grant!")
+                                    multiplePermissionLauncher.launch(permissionRequests)
+                                    Log.d("PermissionDialog","Is it done?")
+                                    attemptPermission.value = false
                                 },
-                                onGoToAppSettingClick = {
-
+                                onThirdButton = {
                                     startIntent(
                                         context, Intent(
                                             Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
                                             Uri.fromParts("package", packageName, null)
                                         )
                                     )
-                                }
+                                    attemptPermission.value = false
+                                },
+                                onDismissRequest = {
+                                    attemptPermission.value = false
+                                },
+                                tts = tts,
+                            )
+                        } else {
+//                        attemptPermission.value = false
+                        }
+
+                        anViewModel.visiblePermissionDialogQueue
+                            .reversed()
+                            .forEach{ permission ->
+                                PermissionDialog(
+                                    permissionsTextProvider = when(permission){
+                                        Manifest.permission.READ_EXTERNAL_STORAGE -> {
+                                            ReadFilePermissionTextProvider()
+                                        }
+                                        Manifest.permission.WRITE_EXTERNAL_STORAGE -> {
+                                            WriteFilePermissionTextProvider()
+                                        }
+                                        Manifest.permission.CAMERA -> {
+                                            CameraPermissionTextProvider()
+                                        }
+                                        Manifest.permission.RECORD_AUDIO -> {
+                                            RecordAudioPermissionTextProvider()
+                                        }
+                                        Manifest.permission.CALL_PHONE -> {
+                                            PhoneCallPermissionTextProvider()
+                                        }
+                                        Manifest.permission.READ_PHONE_STATE -> {
+                                            PhoneStatePermissionTextProvider()
+                                        }
+                                        else -> return@forEach
+                                    },
+                                    isPermanentlyDeclined = !shouldShowRequestPermissionRationale(
+                                        activityHandOver,
+                                        permission,
+                                    ),
+                                    onDismiss = anViewModel::dissmissPermissionDialog,
+                                    onOkClick = {
+                                        anViewModel.dissmissPermissionDialog()
+                                        multiplePermissionLauncher.launch(
+                                            arrayOf(permission)
+                                        )
+                                    },
+                                    onGoToAppSettingClick = {
+
+                                        startIntent(
+                                            context, Intent(
+                                                Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+                                                Uri.fromParts("package", packageName, null)
+                                            )
+                                        )
+                                    }
+                                )
+                            }
+                    }
+                    composable(route = Screen.AboutScreen.name,
+                        enterTransition = {
+                            slideIntoContainer(
+                                towards = AnimatedContentTransitionScope.SlideDirection.Left,
+                                animationSpec = tween(),
+                            )
+                        },
+                        exitTransition = {
+                            slideOutOfContainer(
+                                towards = AnimatedContentTransitionScope.SlideDirection.Right,
+                                animationSpec = tween(),
+                            )
+                        },
+                        popEnterTransition = {
+                            slideIntoContainer(
+                                towards = AnimatedContentTransitionScope.SlideDirection.Right,
+                                animationSpec = tween()
+                            )
+                        },
+                        popExitTransition = {
+                            slideOutOfContainer(
+                                towards = AnimatedContentTransitionScope.SlideDirection.Right,
+                                animationSpec = tween()
                             )
                         }
-                }
-                composable(route = Screen.AboutScreen.name,
-                    enterTransition = {
-                        slideIntoContainer(
-                            towards = AnimatedContentTransitionScope.SlideDirection.Left,
-                            animationSpec = tween(),
-                        )
-                    },
-                    exitTransition = {
-                        slideOutOfContainer(
-                            towards = AnimatedContentTransitionScope.SlideDirection.Right,
-                            animationSpec = tween(),
-                        )
-                    },
-                    popEnterTransition = {
-                        slideIntoContainer(
-                            towards = AnimatedContentTransitionScope.SlideDirection.Right,
-                            animationSpec = tween()
-                        )
-                    },
-                    popExitTransition = {
-                        slideOutOfContainer(
-                            towards = AnimatedContentTransitionScope.SlideDirection.Right,
-                            animationSpec = tween()
+                    ) {
+                        AboutTerms(
+                            navController = navController,
+                            context = context,
+                            pm = pm,
+                            haptic = haptic,
+                            versionName = versionName,
+                            versionNumber = versionNumber,
+                            systemUiController = systemUiController,
+                            tts = tts,
                         )
                     }
+                    composable(route = Screen.LevelEditor.name,
+                        enterTransition = {
+                            slideIntoContainer(
+                                towards = AnimatedContentTransitionScope.SlideDirection.Left,
+                                animationSpec = tween(),
+                            )
+                        },
+                        exitTransition = {
+                            slideOutOfContainer(
+                                towards = AnimatedContentTransitionScope.SlideDirection.Left,
+                                animationSpec = tween(),
+                            )
+                        },
+                        popEnterTransition = {
+                            slideIntoContainer(
+                                towards = AnimatedContentTransitionScope.SlideDirection.Right,
+                                animationSpec = tween()
+                            )
+                        },
+                        popExitTransition = {
+                            slideOutOfContainer(
+                                towards = AnimatedContentTransitionScope.SlideDirection.Right,
+                                animationSpec = tween()
+                            )
+                        }
                     ) {
-                    AboutTerms(
-                        navController = navController,
-                        context = context,
-                        pm = pm,
-                        haptic = haptic,
-                        versionName = versionName,
-                        versionNumber = versionNumber,
-                        systemUiController = systemUiController,
-                        tts = tts,
-                    )
-                }
-                composable(route = Screen.LevelEditor.name,
-                    enterTransition = {
-                        slideIntoContainer(
-                            towards = AnimatedContentTransitionScope.SlideDirection.Left,
-                            animationSpec = tween(),
-                        )
-                    },
-                    exitTransition = {
-                        slideOutOfContainer(
-                            towards = AnimatedContentTransitionScope.SlideDirection.Left,
-                            animationSpec = tween(),
-                        )
-                    },
-                    popEnterTransition = {
-                        slideIntoContainer(
-                            towards = AnimatedContentTransitionScope.SlideDirection.Right,
-                            animationSpec = tween()
-                        )
-                    },
-                    popExitTransition = {
-                        slideOutOfContainer(
-                            towards = AnimatedContentTransitionScope.SlideDirection.Right,
-                            animationSpec = tween()
-                        )
-                    }
-                    ) {
-                    LaunchedEffect(htuiState.editingLevel) {
+                        LaunchedEffect(htuiState.editingLevel) {
 //                        if(!htuiState.editingLevel && currentScreen == Screen.LevelEditor){
 //
 //                            anViewModel.setEditingLevel(true)
 //                        }
-                    }
+                        }
 
-                    LevelEditor(
-                        navController = navController,
-                        context = context,
-                        pm = pm,
-                        saveDirResult = htuiState.selectedSaveDir,
-                        onSelectedSaveDir = {
+                        LevelEditor(
+                            navController = navController,
+                            context = context,
+                            pm = pm,
+                            saveDirResult = htuiState.selectedSaveDir,
+                            onSelectedSaveDir = {
 //                            anViewModel.selectSaveDirUri(it)
-                        },
-                        onChooseSaveDir = {
+                            },
+                            onChooseSaveDir = {
 
+                            },
+                            onOpenTextFile = {
+                                    uri, contentResolver -> openATextFile(uri = uri, contentResolver =  contentResolver)
+                            },
+                            onChooseTextFile = {
+                                testFileLauncher.launch(arrayOf<String>("",""))
+                            },
+                            onCheckPermission = {
+                            },
+                            onClickVersion = {
+                                navController.navigate(Screen.AboutScreen.name)
+                            },
+                            testTextResult = htuiState.testResult,
+                            haptic = haptic,
+                            versionName = versionName,
+                            versionNumber = versionNumber,
+                            systemUiController = systemUiController,
+                            uiState = htuiState,
+                            viewModel = anViewModel,
+                            onEditWhat = { selection ->
+                                Log.d("LevelEditor", "Trying to edit ${selection}")
+                                anViewModel.setEditWhich(selection)
+                                if(selection != EditWhich.Home) {
+                                    navController.navigate(Screen.ItemsExplorer.name)
+                                } else {
+                                    if(htuiState.selectedSaveDir != null) {
+                                        if (!htuiState.editingLevel && currentScreen == Screen.LevelEditor.name) {
+
+                                            anViewModel.setEditingLevel(true)
+                                        }
+                                        var toIntent = Intent(
+                                            context, ItemEditorActivity::class.java
+                                        )
+                                        val theUri = getATextFile(
+                                            dirUri = htuiState.selectedSaveDir!!,
+                                            context = context,
+                                            fileName = "${context.resources.getString(R.string.home_screen_file)}.json",
+                                            mimeType = context.resources.getString(R.string.text_plain_type),
+                                            initData = json.encodeToString<HomepagesWeHave>(
+                                                HomepagesWeHave()
+                                            ),
+                                            hardOverwrite = false,
+                                        )
+                                        toIntent.apply {
+                                            type = context.resources.getString(R.string.text_plain_type)
+                                        }
+                                        toIntent.putExtra(
+                                            "uri", theUri
+                                        )
+                                        toIntent.putExtra("saveDirUri", htuiState.selectedSaveDir)
+                                        toIntent.putExtra(Intent.EXTRA_STREAM, theUri)
+//                                toIntent.putExtra("editType", editType as? Parcelable)
+                                        toIntent.putExtra("editType", EditWhich.Home.name)
+                                        toIntent.putExtra("editTypeName",EditWhich.Home.name)
+                                        toIntent.putExtra("filename",context.resources.getString(R.string.home_screen_file))
+                                        toIntent.putExtra("fileName",context.resources.getString(R.string.home_screen_file))
+                                        startIntent(
+                                            context = context,
+                                            what = toIntent
+                                        )
+
+
+                                    }
+                                }
+                            },
+                            tts = tts,
+                        )
+                    }
+                    composable(Screen.ItemsExplorer.name,
+                        enterTransition = {
+                            slideIntoContainer(
+                                towards = AnimatedContentTransitionScope.SlideDirection.Left,
+                                animationSpec = tween(),
+                            )
                         },
-                        onOpenTextFile = {
-                                uri, contentResolver -> openATextFile(uri = uri, contentResolver =  contentResolver)
+                        exitTransition = {
+                            slideOutOfContainer(
+                                towards = AnimatedContentTransitionScope.SlideDirection.Left,
+                                animationSpec = tween(),
+                            )
                         },
-                        onChooseTextFile = {
-                            testFileLauncher.launch(arrayOf<String>("",""))
+                        popEnterTransition = {
+                            slideIntoContainer(
+                                towards = AnimatedContentTransitionScope.SlideDirection.Right,
+                                animationSpec = tween()
+                            )
                         },
-                        onCheckPermission = {
-                        },
-                        onClickVersion = {
-                            navController.navigate(Screen.AboutScreen.name)
-                        },
-                        testTextResult = htuiState.testResult,
-                        haptic = haptic,
-                        versionName = versionName,
-                        versionNumber = versionNumber,
-                        systemUiController = systemUiController,
-                        uiState = htuiState,
-                        viewModel = anViewModel,
-                        onEditWhat = { selection ->
-                            Log.d("LevelEditor", "Trying to edit ${selection}")
-                            anViewModel.setEditWhich(selection)
-                            if(selection != EditWhich.Home) {
-                                navController.navigate(Screen.ItemsExplorer.name)
-                            } else {
+                        popExitTransition = {
+                            slideOutOfContainer(
+                                towards = AnimatedContentTransitionScope.SlideDirection.Right,
+                                animationSpec = tween()
+                            )
+                        }
+                    ) {
+                        ItemsExplorer(
+                            navController = navController,
+                            context = context,
+                            pm = pm,
+                            saveDirResult = htuiState.selectedSaveDir,
+                            onSelectedSaveDir = {
+//                            anViewModel.selectSaveDirUri(it)
+                            },
+                            onChooseSaveDir = {
+
+                            },
+                            onOpenTextFile = {
+                                    uri, contentResolver -> openATextFile(uri = uri, contentResolver =  contentResolver)
+                            },
+                            onChooseTextFile = {
+                                testFileLauncher.launch(arrayOf<String>("",""))
+                            },
+                            onCheckPermission = {
+                            },
+                            onClickVersion = {
+                                navController.navigate(Screen.AboutScreen.name)
+                            },
+                            testTextResult = htuiState.testResult,
+                            haptic = haptic,
+                            versionName = versionName,
+                            versionNumber = versionNumber,
+                            systemUiController = systemUiController,
+                            uiState = htuiState,
+                            viewModel = anViewModel,
+                            onEditWhat = { editType, filename ->
+                                // https://youtu.be/2hIY1xuImuQ
+                                Log.d("ItemExplorer", "To Edit ${editType.name} ${filename}")
                                 if(htuiState.selectedSaveDir != null) {
-                                    if (!htuiState.editingLevel && currentScreen == Screen.LevelEditor.name) {
+                                    if (!htuiState.editingLevel && currentScreen == Screen.ItemsExplorer.name) {
 
                                         anViewModel.setEditingLevel(true)
                                     }
@@ -1256,13 +1398,27 @@ fun Navigation(
                                         context, ItemEditorActivity::class.java
                                     )
                                     val theUri = getATextFile(
-                                        dirUri = htuiState.selectedSaveDir!!,
-                                        context = context,
-                                        fileName = "${context.resources.getString(R.string.home_screen_file)}.json",
-                                        mimeType = context.resources.getString(R.string.text_plain_type),
-                                        initData = json.encodeToString<HomepagesWeHave>(
-                                            HomepagesWeHave()
+                                        dirUri = getADirectory(
+                                            dirUri = htuiState.selectedSaveDir!!,
+                                            context = context,
+                                            dirName = context.resources.getString(editType.select)
                                         ),
+                                        context = context,
+                                        fileName = "${filename}.json",
+                                        initData = when(editType){
+                                            EditWhich.Pages -> json.encodeToString<PageData>(PageData(
+                                                name = filename
+                                            ))
+                                            EditWhich.Items -> json.encodeToString<ItemData>(ItemData(
+                                                name = filename
+                                            ))
+                                            EditWhich.Home -> json.encodeToString<HomepagesWeHave>(
+                                                HomepagesWeHave()
+                                            )
+//                                        EditWhich.Themes -> json.encodeToString<Then>(HomepagesWeHave())
+                                            else -> ""
+                                        },
+                                        mimeType = context.resources.getString(R.string.text_plain_type),
                                         hardOverwrite = false,
                                     )
                                     toIntent.apply {
@@ -1271,13 +1427,18 @@ fun Navigation(
                                     toIntent.putExtra(
                                         "uri", theUri
                                     )
+//                                    .also {
+//                                    it.putExtra(Intent.EXTRA_STREAM, theUri)
+//                                    it.putExtra("editType",editType)
+//                                    it.putExtra("fileName",filename)
+//                                    }
                                     toIntent.putExtra("saveDirUri", htuiState.selectedSaveDir)
                                     toIntent.putExtra(Intent.EXTRA_STREAM, theUri)
 //                                toIntent.putExtra("editType", editType as? Parcelable)
-                                    toIntent.putExtra("editType", EditWhich.Home.name)
-                                    toIntent.putExtra("editTypeName",EditWhich.Home.name)
-                                    toIntent.putExtra("filename",context.resources.getString(R.string.home_screen_file))
-                                    toIntent.putExtra("fileName",context.resources.getString(R.string.home_screen_file))
+                                    toIntent.putExtra("editType", editType.name)
+                                    toIntent.putExtra("editTypeName",editType.name)
+                                    toIntent.putExtra("filename",filename)
+                                    toIntent.putExtra("fileName",filename)
                                     startIntent(
                                         context = context,
                                         what = toIntent
@@ -1285,153 +1446,34 @@ fun Navigation(
 
 
                                 }
-                            }
-                        },
-                        tts = tts,
-                    )
-                }
-                composable(Screen.ItemsExplorer.name,
-                    enterTransition = {
-                        slideIntoContainer(
-                            towards = AnimatedContentTransitionScope.SlideDirection.Left,
-                            animationSpec = tween(),
-                        )
-                    },
-                    exitTransition = {
-                        slideOutOfContainer(
-                            towards = AnimatedContentTransitionScope.SlideDirection.Left,
-                            animationSpec = tween(),
-                        )
-                    },
-                    popEnterTransition = {
-                        slideIntoContainer(
-                            towards = AnimatedContentTransitionScope.SlideDirection.Right,
-                            animationSpec = tween()
-                        )
-                    },
-                    popExitTransition = {
-                        slideOutOfContainer(
-                            towards = AnimatedContentTransitionScope.SlideDirection.Right,
-                            animationSpec = tween()
-                        )
-                    }
-                    ) {
-                    ItemsExplorer(
-                        navController = navController,
-                        context = context,
-                        pm = pm,
-                        saveDirResult = htuiState.selectedSaveDir,
-                        onSelectedSaveDir = {
-//                            anViewModel.selectSaveDirUri(it)
-                        },
-                        onChooseSaveDir = {
-
-                        },
-                        onOpenTextFile = {
-                                uri, contentResolver -> openATextFile(uri = uri, contentResolver =  contentResolver)
-                        },
-                        onChooseTextFile = {
-                            testFileLauncher.launch(arrayOf<String>("",""))
-                        },
-                        onCheckPermission = {
-                        },
-                        onClickVersion = {
-                            navController.navigate(Screen.AboutScreen.name)
-                        },
-                        testTextResult = htuiState.testResult,
-                        haptic = haptic,
-                        versionName = versionName,
-                        versionNumber = versionNumber,
-                        systemUiController = systemUiController,
-                        uiState = htuiState,
-                        viewModel = anViewModel,
-                        onEditWhat = { editType, filename ->
-                            // https://youtu.be/2hIY1xuImuQ
-                            Log.d("ItemExplorer", "To Edit ${editType.name} ${filename}")
-                            if(htuiState.selectedSaveDir != null) {
-                                if (!htuiState.editingLevel && currentScreen == Screen.ItemsExplorer.name) {
-
-                                    anViewModel.setEditingLevel(true)
-                                }
-                                var toIntent = Intent(
-                                    context, ItemEditorActivity::class.java
-                                )
-                                val theUri = getATextFile(
-                                    dirUri = getADirectory(
-                                        dirUri = htuiState.selectedSaveDir!!,
-                                        context = context,
-                                        dirName = context.resources.getString(editType.select)
-                                    ),
-                                    context = context,
-                                    fileName = "${filename}.json",
-                                    initData = when(editType){
-                                        EditWhich.Pages -> json.encodeToString<PageData>(PageData(
-                                            name = filename
-                                        ))
-                                        EditWhich.Items -> json.encodeToString<ItemData>(ItemData(
-                                            name = filename
-                                        ))
-                                        EditWhich.Home -> json.encodeToString<HomepagesWeHave>(
-                                            HomepagesWeHave()
-                                        )
-//                                        EditWhich.Themes -> json.encodeToString<Then>(HomepagesWeHave())
-                                        else -> ""
-                                    },
-                                    mimeType = context.resources.getString(R.string.text_plain_type),
-                                    hardOverwrite = false,
-                                )
-                                toIntent.apply {
-                                    type = context.resources.getString(R.string.text_plain_type)
-                                }
-                                toIntent.putExtra(
-                                    "uri", theUri
-                                )
-//                                    .also {
-//                                    it.putExtra(Intent.EXTRA_STREAM, theUri)
-//                                    it.putExtra("editType",editType)
-//                                    it.putExtra("fileName",filename)
-//                                    }
-                                toIntent.putExtra("saveDirUri", htuiState.selectedSaveDir)
-                                toIntent.putExtra(Intent.EXTRA_STREAM, theUri)
-//                                toIntent.putExtra("editType", editType as? Parcelable)
-                                toIntent.putExtra("editType", editType.name)
-                                toIntent.putExtra("editTypeName",editType.name)
-                                toIntent.putExtra("filename",filename)
-                                toIntent.putExtra("fileName",filename)
-                                startIntent(
-                                    context = context,
-                                    what = toIntent
-                                )
-
-
-                            }
-                        },
-                        exploreType = htuiState.toEditWhatFile,
-                        tts = tts,
-                    )
-
-                    if(htuiState.openCreateNewFile){
-                        TextInputDialog(
-                            title = stringResource(R.string.create_new_file_dialog_override,
-                                stringResource(htuiState.toEditWhatFile.label)
-                            ),
-                            selectIcon = Icons.Default.Create,
-                            onConfirmText = {
-                                anViewModel.createNewFileNow(
-                                    context = context,
-//                                    name = "$it${if(it.lastIndexOf(".json") < 0) ".json" else ""}",
-                                    name = it,
-                                    atWhere = htuiState.toEditWhatFile,
-                                    uiStating = htuiState,
-                                )
-                                anViewModel.openCreateNewFile(false)
                             },
-                            placeholder = "anItem",
-                            mustBeFilled = true,
-                            onDismiss = {
-                                anViewModel.openCreateNewFile(false)
-                            }
+                            exploreType = htuiState.toEditWhatFile,
+                            tts = tts,
                         )
+
+                        if(htuiState.openCreateNewFile){
+                            TextInputDialog(
+                                title = stringResource(R.string.create_new_file_dialog_override,
+                                    stringResource(htuiState.toEditWhatFile.label)
+                                ),
+                                selectIcon = Icons.Default.Create,
+                                onConfirmText = {
+                                    anViewModel.createNewFileNow(
+                                        context = context,
+//                                    name = "$it${if(it.lastIndexOf(".json") < 0) ".json" else ""}",
+                                        name = it,
+                                        atWhere = htuiState.toEditWhatFile,
+                                        uiStating = htuiState,
+                                    )
+                                    anViewModel.openCreateNewFile(false)
+                                },
+                                placeholder = "anItem",
+                                mustBeFilled = true,
+                                onDismiss = {
+                                    anViewModel.openCreateNewFile(false)
+                                }
+                            )
+                        }
                     }
                 }
             }
@@ -1708,13 +1750,13 @@ fun onLaunchAction(
                 }
             }
             ActionDataLaunchType.Internal -> {
-
+                val containAction = data[selectAction].action
                 try {
-                    when(data[selectAction].action){
-                        context.resources.getString(ActionInternalCommand.AllApps.id)->{
+                    when{
+                        containAction == context.resources.getString(ActionInternalCommand.AllApps.id)->{
                             navController.navigate(Screen.AllAppsScreen.name)
                         }
-                        context.resources.getString(ActionInternalCommand.Camera.id)->{
+                        containAction == context.resources.getString(ActionInternalCommand.Camera.id)->{
                             // https://stackoverflow.com/a/13977619/9079640
                             // https://developer.android.com/guide/components/intents-common#CameraStill
                             startIntent(
@@ -1725,7 +1767,7 @@ fun onLaunchAction(
                                 extras = data[selectAction].extras ?: mapOf()
                             )
                         }
-                        context.resources.getString(ActionInternalCommand.Clock.id) -> {
+                        containAction == context.resources.getString(ActionInternalCommand.Clock.id) -> {
                             // https://stackoverflow.com/a/4281243/9079640
 //                            startIntent(
 //                                context = context,
@@ -1763,7 +1805,7 @@ fun onLaunchAction(
                                 snackbarHostState.showSnackbar(message = "WERROR 404! Clock App Not Found")
                             }
                         }
-                        context.resources.getString(ActionInternalCommand.Settings.id) -> {
+                        containAction == context.resources.getString(ActionInternalCommand.Settings.id) -> {
 //                            startIntent(
 //                                context = context,
 //                                what = Intent(Settings.ACTION_SETTINGS)
@@ -1776,34 +1818,45 @@ fun onLaunchAction(
                             )
 //                            navController.navigate(Screen.OpenAPage.name, navigatorExtras = )
                         }
-                        context.resources.getString(ActionInternalCommand.SystemSettings.id) -> {
+                        containAction == context.resources.getString(ActionInternalCommand.SystemSettings.id) -> {
                             startIntent(
                                 context = context,
                                 what = Intent(Settings.ACTION_SETTINGS)
                             )
                         }
-                        context.resources.getString(ActionInternalCommand.Contacts.id) -> {
+                        // MEGA SETTING
+                        containAction.startsWith("Settings") -> {
+//                            ActionGoToSystemSetting.valueOf(containAction)
+                            val settingGo:String = containAction.replaceFirst("Settings","")
+                            Log.d("GoToSettings","${settingGo}")
+                            startIntent(
+                                context = context,
+                                what = Intent(ActionGoToSystemSetting.valueOf(settingGo).route)
+                            )
+                        }
+                        // END MEGA SETTING
+                        containAction == context.resources.getString(ActionInternalCommand.Contacts.id) -> {
 //                            startIntent(
 //                                context = context,
 //                                what = Intent(Contacts.)
 //                            )
                         }
-                        context.resources.getString(ActionInternalCommand.Preferences.id) -> {
+                        containAction == context.resources.getString(ActionInternalCommand.Preferences.id) -> {
                             navController.navigate(Screen.ConfigurationScreen.name)
                         }
-                        context.resources.getString(ActionInternalCommand.Emergency.id) -> {
+                        containAction == context.resources.getString(ActionInternalCommand.Emergency.id) -> {
 
                         }
-                        context.resources.getString(ActionInternalCommand.Messages.id) -> {
+                        containAction == context.resources.getString(ActionInternalCommand.Messages.id) -> {
 
                         }
-                        context.resources.getString(ActionInternalCommand.Telephone.id) -> {
+                        containAction == context.resources.getString(ActionInternalCommand.Telephone.id) -> {
 
                         }
-                        context.resources.getString(ActionInternalCommand.Gallery.id) -> {
+                        containAction == context.resources.getString(ActionInternalCommand.Gallery.id) -> {
 
                         }
-                        context.resources.getString(ActionInternalCommand.GoToPage.id) -> {
+                        containAction == context.resources.getString(ActionInternalCommand.GoToPage.id) -> {
                             if(data[selectAction].args[0].isNotBlank()){
                                 uiState.coreConfigJson?.let {
                                     if(uiState.coreConfigJson?.pagesPath?.contains(data[0].args[0]) == true){
@@ -1815,7 +1868,7 @@ fun onLaunchAction(
                                 throw IllegalArgumentException("Argument 0 cannot be empty", IllegalStateException("Action ${data[selectAction].action}: Empty Argument 0: ${data[selectAction].args[0]}"))
                             }
                         }
-                        context.resources.getString(ActionInternalCommand.OpenAPage.id) -> {
+                        containAction == context.resources.getString(ActionInternalCommand.OpenAPage.id) -> {
                             if(data[selectAction].args[0].isNotBlank()) {
                                 navController.navigate<PageData>(
                                     viewModel.getPageData(
@@ -1828,7 +1881,7 @@ fun onLaunchAction(
                                 throw IllegalArgumentException("Argument 0 cannot be empty", IllegalStateException("Action ${data[selectAction].action}: Empty Argument 0: ${data[selectAction].args[0]}"))
                             }
                         }
-                        context.resources.getString(ActionInternalCommand.Aria.id) -> {
+                        containAction == context.resources.getString(ActionInternalCommand.Aria.id) -> {
                             // arg 0 = select language. blank is auto
                             // extras Lang, Read of this language. first is default. Recommended start from EN
                             val listOfLocales:Array<JavaLocale> = JavaLocale.getAvailableLocales()

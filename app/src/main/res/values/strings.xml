@@ -244,6 +244,8 @@
     <string name="remove_dialog_content">Are you sure to remove %s?</string>
     <string name="will_not_delete_item_itself">Note, this will not delete the item itself.</string>
     <string name="not_found">WERROR 404 Not Found %s</string>
+    <string name="saved">Saved</string>
+    <string name="item_empty_emphasis">EMPTY</string>
 
     <string name="menu_home">Home</string>
     <string name="menu_gallery">Gallery</string>
@@ -382,9 +384,28 @@
 
     <!--  Extras  -->
     <string name="unit_packages_installed">installed packages</string>
+    <string name="unit_packages_launchable">launch able apps</string>
+    <plurals name="unit_packages_installed">
+        <item quantity="zero">%d package</item>
+        <item quantity="one">%d package</item>
+        <item quantity="other">%d packages</item>
+    </plurals>
+    <plurals name="unit_packages_launchable">
+        <item quantity="zero">%d launch-able</item>
+        <item quantity="one">%d launch-able</item>
+        <item quantity="other">%d launch-ables</item>
+    </plurals>
+    <string name="unit_package_bridge">%s of %s</string>
     <string name="unit_version_name">version</string>
     <string name="unit_version_number">iteration</string>
     <string name="iteration">iteration</string>
+    <string name="select_an_app">Select an App</string>
+    <string name="select_an_idk">Select something</string>
+    <string name="select_an_page">Select a page</string>
+    <string name="select_an_item">Select an item</string>
+    <string name="select_an_something">Select %s %s</string>
+    <string name="selecting_a_start_consonant">a</string>
+    <string name="selecting_a_start_vowel">an</string>
 
     <!--  Internal Commmands  -->
     <string name="internal_commands_all_apps" translatable="false">AllApps</string>

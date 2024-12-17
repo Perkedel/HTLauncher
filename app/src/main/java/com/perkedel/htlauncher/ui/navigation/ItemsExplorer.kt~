@@ -108,7 +108,7 @@ fun ItemsExplorer(
                         icon = {
                             when(exploreType){
                                 EditWhich.Items -> AsyncImage(
-                                    modifier = Modifier.size(72.dp).padding(4.dp),
+                                    modifier = Modifier.size(72.dp).padding(4.d),
                                     placeholder = painterResource(R.drawable.placeholder),
                                     error = painterResource(R.drawable.mavrickle),
                                     model = when(uiState.itemList[editData[it]]?.action?.get(0)?.type){

@@ -185,6 +185,8 @@
     <string name="remove_dialog_content">Yakin untuk menghapus %s?</string>
     <string name="will_not_delete_item_itself">NB, ini tidak akan menghapus item itu sendiri.</string>
     <string name="not_found">WERROR 404 Tidak Ditemukan %s</string>
+    <string name="saved">Tersimpan</string>
+    <string name="item_empty_emphasis">KOSONG</string>
 
     <string name="reloading_save">Konfigurasi Dimuat Ulang</string>
     <string name="save_error">Galat Menyimpan</string>
@@ -322,6 +324,14 @@
 
     <!--  Extras  -->
     <string name="unit_packages_installed">paket terinstal</string>
+    <string name="unit_packages_launchable">aplikasi dapat dijalankan</string>
+    <plurals name="unit_packages_installed">
+        <item quantity="other">%d paket</item>
+    </plurals>
+    <plurals name="unit_packages_launchable">
+        <item quantity="other">%d dapat dijalankan</item>
+    </plurals>
+    <string name="unit_package_bridge">%s dari %s</string>
     <string name="unit_version_name">versi</string>
     <string name="unit_version_number">iterasi</string>
     <string name="iteration">iterasi</string>
@@ -350,6 +360,13 @@
     <string name="category_bar_fill">Kategori %s</string>
     <string name="action_remove_detailed">Hapus %s</string>
     <string name="action_removed_detailed">%s Dihapus</string>
+    <string name="select_an_app">Pilih sebuah aplikasi</string>
+    <string name="select_an_idk">Pilih sesuatu</string>
+    <string name="select_an_page">Pilih sebuah halaman</string>
+    <string name="select_an_item">Pilih sebuah item</string>
+    <string name="select_an_something">Select %s %s</string>
+    <string name="selecting_a_start_consonant">sebuah</string>
+    <string name="selecting_a_start_vowel">sebuah</string>
 
     <!--  Internal Commmands  -->
     <string name="internal_commands_all_apps_label" translatable="true">Semua Aplikasi</string>

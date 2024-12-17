@@ -103,6 +103,7 @@ import com.perkedel.htlauncher.widgets.HTButton
 import com.perkedel.htlauncher.widgets.ItemCell
 import com.perkedel.htlauncher.writeATextFile
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import kotlinx.serialization.encodeToString
 import okio.IOException
 
@@ -258,28 +259,52 @@ fun soPressBack(nav:ThreePaneScaffoldNavigator<Any>){
     }
 }
 
-fun saveThisFile(saveUri:Uri, context: Context, contentResolver: ContentResolver, itemType: EditWhich, content:String = "{}", viewModel: ItemEditorViewModel,){
-    try{
-    writeATextFile(
-        uri = saveUri,
-        contentResolver = contentResolver,
-        with = content
-    )
+fun saveThisFile(
+    saveUri: Uri,
+    context: Context,
+    contentResolver: ContentResolver,
+    itemType: EditWhich,
+    content: String = "{}",
+    viewModel: ItemEditorViewModel,
+    coroutineScope: CoroutineScope,
+    snackbarHostState: SnackbarHostState
+) {
+    try {
+        writeATextFile(
+            uri = saveUri,
+            contentResolver = contentResolver,
+            with = content
+        )
+        coroutineScope.launch {
+            snackbarHostState.showSnackbar(
+                message = context.resources.getString(R.string.save_success),
+            )
+        }
 //        Toast.makeText(context,context.resources.getString(R.string.save_success),Toast.LENGTH_SHORT).show()
-    } catch (e:Exception){
+    } catch (e: Exception) {
         e.printStackTrace()
         viewModel.updateError(
             into = true,
-            message = e.localizedMessage ?: context.resources.getString(R.string.error_unknown_reason)
+            message = e.localizedMessage
+                ?: context.resources.getString(R.string.error_unknown_reason)
         )
-        Toast.makeText(context,context.resources.getString(R.string.save_error),Toast.LENGTH_SHORT).show()
-    } catch (e:IOException){
+        Toast.makeText(
+            context,
+            context.resources.getString(R.string.save_error),
+            Toast.LENGTH_SHORT
+        ).show()
+    } catch (e: IOException) {
         e.printStackTrace()
         viewModel.updateError(
             into = true,
-            message = e.localizedMessage ?: context.resources.getString(R.string.error_unknown_reason)
+            message = e.localizedMessage
+                ?: context.resources.getString(R.string.error_unknown_reason)
         )
-        Toast.makeText(context,context.resources.getString(R.string.save_error),Toast.LENGTH_SHORT).show()
+        Toast.makeText(
+            context,
+            context.resources.getString(R.string.save_error),
+            Toast.LENGTH_SHORT
+        ).show()
     }
 }
 
@@ -305,7 +330,9 @@ fun ItemEditorGreeting(
             contentResolver = resolver,
             itemType = editType,
             content = content,
-            viewModel = viewModel
+            viewModel = viewModel,
+            coroutineScope = coroutineScope,
+            snackbarHostState = snackbarHostState,
         )
     },
     json: Json = Json {

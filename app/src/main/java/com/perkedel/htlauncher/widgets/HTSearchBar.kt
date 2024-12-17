@@ -2,7 +2,9 @@ package com.perkedel.htlauncher.widgets
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -24,6 +26,7 @@ import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.unit.dp
 import com.perkedel.htlauncher.R
 import com.perkedel.htlauncher.ui.previews.HTPreviewAnnotations
 import com.perkedel.htlauncher.ui.theme.HTLauncherTheme
@@ -35,18 +38,22 @@ fun HTSearchBar(
     megaTitle:String = "",
     onValueChange:(String)->Unit = {},
     initExpanded:Boolean = false,
+    padForScrollbar:Boolean = true,
 ){
     var expanded by remember { mutableStateOf(initExpanded) }
     Card(
         modifier = Modifier.fillMaxWidth()
     ) {
-        Column {
+        Column(
+            modifier = Modifier.padding(8.dp)
+        ) {
             if(megaTitle.isNotBlank()) {
                 Text(megaTitle)
             }
+            Row {
 //            if(expanded) {
                 OutlinedTextField(
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier.weight(1f),
                     value = value,
                     label = { Text(stringResource(R.string.action_search)) },
                     onValueChange = onValueChange,
@@ -105,6 +112,13 @@ fun HTSearchBar(
 //                }
 //
 //            }
+                if(padForScrollbar){
+                    Spacer(
+                        modifier = Modifier.padding(8.dp)
+                    )
+                }
+            }
+
         }
     }
 }
@@ -118,7 +132,15 @@ fun HTSearchBarPreview(){
         ) {
             Column {
                 HTSearchBar(
+                    megaTitle = "HAHAHA",
                     value = "HELLO"
+                )
+                HTSearchBar(
+                    value = "HELLO"
+                )
+                HTSearchBar(
+                    value = "HELLO",
+                    padForScrollbar = false,
                 )
                 HTSearchBar(
                     value = ""

@@ -15,6 +15,7 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
@@ -70,6 +71,21 @@ fun StandalonePageScreen(
     isCompact: Boolean = windowInfo.screenWidthInfo is WindowInfo.WindowType.Compact,
     isOrientation: Int = configuration.orientation,
 ) {
+    LaunchedEffect(
+        key1 = pageData
+    ) {
+        viewModel.updateCurrentPageIconModel(
+            viewModel.getPageIcon(
+                context = context,
+                of = pageData.name,
+                json = json,
+                ignoreFile = false,
+                forceReload = false,
+                pm = pm,
+            )
+        )
+    }
+
     Box(){
         BasePage(
             pageData = pageData,

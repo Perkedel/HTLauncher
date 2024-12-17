@@ -28,12 +28,14 @@ import com.perkedel.htlauncher.ui.theme.HTLauncherTheme
 
 @Preview(
     name = "Handy Talky POC",
+    group = "Special Embedded",
     device = "spec:width=350dp,height=280dp,dpi=1", apiLevel = 28, fontScale = .81f,
     showSystemUi = true,
     uiMode = Configuration.UI_MODE_NIGHT_NO or Configuration.UI_MODE_TYPE_NORMAL
 )
 @Preview(
     name = "Handy Talky POC Actual",
+    group = "Special Embedded",
     device = "spec:width=350dp,height=280dp,dpi=1", apiLevel = 21, fontScale = .81f,
     showSystemUi = true,
     uiMode = Configuration.UI_MODE_NIGHT_NO or Configuration.UI_MODE_TYPE_NORMAL
@@ -43,12 +45,14 @@ annotation class HTPreviewAnnotationsPOC
 @Preview(
     // https://stackoverflow.com/a/78279389/9079640
     name = "Workaround Dynamic Color",
+    group = "Dynamic Color Workarounds",
     apiLevel = 31,
     uiMode = Configuration.UI_MODE_NIGHT_NO,
 )
 @Preview(
     // https://stackoverflow.com/a/78279389/9079640
     name = "Workaround Dynamic Color Red",
+    group = "Dynamic Color Workarounds",
     apiLevel = 31,
     wallpaper = Wallpapers.RED_DOMINATED_EXAMPLE,
     uiMode = Configuration.UI_MODE_NIGHT_NO,
@@ -56,6 +60,7 @@ annotation class HTPreviewAnnotationsPOC
 @Preview(
     // https://stackoverflow.com/a/78279389/9079640
     name = "Workaround Dynamic Color Blue",
+    group = "Dynamic Color Workarounds",
     apiLevel = 31,
     wallpaper = Wallpapers.BLUE_DOMINATED_EXAMPLE,
     uiMode = Configuration.UI_MODE_NIGHT_NO,
@@ -63,6 +68,7 @@ annotation class HTPreviewAnnotationsPOC
 @Preview(
     // https://stackoverflow.com/a/78279389/9079640
     name = "Workaround Dynamic Color Green",
+    group = "Dynamic Color Workarounds",
     apiLevel = 31,
     wallpaper = Wallpapers.GREEN_DOMINATED_EXAMPLE,
     uiMode = Configuration.UI_MODE_NIGHT_NO,
@@ -70,6 +76,7 @@ annotation class HTPreviewAnnotationsPOC
 @Preview(
     // https://stackoverflow.com/a/78279389/9079640
     name = "Workaround Dynamic Color Yellow",
+    group = "Dynamic Color Workarounds",
     apiLevel = 31,
     wallpaper = Wallpapers.YELLOW_DOMINATED_EXAMPLE,
     uiMode = Configuration.UI_MODE_NIGHT_NO,
@@ -77,6 +84,7 @@ annotation class HTPreviewAnnotationsPOC
 @Preview(
     // https://stackoverflow.com/a/78279389/9079640
     name = "Workaround Dynamic Color",
+    group = "Dynamic Color Workarounds",
     apiLevel = 31,
     uiMode = Configuration.UI_MODE_NIGHT_NO,
 )
@@ -85,6 +93,7 @@ annotation class PreviewDynamicColorsWorkaroundLight
 @Preview(
     // https://stackoverflow.com/a/78279389/9079640
     name = "Workaround Dynamic Color Red Dark",
+    group = "Dynamic Color Workarounds",
     apiLevel = 31,
     wallpaper = Wallpapers.RED_DOMINATED_EXAMPLE,
     uiMode = Configuration.UI_MODE_NIGHT_YES,
@@ -92,6 +101,7 @@ annotation class PreviewDynamicColorsWorkaroundLight
 @Preview(
     // https://stackoverflow.com/a/78279389/9079640
     name = "Workaround Dynamic Color Blue Dark",
+    group = "Dynamic Color Workarounds",
     apiLevel = 31,
     wallpaper = Wallpapers.BLUE_DOMINATED_EXAMPLE,
     uiMode = Configuration.UI_MODE_NIGHT_YES,
@@ -99,6 +109,7 @@ annotation class PreviewDynamicColorsWorkaroundLight
 @Preview(
     // https://stackoverflow.com/a/78279389/9079640
     name = "Workaround Dynamic Color Green Dark",
+    group = "Dynamic Color Workarounds",
     apiLevel = 31,
     wallpaper = Wallpapers.GREEN_DOMINATED_EXAMPLE,
     uiMode = Configuration.UI_MODE_NIGHT_YES,
@@ -106,6 +117,7 @@ annotation class PreviewDynamicColorsWorkaroundLight
 @Preview(
     // https://stackoverflow.com/a/78279389/9079640
     name = "Workaround Dynamic Color Yellow Dark",
+    group = "Dynamic Color Workarounds",
     apiLevel = 31,
     wallpaper = Wallpapers.YELLOW_DOMINATED_EXAMPLE,
     uiMode = Configuration.UI_MODE_NIGHT_YES,
@@ -114,18 +126,21 @@ annotation class PreviewDynamicColorsWorkaroundDark
 
 @Preview(
     name = "WearOS", device = "id:wearos_large_round", showSystemUi = true, showBackground = true,
+    group = "WearOS",
     uiMode = Configuration.UI_MODE_NIGHT_YES or Configuration.UI_MODE_TYPE_WATCH
 )
 annotation class PreviewWearOS
 
 @Preview(
     name = "WearOS Square", device = "id:wearos_square", showSystemUi = true, showBackground = true,
+    group = "WearOS",
     uiMode = Configuration.UI_MODE_NIGHT_YES or Configuration.UI_MODE_TYPE_WATCH
 )
 annotation class PreviewWearOsSquare
 
 @Preview(
     name = "WearOS Rectangular", device = "id:wearos_rect", showSystemUi = true,
+    group = "WearOS",
     showBackground = true,
     uiMode = Configuration.UI_MODE_NIGHT_YES or Configuration.UI_MODE_TYPE_WATCH
 )
@@ -133,6 +148,7 @@ annotation class PreviewWearOsRectangular
 
 @Preview(
     name = "Nexus 5",
+    group = "Special Embedded",
     device = "spec:parent=Nexus 5,navigation=buttons", showSystemUi = true, showBackground = true,
     uiMode = Configuration.UI_MODE_NIGHT_YES or Configuration.UI_MODE_TYPE_NORMAL
 )
@@ -140,18 +156,21 @@ annotation class PreviewNexus5
 
 @Preview(
     name = "Chromebook",
+    group = "Android-x86",
     device = "id:desktop_large", showSystemUi = true, showBackground = true,
     uiMode = Configuration.UI_MODE_NIGHT_YES or Configuration.UI_MODE_TYPE_DESK
 )
 annotation class PreviewChromebook
 
 @Preview(
-    name = "Pixel Fold", device = "id:pixel_9_pro_fold", showSystemUi = true, showBackground = true
+    name = "Pixel Fold", device = "id:pixel_9_pro_fold", showSystemUi = true, showBackground = true,
+            group = "Special Embedded",
 )
 annotation class PreviewPixelFold
 
 @Preview(
     name = "Microwave",
+    group = "Special Embedded",
     uiMode = Configuration.UI_MODE_NIGHT_YES or Configuration.UI_MODE_TYPE_APPLIANCE,
     device = "spec:width=1080px,height=2400px,orientation=landscape,cutout=corner,navigation=buttons"
 )
@@ -159,6 +178,7 @@ annotation class PreviewMicrowave
 
 @Preview(
     name = "Car Infotainment Portrait",
+    group = "Special Embedded",
     device = "spec:parent=automotive_large_portrait", showSystemUi = true,
     showBackground = true,
     uiMode = Configuration.UI_MODE_NIGHT_YES or Configuration.UI_MODE_TYPE_CAR
@@ -167,24 +187,28 @@ annotation class PreviewCarPortrait
 
 @Preview(
     name = "Car Infotainment Landscape", device = "id:automotive_1080p_landscape",
+    group = "Special Embedded",
     uiMode = Configuration.UI_MODE_NIGHT_YES or Configuration.UI_MODE_TYPE_CAR
 )
 annotation class PreviewCarLandscape
 
 @Preview(
     name = "Car Distant", device = "id:automotive_distant_display_with_play",
+    group = "Special Embedded",
     uiMode = Configuration.UI_MODE_NIGHT_YES or Configuration.UI_MODE_TYPE_CAR
 )
 annotation class PreviewCarDistant
 
 @Preview(
     name = "Google TV", device = "id:tv_4k",
+    group = "Special Embedded",
     uiMode = Configuration.UI_MODE_NIGHT_YES or Configuration.UI_MODE_TYPE_TELEVISION
 )
 annotation class PreviewGoogleTV
 
 @Preview(
     name = "VR", uiMode = Configuration.UI_MODE_NIGHT_YES or Configuration.UI_MODE_TYPE_VR_HEADSET,
+    group = "Special Embedded",
     device = "spec:width=1920dp,height=1080dp,dpi=640,navigation=buttons", showSystemUi = true,
     showBackground = true
 )

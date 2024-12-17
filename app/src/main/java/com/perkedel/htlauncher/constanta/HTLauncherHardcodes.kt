@@ -7,6 +7,7 @@ import com.perkedel.htlauncher.data.ItemData
 import com.perkedel.htlauncher.data.PageData
 import com.perkedel.htlauncher.data.SearchableApps
 import com.perkedel.htlauncher.enumerations.ActionDataLaunchType
+import com.perkedel.htlauncher.enumerations.ActionGoToSystemSetting
 import com.perkedel.htlauncher.enumerations.ActionInternalCommand
 import com.perkedel.htlauncher.enumerations.InternalCategories
 
@@ -54,7 +55,17 @@ object HTLauncherHardcodes {
             "SettingsSystem",
             "Preferences",
             "CategorySettingsSystem",
-            "SettingsLocation",
+            ActionGoToSystemSetting.WiFi.id,
+            ActionGoToSystemSetting.Tethering.id,
+            ActionGoToSystemSetting.Bluetooth.id,
+            ActionGoToSystemSetting.Location.id,
+            ActionGoToSystemSetting.Display.id,
+            ActionGoToSystemSetting.Sound.id,
+            ActionGoToSystemSetting.Security.id,
+            ActionGoToSystemSetting.Applications.id,
+//            ActionGoToSystemSetting.Battery.id,
+            ActionGoToSystemSetting.Storage.id,
+//            ActionGoToSystemSetting.Network.id,
         )
     )
 

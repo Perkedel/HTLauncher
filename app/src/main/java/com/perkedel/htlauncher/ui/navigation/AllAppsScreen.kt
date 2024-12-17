@@ -2,11 +2,15 @@
 
 package com.perkedel.htlauncher.ui.navigation
 
+import android.annotation.SuppressLint
 import android.content.ActivityNotFoundException
 import android.content.Context
+import android.content.Intent
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
+import android.content.pm.PackageManager.PackageInfoFlags
+import android.content.pm.ResolveInfo
 import android.speech.tts.TextToSpeech
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.MarqueeAnimationMode
@@ -89,9 +93,11 @@ import me.zhanghai.compose.preference.Preference
 import me.zhanghai.compose.preference.ProvidePreferenceLocals
 import my.nanihadesuka.compose.LazyColumnScrollbar
 import my.nanihadesuka.compose.ScrollbarSettings
+import java.util.Collections
 
 //import com.gigamole.scrollbars
 
+@SuppressLint("InlinedApi")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AllAppsScreen(
@@ -108,6 +114,7 @@ fun AllAppsScreen(
     onLaunchApp: (ApplicationInfo)->Unit = {},
     searchTerm: MutableState<String> = remember{mutableStateOf("")},
     anViewModel: HTViewModel = viewModel(),
+    onlyLauncherActivity:Boolean = true,
     ) {
     // https://stackoverflow.com/questions/64377518/how-to-initialize-or-access-packagemanager-out-from-coroutinecontext
     // https://www.geeksforgeeks.org/different-ways-to-get-list-of-all-apps-installed-in-your-android-phone/
@@ -138,15 +145,64 @@ fun AllAppsScreen(
     // https://gist.github.com/akexorcist/b058ed1fea821614bcd4
     // https://blog.savvas.cloud/2023/09/07/the-dos-and-donts-of-jetpack-compose/
     // https://meetpatadia9.medium.com/efficient-search-with-lazy-layouts-in-jetpack-compose-0a6c3f219ff5
+    // https://stackoverflow.com/a/13027415/9079640
 //    val pm:PackageManager = getPackageManager()
 //    val pm: PackageManager = context.packageManager
 //    val pm:PackageManager = context.getApp
-    val packList = pm.getInstalledPackages(0)
+    // TODO: pls only get apps with LauncherActivity!!!
+//    val packList = pm.getInstalledPackages(0)
+    val mainIntent = Intent(Intent.ACTION_MAIN, null)
+    val mainIntent2 = Intent(Intent.ACTION_MAIN, null)
+    mainIntent.addCategory(Intent.CATEGORY_LAUNCHER)
+    mainIntent2.addCategory(Intent.CATEGORY_LEANBACK_LAUNCHER)
+//    mainIntent.addCategory(Intent.CATEGORY_LEANBACK_LAUNCHER)
+//    val launcherActivities = pm.queryIntentActivities(mainIntent,0)
+//    val tvActivities = pm.queryIntentActivities(mainIntent2,0)
+    var readyToShow by remember { mutableStateOf(false) }
+//    val launcherActivities = pm.queryIntentActivities(mainIntent,PackageManager.MATCH_ALL)
+
 //    val packList = pm.getInstalledApplications(0)
-    val appList = pm.getInstalledApplications(0)
-    LaunchedEffect(true) {
+//    val appList = pm.getInstalledApplications()
+    val appFilter by anViewModel.appAll.collectAsState()
+//    val appFilterSort = appFilter.sortedBy { it.label }
+    LaunchedEffect(
+        key1 = pm.queryIntentActivities(mainIntent,0),
+        key2 = pm.getInstalledPackages(0)
+    ) {
         coroutineScope.launch {
-            anViewModel.initializeAllApps(packList,pm)
+            readyToShow = false
+            if(onlyLauncherActivity){
+                val launcherActivities = pm.queryIntentActivities(mainIntent,0)
+                val tvActivities = pm.queryIntentActivities(mainIntent2,0)
+                val theAlreadyExist: MutableList<ResolveInfo> = mutableListOf()
+                for(i in tvActivities){
+                    var alreadyExist:Boolean = false
+                    if (theAlreadyExist.contains(i) || launcherActivities.contains(i)) continue
+                    // PLEASE PREVENT DUPLICATE WHEN MERGING!
+//                if(launcherActivities.contains(i)){
+////                    continue
+//                } else {
+//                    launcherActivities.add(i)
+//                }
+                    for(j in launcherActivities){
+                        if(theAlreadyExist.contains(j)) continue
+                        if(i.activityInfo.packageName == j.activityInfo.packageName){
+                            theAlreadyExist.add(j)
+                            alreadyExist = true
+                            break
+                        } else {
+
+                        }
+                    }
+                    if(!alreadyExist) launcherActivities.add(i)
+                }
+                Collections.sort(launcherActivities, ResolveInfo.DisplayNameComparator(pm))
+                anViewModel.initializeAllAppsResolve(launcherActivities,pm)
+            } else {
+                val packList = pm.getInstalledPackages(0)
+                anViewModel.initializeAllApps(packList,pm)
+            }
+            readyToShow = true
         }
     }
 
@@ -184,8 +240,12 @@ fun AllAppsScreen(
 
 //    var searchT:String by searchTerm
     var searchT:String by remember{mutableStateOf("")}
-    anViewModel.updateAppSearchText(searchT)
-    anViewModel.updateAppSearchActive(searchT.isNotBlank())
+    LaunchedEffect(
+        key1 = searchT
+    ) {
+        anViewModel.updateAppSearchText(searchT)
+        anViewModel.updateAppSearchActive(searchT.isNotBlank())
+    }
 //    val appFilter = if(appList != null && searchT.isNotEmpty()) appList.filter {
 ////        it.loadLabel(pm).contains(searchT, true)
 //                it.packageName.contains(searchT, true)
@@ -208,8 +268,7 @@ fun AllAppsScreen(
 //    ) {}
 //
 //    appFilter = if(packList != null && searchT.isNotEmpty()) packList.filter { it.applicationInfo?.loadLabel(pm).toString().contains(searchT,true) || it.packageName.contains(searchT,true) || searchT.isEmpty() } else packList
-    val appFilter by anViewModel.appAll.collectAsState()
-    val appFilterSort = appFilter.sortedBy { it.label }
+
     val lazyListState = rememberLazyListState()
 
     Box(
@@ -220,112 +279,119 @@ fun AllAppsScreen(
             // https://github.com/nanihadesuka/LazyColumnScrollbar
             // https://youtu.be/XfYlRn_Jy1g
             // https://github.com/philipplackner/CategorizedLazyColumn
-            LazyColumnScrollbar(
-                state = lazyListState,
-                settings = ScrollbarSettings(
-                    thumbSelectedColor = colorScheme.primary,
-                    thumbUnselectedColor = colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
-                )
-            ) {
-                LazyColumn(
+            if(readyToShow || LocalInspectionMode.current) {
+                LazyColumnScrollbar(
                     state = lazyListState,
-                    modifier = Modifier,
-                    verticalArrangement = Arrangement.spacedBy(16.dp),
+                    settings = ScrollbarSettings(
+                        thumbSelectedColor = colorScheme.primary,
+                        thumbUnselectedColor = colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
+                    )
                 ) {
-                    item{
-                        HTSearchBar(
-                            value = searchT,
-                            onValueChange = {
-                                searchT = it
-                            }
-                        )
-                    }
-                    stickyHeader{
-                        SettingCategoryBar(
-                            title = stringResource(R.string.recent_apps),
-                            icon = {
-                                Icon(Icons.Default.Restore,"")
-                            },
-                        )
-                    }
-                    stickyHeader{
-                        SettingCategoryBar(
-                            title = stringResource(R.string.whole_apps),
-                            icon = {
-                                Icon(Icons.Default.Apps,"")
-                            },
-                        )
-                    }
-                    if(appFilterSort.isNotEmpty()){
-                        items(
+                    LazyColumn(
+                        state = lazyListState,
+                        modifier = Modifier,
+                        verticalArrangement = Arrangement.spacedBy(16.dp),
+                    ) {
+                        stickyHeader {
+                            HTSearchBar(
+                                value = searchT,
+                                onValueChange = {
+                                    searchT = it
+                                }
+                            )
+                        }
+                        item {
+                            SettingCategoryBar(
+                                title = stringResource(R.string.recent_apps),
+                                icon = {
+                                    Icon(Icons.Default.Restore, "")
+                                },
+                            )
+                        }
+                        item {
+                            SettingCategoryBar(
+                                title = stringResource(R.string.whole_apps),
+                                icon = {
+                                    Icon(Icons.Default.Apps, "")
+                                },
+                            )
+                        }
+                        if (appFilter.isNotEmpty()) {
+                            items(
 //                    count = appList.size
 //                    items = appList.filter { it.loadLabel(pm).contains(searchT, true) || it.packageName.contains(searchT, true) || searchT.isEmpty() }
 //                    items = appList
-                            items = appFilterSort
+                                items = appFilter
 //                    items = packList.filter { it.applicationInfo?.loadLabel(pm).toString().contains(searchT,true) || it.packageName.contains(searchT,true) || searchT.isEmpty() }
-                        ) {
+                            ) {
 //                    val ddawe = pm.getApplicationIcon(packList[it].packageName)
 //                    val ddawe = pm.getApplicationIcon(appList[it].packageName)
-                            val ddawe = pm.getApplicationIcon(it.packageName)
+                                val ddawe = pm.getApplicationIcon(it.packageName)
 //                    val ddlabel:String = it.loadLabel(pm).toString()
-                            val ddlabel:String = it.label
+                                val ddlabel: String = it.label
 //                    val ddlabel:String = it.applicationInfo?.loadLabel(pm).toString()
-                            Preference(
-                                icon = {
+                                Preference(
+                                    icon = {
 
-                                    AsyncImage(
-                                        model = ddawe,
-                                        contentDescription = "",
-                                        modifier = Modifier
-                                            .size(75.dp),
-                                        error = painterResource(id = R.drawable.mavrickle),
-                                        placeholder = painterResource(id = R.drawable.placeholder),
-                                    )
-                                },
+                                        AsyncImage(
+                                            model = ddawe,
+                                            contentDescription = "",
+                                            modifier = Modifier
+                                                .size(75.dp),
+                                            error = painterResource(id = R.drawable.mavrickle),
+                                            placeholder = painterResource(id = R.drawable.placeholder),
+                                        )
+                                    },
 //                        title = { Text("${packList[it].applicationInfo.loadLabel(pm)}") },
-                                title = { Text(ddlabel) },
+                                    title = { Text(ddlabel) },
 //                    summary = {Text("${packList.get(it).applicationInfo.loadDescription(pm)}")},
-                                summary = {
-                                    Text(
+                                    summary = {
+                                        Text(
 //                                packList[it].packageName,
 //                                appList[it].packageName,
-                                        text = it.packageName,
-                                        modifier = Modifier.basicMarquee(
-                                            // https://medium.com/@theAndroidDeveloper/jetpack-compose-gets-official-support-for-marquee-heres-how-to-use-it-1f678aecb851
-                                            // https://composables.com/foundation/basicmarquee
-                                            spacing = MarqueeSpacing(20.dp),
-                                            iterations = Int.MAX_VALUE,
-                                            animationMode = MarqueeAnimationMode.Immediately
+                                            text = it.packageName,
+                                            modifier = Modifier.basicMarquee(
+                                                // https://medium.com/@theAndroidDeveloper/jetpack-compose-gets-official-support-for-marquee-heres-how-to-use-it-1f678aecb851
+                                                // https://composables.com/foundation/basicmarquee
+                                                spacing = MarqueeSpacing(20.dp),
+                                                iterations = Int.MAX_VALUE,
+                                                animationMode = MarqueeAnimationMode.Immediately
+                                            )
                                         )
-                                    )
-                                },
+                                    },
 
-                                onClick = {
+                                    onClick = {
 //                            onLaunchApp(appList[it])
-                                    onLaunchApp(pm.getApplicationInfo(it.packageName,0))
+                                        onLaunchApp(pm.getApplicationInfo(it.packageName, 0))
 //                            if(it.applicationInfo != null)
 //                                onLaunchApp(it.applicationInfo!!)
 
 
-                                }
-                            )
-                        }
-                    } else {
-                        item{
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(16.dp)
-                                ,
-                                contentAlignment = Alignment.Center
-                            ){
-                                Text(
-                                    "EMPTY"
+                                    }
                                 )
+                            }
+                        } else {
+                            item {
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(16.dp),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Text(
+                                        text = stringResource(R.string.item_empty_emphasis)
+                                    )
+                                }
                             }
                         }
                     }
-
+                }
+            } else {
+                Box(
+                    modifier = Modifier.fillMaxHeight(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    HTLoading()
                 }
             }
 

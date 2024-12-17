@@ -7,6 +7,7 @@ import android.content.Context
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
+import android.content.pm.ResolveInfo
 import android.net.Uri
 import android.os.Message
 import android.util.Log
@@ -71,6 +72,9 @@ class ItemEditorViewModel(
             } else {
                 wild.filter {
                     it.contains(text)
+//                    it.startsWith(text)
+//                    it.endsWith(text)
+//                    it == text
                 }
             }
         }
@@ -279,11 +283,15 @@ class ItemEditorViewModel(
         .onEach { _appSearchActive.update { true } }
         .combine(_appAll){ text, apps ->
             if(text.isBlank()){
-                apps
+                apps.sortedBy {
+                    it.label
+                }
             } else {
                 apps.filter {
 //                    it.packageName.contains(text)
                     it.doesMatchSearchQuery(text)
+                }.sortedBy {
+                    it.label
                 }
             }
         }
@@ -312,12 +320,31 @@ class ItemEditorViewModel(
             }
         )
     }
-    fun initializeAllApps(with:List<PackageInfo>, packageManager: PackageManager){
-        viewModelScope.launch {
+    suspend fun initializeAllApps(with:List<PackageInfo>, packageManager: PackageManager){
+//        viewModelScope.launch {
 //            installAllApps(with,packageManager)
             _appAll.value = asyncService.getSearchableApps(with,packageManager)
-        }
+//        }
     }
+    suspend fun initializeAllAppsResolve(with:List<ResolveInfo>, packageManager: PackageManager){
+//        viewModelScope.launch {
+//            installAllApps(with,packageManager)
+        _appAll.value = asyncService.getSearchableAppsResolve(with,packageManager)
+//        }
+    }
+    suspend fun appendAllApps(base:List<SearchableApps>, with:List<PackageInfo>, packageManager: PackageManager){
+//        viewModelScope.launch {
+//            installAllApps(with,packageManager)
+        _appAll.value = asyncService.appendSearchableApps(base, with,packageManager)
+//        }
+    }
+    suspend fun appendAllAppsResolve(base:List<SearchableApps>, with:List<ResolveInfo>, packageManager: PackageManager){
+//        viewModelScope.launch {
+//            installAllApps(with,packageManager)
+        _appAll.value = asyncService.appendSearchableAppsResolve(base, with,packageManager)
+//        }
+    }
+
     fun getItemFolderContents(saveDirUri: Uri, context:Context):List<String> {
         if(saveDirUri.toString().isNotBlank()) {
             val itemFolder: Uri = getADirectory(
