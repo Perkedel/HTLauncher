@@ -288,12 +288,13 @@ fun Navigation(
 //            it[saveDir] ?: ""
 //        }
 //        .collectAsState("")
-    val selectedSaveDirState by selectedSaveDir.collectAsState("")
+    val selectedSaveDirState by selectedSaveDir.collectAsState(htuiState.selectedSaveDir?.toString() ?: "")
 //    val ramSaveDir by rememberSaveable { mutableStateOf(selectedSaveDir) }
     LaunchedEffect(
 //        key1 = 0,
 //        prefs,
-        selectedSaveDir,
+//        selectedSaveDir,
+        selectedSaveDirState,
 //        prefs.data.map {
 //            val saveDir = stringPreferencesKey("saveDir")
 //        },
