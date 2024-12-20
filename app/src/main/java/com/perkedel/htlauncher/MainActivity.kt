@@ -27,6 +27,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
@@ -44,11 +45,21 @@ import androidx.datastore.preferences.preferencesDataStore
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
+import androidx.xr.compose.platform.LocalSpatialCapabilities
+import androidx.xr.compose.spatial.Subspace
+import androidx.xr.compose.subspace.SpatialPanel
+import androidx.xr.compose.subspace.layout.SubspaceModifier
+import androidx.xr.compose.subspace.layout.movable
+import androidx.xr.compose.subspace.layout.resizable
 import com.perkedel.htlauncher.func.DATA_STORE_FILE_NAME
 import com.perkedel.htlauncher.func.createDataStore
 import com.perkedel.htlauncher.ui.previews.HTPreviewAnnotations
 import com.perkedel.htlauncher.ui.theme.HTLauncherTheme
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.map
+//import androidx.xr.compose.platform.LocalSession
+//import androidx.xr.scenecore.Session
 
 class MainActivity : ComponentActivity() {
 
@@ -100,6 +111,7 @@ class MainActivity : ComponentActivity() {
 //            .collectAsState("")
 //        val dataStorePrefs: DataStore<Preferences> = createDataStore(applicationContext)
         val dataStorePrefs: DataStore<Preferences> = applicationContext.preferencesDataStore
+        val selectedSaveDir = dataStorePrefs.data.map { it[stringPreferencesKey("saveDir")] ?: "" }
 
 //        val selectedSaveDir by dataStorePrefs
 //            .data
@@ -127,14 +139,38 @@ class MainActivity : ComponentActivity() {
 
 
         setContent {
-            HomeGreeting(
+            val itself = this
+            if(LocalSpatialCapabilities.current.isSpatialUiEnabled){
+                // https://developer.android.com/develop/xr/jetpack-xr-sdk/add-xr-to-existing#migrate-2d-to-spatial-panel
+                Subspace {
+                    SpatialPanel(
+                        modifier = SubspaceModifier
+                            .resizable(true)
+                            .movable(true)
+                    ) {
+                        HomeGreeting(
 //                prefs = remember { createDataStore(applicationContext) }
-                permissionRequests = permissions,
-                activityHandOver = this,
-                dataStorePrefs = dataStorePrefs,
-                prefs = remember { dataStorePrefs },
-                anViewModel = htViewModel,
-            )
+                            permissionRequests = permissions,
+                            activityHandOver = itself,
+                            dataStorePrefs = dataStorePrefs,
+                            prefs = remember { dataStorePrefs },
+                            selectedSaveDir = selectedSaveDir,
+                            anViewModel = htViewModel,
+                        )
+                    }
+                }
+            } else {
+                HomeGreeting(
+//                prefs = remember { createDataStore(applicationContext) }
+                    permissionRequests = permissions,
+                    activityHandOver = itself,
+                    dataStorePrefs = dataStorePrefs,
+                    prefs = remember { dataStorePrefs },
+                    selectedSaveDir = selectedSaveDir,
+                    anViewModel = htViewModel,
+                )
+            }
+
         }
 
     }
@@ -148,6 +184,7 @@ fun HomeGreeting(
     activityHandOver: ComponentActivity = ComponentActivity(),
     dataStorePrefs: DataStore<Preferences> = createDataStore(context),
     prefs: DataStore<Preferences> = remember { dataStorePrefs },
+    selectedSaveDir: Flow<String> = remember { dataStorePrefs.data.map { it[stringPreferencesKey("saveDir")] ?: "" } },
     anViewModel: HTViewModel = viewModel(),
 ){
     HTLauncherTheme {
@@ -156,6 +193,7 @@ fun HomeGreeting(
             permissionRequests = permissionRequests,
             activityHandOver = activityHandOver,
             dataStorePrefs = dataStorePrefs,
+            selectedSaveDir = selectedSaveDir,
             prefs = prefs,
             anViewModel = anViewModel,
         )

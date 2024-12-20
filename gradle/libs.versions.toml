@@ -5,6 +5,7 @@ batterystatslibrary = "1.0.0"
 coilCompose = "3.0.2"
 coilNetworkOkhttp = "3.0.2"
 coilSvg = "3.0.4"
+composeXr = "1.0.0-alpha01"
 composescrollbars = "1.4.0"
 datastore = "1.1.1"
 datastorePreferences = "1.1.1"
@@ -58,6 +59,8 @@ accompanist-adaptive = { module = "com.google.accompanist:accompanist-adaptive" 
 accompanist-drawablepainter = { module = "com.google.accompanist:accompanist-drawablepainter" }
 accompanist-permissions = { module = "com.google.accompanist:accompanist-permissions" }
 accompanist-systemuicontroller = { module = "com.google.accompanist:accompanist-systemuicontroller", version.ref = "accompanistSystemuicontroller" }
+androidx-compose = { module = "androidx.xr.compose:compose", version.ref = "composeXr" }
+androidx-compose-testing = { module = "androidx.xr.compose:compose-testing", version.ref = "composeXr" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 androidx-datastore = { module = "androidx.datastore:datastore", version.ref = "datastore" }
 androidx-datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastorePreferences" }

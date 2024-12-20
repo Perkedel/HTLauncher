@@ -13,6 +13,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Apps
 import androidx.compose.material.icons.filled.Build
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Fullscreen
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.outlined.Info
@@ -21,6 +22,7 @@ import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -31,7 +33,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import androidx.xr.compose.spatial.SpatialDialog
 import com.perkedel.htlauncher.R
+import com.perkedel.htlauncher.ui.previews.HTPreviewAnnotations
 import com.perkedel.htlauncher.ui.theme.HTLauncherTheme
 import me.zhanghai.compose.preference.ProvidePreferenceLocals
 import me.zhanghai.compose.preference.switchPreference
@@ -45,7 +49,7 @@ fun HomeMoreMenu (
     onDismissRequest: () -> Unit,
 ){
     // https://developer.android.com/develop/ui/compose/components/dialog
-    val activity = (LocalContext.current as Activity)
+//    val activity = (LocalContext.current as Activity)
 
 //    BasicAlertDialog(
 //        modifier = Modifier,
@@ -58,7 +62,7 @@ fun HomeMoreMenu (
 //            Text("HAHO")
 //        }
 //    )
-    Dialog(
+    SpatialDialog(
         onDismissRequest = onDismissRequest
     ){
         Card(
@@ -116,6 +120,15 @@ fun HomeMoreMenu (
                         }
                     )
                     preference(
+                        key = "fullscreen",
+                        title = { Text(text = stringResource(R.string.Home_more_fullscreen)) },
+                        icon = { Icon(imageVector = Icons.Default.Fullscreen, contentDescription = null) },
+//                        summary = { Text(text = "") },
+                        onClick = {
+                            onChosenMenu("fullscreen")
+                        }
+                    )
+                    preference(
                         key = "all_apps",
                         title = { Text(text = stringResource(R.string.Home_more_all_apps)) },
                         icon = { Icon(imageVector = Icons.Filled.Apps, contentDescription = null) },
@@ -132,11 +145,12 @@ fun HomeMoreMenu (
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
-@Preview(showBackground = true)
+//@Preview(showBackground = true)
+@HTPreviewAnnotations
 @Composable
 fun HomeMoreMenuPreview(){
     HTLauncherTheme {
-        Column (
+        Surface (
             modifier = Modifier.fillMaxSize()
         ){
             HomeMoreMenu(

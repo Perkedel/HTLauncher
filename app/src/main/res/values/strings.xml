@@ -132,6 +132,7 @@
     <string name="Home_more_configuration">Configure Launchers</string>
     <string name="Home_more_sys_setting">System Settings</string>
     <string name="Home_more_all_apps">All Apps</string>
+    <string name="Home_more_fullscreen">Fullscreen</string>
 
     <!--  Configurations  -->
     <string name="default_button">Default</string>

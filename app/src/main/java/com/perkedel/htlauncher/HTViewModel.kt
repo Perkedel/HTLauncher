@@ -163,7 +163,7 @@ class HTViewModel(
         // https://programmingheadache.com/2024/02/13/effortless-loading-screen-with-state-flows-and-jetpack-compose-just-4-easy-steps/
 
 //        viewModelScope.launch {
-            setIsReady(into = false)
+
             var initing:Boolean = uiStating.inited
             Log.d("PreloadFiles","Inited is ${initing}")
             if(force){
@@ -174,6 +174,10 @@ class HTViewModel(
 //                uiStating.coreConfigJson = null
                 updateIniting(false)
                 initing = false
+            } else {
+                if(initing){
+                    return
+                }
             }
 
 //        val launch = viewModelScope.launch {
@@ -186,6 +190,7 @@ class HTViewModel(
             val homeSafData:HomepagesWeHave = HTLauncherHardcodes.HOMESCREEN_FILE
             var homeSafFileUri:Uri = Uri.EMPTY
             if(!initing) {
+
                 if (uiStating.selectedSaveDir != null && uiStating.selectedSaveDir.toString()
                         .isNotEmpty()
                 ) {
@@ -267,6 +272,7 @@ class HTViewModel(
 
                 // Load Pages & Items
                 if(uiStating.testPreloadAll && uiStating.coreConfigJson != null && folders[context.resources.getString(R.string.pages_folder)] != null){
+                    setIsReady(into = false)
                     var pageFolder:Uri = getADirectory(
                         dirUri = uiStating.selectedSaveDir!!,
                         context = context,
@@ -478,6 +484,11 @@ class HTViewModel(
                     initing = true
                     updateIniting(initing)
                 }
+
+            } else {
+                setIsReady(into = true)
+                initing = true
+                updateIniting(initing)
             }
 //        }
 

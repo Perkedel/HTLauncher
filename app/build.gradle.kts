@@ -198,6 +198,10 @@ dependencies {
 
     // https://github.com/lvabarajithan/BatteryStatsLibrary
 //    implementation(libs.batterystatslibrary)
+
+    // https://developer.android.com/jetpack/androidx/releases/xr-compose
+    implementation(libs.androidx.compose)
+    testImplementation(libs.androidx.compose.testing)
 }
 
 //composeCompiler {

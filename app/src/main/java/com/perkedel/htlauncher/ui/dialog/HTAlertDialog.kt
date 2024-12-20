@@ -46,6 +46,7 @@ import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.xr.compose.spatial.SpatialDialog
 import com.perkedel.htlauncher.R
 import com.perkedel.htlauncher.enumerations.ButtonTypes
 import com.perkedel.htlauncher.enumerations.ThirdButtonPosition
@@ -102,7 +103,9 @@ fun HTAlertDialog(
 
     content: @Composable () -> Unit = {},
 ){
-    BasicAlertDialog(
+    // https://developer.android.com/develop/xr/jetpack-xr-sdk/add-xr-to-existing
+    SpatialDialog(
+//    BasicAlertDialog(
         onDismissRequest = onDismissRequest,
         content = {
             Card(

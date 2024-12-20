@@ -91,6 +91,8 @@ import androidx.documentfile.provider.DocumentFile
 
 import androidx.lifecycle.ViewModel
 import androidx.navigation.toRoute
+import androidx.xr.compose.platform.LocalSession
+import androidx.xr.compose.platform.LocalSpatialCapabilities
 import com.google.accompanist.systemuicontroller.SystemUiController
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.perkedel.htlauncher.data.ActionData
@@ -135,6 +137,7 @@ import com.perkedel.htlauncher.ui.theme.rememberColorScheme
 import com.perkedel.htlauncher.widgets.ContainsSharedTransition
 import com.perkedel.htlauncher.widgets.HTButton
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.serialization.encodeToString
@@ -153,7 +156,8 @@ fun Navigation(
     haptic: HapticFeedback = LocalHapticFeedback.current,
     dataStorePrefs: DataStore<Preferences> = createDataStore(context),
     prefs: DataStore<Preferences> = remember { dataStorePrefs },
-    anViewModel: HTViewModel = viewModel(),
+    selectedSaveDir: Flow<String> = remember { dataStorePrefs.data.map { it[stringPreferencesKey("saveDir")] ?: "" } },
+    anViewModel: HTViewModel = rememberSaveable { HTViewModel() },
 //    homePagerState: PagerState = rememberPagerState(pageCount = {10}),
 //    scaffoldState: ScaffoldState = rememberScaffoldState(),
     coroutineScope: CoroutineScope = rememberCoroutineScope(),
@@ -173,6 +177,7 @@ fun Navigation(
     tts: MutableState<TextToSpeech?> = rememberTextToSpeech(),
     view: View = LocalView.current,
     inspectionMode:Boolean = LocalInspectionMode.current,
+//    xrSession = checkNotNull(LocalSession.current),
 //    animatedContentTransitionScope: AnimatedContentTransitionScope =
 ){
     // https://developer.android.com/codelabs/large-screens/add-keyboard-and-mouse-support-with-compose#0
@@ -180,6 +185,33 @@ fun Navigation(
     // TODO: go back to page 0 if on Homescreen, and press back button.
 
     var homePagerState: PagerState = rememberPagerState(pageCount = {10})
+//    val xrSession = checkNotNull(LocalSession.current)
+//    val xrSession = LocalSession.current
+    val uiIsSpatialized = LocalSpatialCapabilities.current.isSpatialUiEnabled
+    val toggleXrMode = {
+//        try{
+//            val xrSession = checkNotNull(LocalSession.current)
+//
+//        } catch (e:Exception){
+//
+//        }
+//        xrSession?.let {
+//            if (uiIsSpatialized) {
+//                { it.requestHomeSpaceMode() }
+//            } else {
+//                { it.requestFullSpaceMode() }
+//            }
+//        }
+    }
+    val setXrMode:(Boolean) -> Unit = { into ->
+//        xrSession?.let{
+//            if(into){
+//                it.requestFullSpaceMode()
+//            } else {
+//                it.requestHomeSpaceMode()
+//            }
+//        }
+    }
 
     //permission
     //
@@ -219,7 +251,7 @@ fun Navigation(
 //        backStackEntry?.destination?.route ?: Screen.HomeScreen.name
 //    )
     val currentScreen:String = backStackEntry?.destination?.route ?: Screen.HomeScreen.name
-    val hideTopBar:Boolean = false
+    var hideTopBar: MutableState<Boolean> = rememberSaveable { mutableStateOf(false) }
     val htuiState : HTUIState by anViewModel.uiState.collectAsState()
 //    val context: Context = LocalContext.current
 
@@ -249,15 +281,18 @@ fun Navigation(
 //    val colorScheme = if (isSystemInDarkTheme()) darkColorScheme() else lightColorScheme()
 
     // LOAD SETTING
-    val selectedSaveDir by prefs
-        .data
-        .map {
-            val saveDir = stringPreferencesKey("saveDir")
-            it[saveDir] ?: ""
-        }
-        .collectAsState("")
-    val ramSaveDir by rememberSaveable { mutableStateOf(selectedSaveDir) }
+//    val selectedSaveDir by prefs
+//        .data
+//        .map {
+//            val saveDir = stringPreferencesKey("saveDir")
+//            it[saveDir] ?: ""
+//        }
+//        .collectAsState("")
+    val selectedSaveDirState by selectedSaveDir.collectAsState("")
+//    val ramSaveDir by rememberSaveable { mutableStateOf(selectedSaveDir) }
     LaunchedEffect(
+//        key1 = 0,
+//        prefs,
         selectedSaveDir,
 //        prefs.data.map {
 //            val saveDir = stringPreferencesKey("saveDir")
@@ -266,11 +301,23 @@ fun Navigation(
 //        Uri.parse(selectedSaveDir)
     ) {
         try{
-            anViewModel.selectSaveDirUri(Uri.parse(selectedSaveDir))
+            if(!htuiState.inited && selectedSaveDirState != null && selectedSaveDirState.isNotBlank()){
+                anViewModel.selectSaveDirUri(Uri.parse(selectedSaveDirState))
+            }
         } catch (e:Exception){
             e.printStackTrace()
         } catch (e:IOException){
             e.printStackTrace()
+        }
+    }
+    LaunchedEffect(
+        key1 = hideTopBar.value
+    ) {
+        setXrMode(hideTopBar.value)
+        if(hideTopBar.value){
+
+        } else {
+
         }
     }
     // https://medium.com/@yogesh_shinde/implementing-image-video-documents-picker-in-jetpack-compose-73ef846cfffb
@@ -449,22 +496,30 @@ fun Navigation(
 //            json = json,
 //        )
 //        preloadThing
+
         coroutineScope.launch {
-            if(!initing) {
-                anViewModel.preloadFiles(
-                    context = context,
-                    contentResolver = saveDirResolver,
-                    uiStating = htuiState,
-                    listOfFolder = listOfFolder,
-                    folders = folders,
-                    json = json,
+//            if(htuiState.selectedSaveDir != null) {
+//                anViewModel.setIsReady(false)
+                if (!initing) {
+                    anViewModel.preloadFiles(
+                        context = context,
+                        contentResolver = saveDirResolver,
+                        uiStating = htuiState,
+                        listOfFolder = listOfFolder,
+                        folders = folders,
+                        json = json,
 //                    force = true,
-                )
-                initing = true
-            } else {
-                anViewModel.setIsReady(true)
-            }
+                    )
+                    initing = true
+                } else {
+                    anViewModel.setIsReady(true)
+                }
+//                anViewModel.setIsReady(true)
+//            } else {
+////                anViewModel.setIsReady(true)
+//            }
         }
+
 //        coroutineScope.launch {
 //
 //            // Full screen
@@ -1509,6 +1564,10 @@ fun Navigation(
                         navController.navigate(Screen.AllAppsScreen.name)
                     }
 
+                    "fullscreen" -> {
+                        // Fullscreen
+
+                    }
                     else -> {
 
                     }
