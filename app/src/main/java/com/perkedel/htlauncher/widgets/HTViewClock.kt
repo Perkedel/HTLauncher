@@ -338,7 +338,7 @@ fun HTViewClock(
             )
             SinasamakiCounter(
                 modifier = Modifier,
-                count = clockTime.month,
+                count = clockTime.month+1,
                 forceSlideIncrease = true,
             )
             Text(

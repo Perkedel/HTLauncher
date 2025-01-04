@@ -1,0 +1,30 @@
+{
+    "type": "Item",
+    "name": "TeamSpeak",
+    "label": "TeamSpeak",
+    "aria": "TeamSpeak",
+    "imagePath": "TeamSpeak",
+    "action": [
+        {
+            "name": "LaunchTs",
+            "action": "com.teamspeak.ts3client",
+            "args": [
+                "",
+                ""
+            ],
+            "extras": {
+                "AAAa": "BBB1",
+                "AAAb": "BBB2",
+                "AAAc": "BBB3"
+            },
+            "type": "LauncherActivity"
+        }
+    ],
+    "isCategory": false,
+    "showLabel": true,
+    "useLabel": false,
+    "useAria": false,
+    "showWhichIcon": "Default",
+    "textFillColor": "Black",
+    "textOutlineColor": "White"
+}

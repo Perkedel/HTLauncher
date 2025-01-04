@@ -284,7 +284,10 @@ fun HTLauncherTheme(
 ) {
     // http://material-foundation.github.io?primary=%230052EB&bodyFont=Ubuntu&displayFont=Ubuntu&colorMatch=true
     MaterialTheme(
-        colorScheme = rememberColorScheme(),
+        colorScheme = rememberColorScheme(
+            darkTheme = darkTheme,
+            dynamicColor = dynamicColor,
+        ),
         typography = Typography,
         content = content
     )

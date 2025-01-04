@@ -1,0 +1,20 @@
+{
+    "type": "Page",
+    "name": "Home",
+    "viewStyle": "Default",
+    "items": [
+        "PocApps",
+        "Camera",
+        "SOS",
+        "Telephone",
+        "Settings",
+        "AllApps"
+    ],
+    "gridType": "Default",
+    "cellSize": 125,
+    "cellCount": 3,
+    "cellCountLandscape": 6,
+    "showWhichIcon": "Default",
+    "isHome": true,
+    "iconPath": ""
+}

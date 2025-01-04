@@ -1,0 +1,30 @@
+{
+    "type": "Item",
+    "name": "PocApps",
+    "label": "PocApps",
+    "aria": "PocApps",
+    "imagePath": "amateur_radio.png",
+    "action": [
+        {
+            "name": "PagePocApps",
+            "action": "PocApps",
+            "args": [
+                "",
+                ""
+            ],
+            "extras": {
+                "AAAa": "BBB1",
+                "AAAb": "BBB2",
+                "AAAc": "BBB3"
+            },
+            "type": "PageDialog"
+        }
+    ],
+    "isCategory": false,
+    "showLabel": true,
+    "useLabel": false,
+    "useAria": false,
+    "showWhichIcon": "Default",
+    "textFillColor": "Black",
+    "textOutlineColor": "White"
+}

@@ -1,0 +1,30 @@
+{
+    "type": "Item",
+    "name": "WalkieFleet",
+    "label": "WalkieFleet",
+    "aria": "WalkieFleet",
+    "imagePath": "WalkieFleet",
+    "action": [
+        {
+            "name": "LaunchWalkie",
+            "action": "com.fleetclient",
+            "args": [
+                "",
+                ""
+            ],
+            "extras": {
+                "AAAa": "BBB1",
+                "AAAb": "BBB2",
+                "AAAc": "BBB3"
+            },
+            "type": "LauncherActivity"
+        }
+    ],
+    "isCategory": false,
+    "showLabel": true,
+    "useLabel": false,
+    "useAria": false,
+    "showWhichIcon": "Default",
+    "textFillColor": "Black",
+    "textOutlineColor": "White"
+}

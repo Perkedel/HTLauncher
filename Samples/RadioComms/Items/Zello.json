@@ -1,0 +1,30 @@
+{
+    "type": "Item",
+    "name": "Zello",
+    "label": "Zello",
+    "aria": "Zello",
+    "imagePath": "Zello",
+    "action": [
+        {
+            "name": "Launch",
+            "action": "com.loudtalks",
+            "args": [
+                "",
+                ""
+            ],
+            "extras": {
+                "AAAa": "BBB1",
+                "AAAb": "BBB2",
+                "AAAc": "BBB3"
+            },
+            "type": "LauncherActivity"
+        }
+    ],
+    "isCategory": false,
+    "showLabel": true,
+    "useLabel": false,
+    "useAria": false,
+    "showWhichIcon": "Default",
+    "textFillColor": "Black",
+    "textOutlineColor": "White"
+}

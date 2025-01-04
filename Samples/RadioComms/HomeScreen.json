@@ -1,0 +1,12 @@
+{
+    "type": "Home",
+    "pagesPath": [
+        "Home"
+    ],
+    "setting": {
+        "fullscreen": false,
+        "colorMode": 0,
+        "darkMode": 0
+    },
+   "startFromPage": 0
+}

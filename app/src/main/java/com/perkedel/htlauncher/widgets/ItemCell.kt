@@ -188,12 +188,24 @@ fun ItemCell(
     var selectLabel:String = if(itemOfIt.label.isNotEmpty()) itemOfIt.label else handoverText
     if(itemOfIt.action.isNotEmpty() && itemOfIt.action[0].type != ActionDataLaunchType.Internal && itemOfIt.action[0].type != ActionDataLaunchType.Category) {
         try {
-            selectImage = when (itemOfIt.showWhichIcon) {
-                ShowWhichIcon.Default -> if (itemOfIt.action[0].action.isNotEmpty()) pm.getApplicationIcon(
-                    itemOfIt.action[0].action
-                ) else "idk"
-
-                else -> if (itemOfIt.action[0].action.isNotEmpty()) pm.getApplicationIcon(itemOfIt.action[0].action) else "idk"
+//            selectImage = when (itemOfIt.showWhichIcon) {
+//                ShowWhichIcon.Default -> {
+//                    when(itemOfIt.action[0].type){
+//                        ActionDataLaunchType.LauncherActivity -> {
+//                            if (itemOfIt.action[0].action.isNotEmpty()) pm.getApplicationIcon(
+//                                itemOfIt.action[0].action
+//                            ) else "idk"
+//                        }
+//                        else -> itemOfIt.action[0].action
+//                    }
+//
+//                }
+//
+//                else -> itemOfIt.action[0].action
+//            }
+            selectImage = when(itemOfIt.showWhichIcon){
+                ShowWhichIcon.Default -> viewModel.getItemIcon(itemOfIt, context = context, pm = pm) ?: itemOfIt.action[0].action
+                else -> viewModel.getItemIcon(itemOfIt, context = context, pm = pm) ?: itemOfIt.action[0].action
             }
         } catch (e: Exception) {
             e.printStackTrace()
@@ -203,10 +215,16 @@ fun ItemCell(
                 selectLabel = if (itemOfIt.label.isNotEmpty()) itemOfIt.label else handoverText
             } else {
                 if (itemOfIt.action[0].action.isNotEmpty()) {
-                    // https://stackoverflow.com/a/5841353/9079640
-                    val ai: ApplicationInfo = pm.getApplicationInfo(itemOfIt.action[0].action, 0)
-                    selectLabel = if (ai != null) pm.getApplicationLabel(ai)
-                        .toString() else if (itemOfIt.label.isNotEmpty()) itemOfIt.label else handoverText
+                    when(itemOfIt.action[0].type){
+                        ActionDataLaunchType.LauncherActivity -> {
+                            // https://stackoverflow.com/a/5841353/9079640
+                            val ai: ApplicationInfo = pm.getApplicationInfo(itemOfIt.action[0].action, 0)
+                            selectLabel = if (ai != null) pm.getApplicationLabel(ai)
+                                .toString() else if (itemOfIt.label.isNotEmpty()) itemOfIt.label else handoverText
+                        }
+                        else -> selectLabel = itemOfIt.action[0].action
+                    }
+
                 }
             }
         } catch (e: Exception) {

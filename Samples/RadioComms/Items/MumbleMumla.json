@@ -1,0 +1,30 @@
+{
+    "type": "Item",
+    "name": "MumbleMumla",
+    "label": "MumbleMumla",
+    "aria": "MumbleMumla",
+    "imagePath": "MumbleMumla",
+    "action": [
+        {
+            "name": "LaunchMumla",
+            "action": "se.lublin.mumla",
+            "args": [
+                "",
+                ""
+            ],
+            "extras": {
+                "AAAa": "BBB1",
+                "AAAb": "BBB2",
+                "AAAc": "BBB3"
+            },
+            "type": "LauncherActivity"
+        }
+    ],
+    "isCategory": false,
+    "showLabel": true,
+    "useLabel": false,
+    "useAria": false,
+    "showWhichIcon": "Default",
+    "textFillColor": "Black",
+    "textOutlineColor": "White"
+}

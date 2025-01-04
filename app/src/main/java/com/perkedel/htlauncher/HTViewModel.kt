@@ -832,19 +832,22 @@ class HTViewModel(
 
         return _uiState.value.itemList[of] ?: predeterminedItem
     }
-    fun getIconFile(of:String, context: Context, pm:PackageManager):Uri?{
+    fun getIconFile(of:String, context: Context):Uri?{
         if(uiState.value.selectedSaveDir == null) return null
-        val selectMediaFolder: Uri = getADirectory(
-            dirUri = _uiState.value.selectedSaveDir!!,
-            dirName = context.resources.getString(R.string.medias_folder),
-            context = context
-        )
+
         try {
-            return getAFile(
+            val selectMediaFolder: Uri = getADirectory(
+                dirUri = _uiState.value.selectedSaveDir!!,
+                dirName = context.resources.getString(R.string.medias_folder),
+                context = context
+            )
+            val result:Uri? = getAFile(
                 dirUri = selectMediaFolder,
                 fileName = of,
                 context = context,
             )
+//            Log.d("GetIconFile","Obtain icon ${result}")
+            return result
         } catch (e: Exception) {
             e.printStackTrace()
         }
@@ -863,10 +866,25 @@ class HTViewModel(
         )
         return when(target.action[0].type){
             ActionDataLaunchType.LauncherActivity -> if(target.action[0].action.isNotBlank()) pm.getApplicationIcon(
-                target.action[0].action ?: "") else R.drawable.all_apps
+                target.action[0].action) else R.drawable.all_apps
             ActionDataLaunchType.Activity -> if(target.action[0].action.isNotBlank()) pm.getApplicationIcon(
                 target.action[0].action ?: "") else R.drawable.all_apps
             ActionDataLaunchType.Internal -> HTLauncherHardcodes.getInternalActionIcon(target.action[0].action)
+            ActionDataLaunchType.PageDialog -> getIconFile(target.imagePath , context)
+            else -> R.drawable.placeholder
+        }
+    }
+    fun getItemIcon(of:ItemData, json:Json = Json{
+        prettyPrint = true
+        encodeDefaults = true
+    }, context: Context, ignoreFile:Boolean = false, forceReload:Boolean = false, pm:PackageManager):Any? {
+        return when(of.action[0].type){
+            ActionDataLaunchType.LauncherActivity -> if(of.action[0].action.isNotBlank()) pm.getApplicationIcon(
+                of.action[0].action) else R.drawable.all_apps
+            ActionDataLaunchType.Activity -> if(of.action[0].action.isNotBlank()) pm.getApplicationIcon(
+                of.action[0].action ?: "") else R.drawable.all_apps
+            ActionDataLaunchType.Internal -> HTLauncherHardcodes.getInternalActionIcon(of.action[0].action)
+            ActionDataLaunchType.PageDialog -> getIconFile(of.imagePath , context)
             else -> R.drawable.placeholder
         }
     }
@@ -884,7 +902,18 @@ class HTViewModel(
         return when{
             target.name == context.getString(R.string.internal_pages_settings) -> R.drawable.settings
             target.name == context.getString(R.string.settings_item_file) -> R.drawable.settings
-            target.iconPath.isNotBlank() -> getIconFile(of, context, pm)
+            target.iconPath.isNotBlank() -> getIconFile(target.iconPath, context)
+            else -> R.drawable.open_a_page
+        }
+    }
+    fun getPageIcon(of: PageData, json: Json = Json{
+        prettyPrint = true
+        encodeDefaults = true
+    }, context: Context, ignoreFile:Boolean = false, forceReload:Boolean = false, pm:PackageManager): Any?{
+        return when{
+            of.name == context.getString(R.string.internal_pages_settings) -> R.drawable.settings
+            of.name == context.getString(R.string.settings_item_file) -> R.drawable.settings
+            of.iconPath.isNotBlank() -> getIconFile(of.iconPath, context)
             else -> R.drawable.open_a_page
         }
     }

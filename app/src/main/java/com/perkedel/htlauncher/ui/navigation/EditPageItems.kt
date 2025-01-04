@@ -442,7 +442,7 @@ fun EditPageItems(
                                                 placeholder = painterResource(R.drawable.placeholder),
                                                 error = painterResource(R.drawable.mavrickle),
                                                 model = htViewModel.getItemIcon(
-                                                    of = itemData.name,
+                                                    of = itemData,
                                                     context = context,
                                                     ignoreFile = false,
                                                     pm = pm,
@@ -753,7 +753,7 @@ fun EditPageItems(
                                             placeholder = painterResource(R.drawable.placeholder),
                                             error = painterResource(R.drawable.mavrickle),
                                             model = htViewModel.getItemIcon(
-                                                of = itemData.name,
+                                                of = itemData,
                                                 context = context,
                                                 ignoreFile = false,
                                                 pm = pm,

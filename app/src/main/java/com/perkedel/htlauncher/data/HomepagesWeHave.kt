@@ -10,7 +10,7 @@ data class HomepagesWeHave( // In a Home Button, we have:
         "Second",
         "Third",
     ), // Pages we have
-    val setting:SettingData = SettingData()
-
+    val setting:SettingData = SettingData(),
+    val startFromPage:Int = 0,
     // Extras: e.g. Customizations
 )

@@ -1929,6 +1929,7 @@ fun onLaunchAction(
                             }
                         }
                         containAction == context.resources.getString(ActionInternalCommand.OpenAPage.id) -> {
+                            Log.d("OpenAPage","Try open page ${data[selectAction].args[0]}")
                             if(data[selectAction].args[0].isNotBlank()) {
                                 navController.navigate<PageData>(
                                     viewModel.getPageData(
@@ -1967,6 +1968,25 @@ fun onLaunchAction(
                 } catch (e:Exception){
                     e.printStackTrace()
                 } catch (e:ActivityNotFoundException){
+                    e.printStackTrace()
+                }
+            }
+            ActionDataLaunchType.PageDialog -> {
+                val containAction = data[selectAction].action
+                Log.d("OpenAPage","Try open page ${containAction}")
+                try {
+                    if(containAction.isNotBlank()) {
+                        navController.navigate<PageData>(
+                            viewModel.getPageData(
+                                of = containAction,
+                                context = context
+                            )
+                        )
+                    } else {
+                        // https://kotlinlang.org/docs/exceptions.html#throw-exceptions-with-precondition-functions
+                        throw IllegalArgumentException("Argument Action cannot be empty", IllegalStateException("Action ${containAction}: Empty Action: ${containAction}"))
+                    }
+                } catch (e:Exception){
                     e.printStackTrace()
                 }
             }

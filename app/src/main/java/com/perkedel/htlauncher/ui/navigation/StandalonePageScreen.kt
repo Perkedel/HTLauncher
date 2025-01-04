@@ -77,7 +77,7 @@ fun StandalonePageScreen(
         viewModel.updateCurrentPageIconModel(
             viewModel.getPageIcon(
                 context = context,
-                of = pageData.name,
+                of = pageData,
                 json = json,
                 ignoreFile = false,
                 forceReload = false,
