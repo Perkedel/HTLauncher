@@ -4,6 +4,7 @@ package com.perkedel.htlauncher
 
 import android.Manifest
 import android.content.ActivityNotFoundException
+import android.content.ComponentName
 import android.content.ContentResolver
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
@@ -1885,6 +1886,18 @@ fun onLaunchAction(
                             )
                         }
                         // MEGA SETTING
+                        containAction == "SettingsHotspot" || containAction == "SettingsTether" || containAction == "SettingsTethering" -> {
+                            // https://stackoverflow.com/a/21686120/9079640
+                            val tetherIntent = Intent(Intent.ACTION_MAIN,null)
+                            tetherIntent.addCategory(Intent.CATEGORY_LAUNCHER);
+                            val componentTether = ComponentName("com.android.settings", "com.android.settings.TetherSettings")
+                            tetherIntent.setComponent(componentTether)
+                            tetherIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                            startIntent(
+                                context = context,
+                                what = tetherIntent
+                            );
+                        }
                         containAction.startsWith("Settings") -> {
 //                            ActionGoToSystemSetting.valueOf(containAction)
                             val settingGo:String = containAction.replaceFirst("Settings","")

@@ -445,6 +445,26 @@
     <string name="internal_categories_settings_overall_label" translatable="true">Overall Settings</string>
     <string name="internal_categories_settings_system_label" translatable="true">System Settings</string>
 
+    <!--  System Settings  -->
+    <string name="internal_system_settings">System Settings</string>
+    <string name="internal_system_settings_placeholder" translatable="false">SETTING???</string>
+    <string name="internal_system_settings_location">Location</string>
+    <string name="internal_system_settings_blueooth">Bluetooth</string>
+    <string name="internal_system_settings_wifi">WiFi</string>
+    <string name="internal_system_settings_hotspot">Hotspot</string>
+    <string name="internal_system_settings_sound">Sounds</string>
+    <string name="internal_system_settings_display">Display</string>
+    <string name="internal_system_settings_brightness">Brightness</string>
+    <string name="internal_system_settings_notifications">Notifications</string>
+    <string name="internal_system_settings_storage">Storage</string>
+    <string name="internal_system_settings_power">Power</string>
+    <string name="internal_system_settings_security">Security</string>
+    <string name="internal_system_settings_privacy">Privacy</string>
+    <string name="internal_system_settings_language">Language</string>
+    <string name="internal_system_settings_date_time">Date and Time</string>
+    <string name="internal_system_settings_application">Applications</string>
+    <string name="internal_system_settings_about_device">About Device</string>
+
     <!--  Internal Pages  -->
     <string name="internal_pages_settings" translatable="false">Settings</string>
     <string name="internal_pages_settings_label" translatable="true">Settings</string>

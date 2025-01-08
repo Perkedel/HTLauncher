@@ -389,6 +389,25 @@
     <string name="internal_categories_settings_overall_label" translatable="true">Pengaturan Keseluruhan</string>
     <string name="internal_categories_settings_system_label" translatable="true">Pengaturan Sistem</string>
 
+    <!--  System Settings  -->
+    <string name="internal_system_settings">Pengaturan Sistem</string>
+    <string name="internal_system_settings_location">Lokasi</string>
+    <string name="internal_system_settings_blueooth">Bluetooth</string>
+    <string name="internal_system_settings_wifi">WiFi</string>
+    <string name="internal_system_settings_hotspot">Hotspot</string>
+    <string name="internal_system_settings_sound">Suara</string>
+    <string name="internal_system_settings_display">Tampilan</string>
+    <string name="internal_system_settings_brightness">Kecerahan</string>
+    <string name="internal_system_settings_notifications">Notifikasi</string>
+    <string name="internal_system_settings_storage">Penyimpanan</string>
+    <string name="internal_system_settings_power">Daya</string>
+    <string name="internal_system_settings_security">Keamanan</string>
+    <string name="internal_system_settings_privacy">Privasi</string>
+    <string name="internal_system_settings_language">Bahasa</string>
+    <string name="internal_system_settings_date_time">Tanggal dan Waktu</string>
+    <string name="internal_system_settings_application">Aplikasi</string>
+    <string name="internal_system_settings_about_device">Tentang Perangkat</string>
+
     <!--  Internal Pages  -->
     <string name="internal_pages_settings_label" translatable="true">Pengaturan</string>
 

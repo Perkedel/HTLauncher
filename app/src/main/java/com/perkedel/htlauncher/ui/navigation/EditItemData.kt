@@ -294,7 +294,8 @@ fun EditItemData(
                     ) {
                         ItemCell(
 //                    readTheItemFile = toChange?.name ?: "",
-                            readTheItemData = data ?: ItemData()
+                            readTheItemData = data ?: ItemData(),
+                            preventCreateNewFile = true,
                         )
                     }
                 }

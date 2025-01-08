@@ -135,24 +135,33 @@ object HTLauncherHardcodes {
         Pair("rolodex",SearchableApps(packageName = "com.rolodex.rolodex")),
     )
     fun getInternalActionIcon(whichIs:String? = null):Int{
-        return when(whichIs){
-            ActionInternalCommand.AllApps.name -> R.drawable.all_apps
-            ActionInternalCommand.Emergency.name -> R.drawable.emergency
-            "SOS" -> R.drawable.emergency
-            ActionInternalCommand.Telephone.name -> R.drawable.telephone
-            ActionInternalCommand.Clock.name -> R.drawable.clock
-            ActionInternalCommand.Contacts.name -> R.drawable.contacts
-            ActionInternalCommand.Preferences.name -> R.drawable.preferences
-            ActionInternalCommand.Settings.name -> R.drawable.settings
-            ActionInternalCommand.SystemSettings.name -> R.drawable.settings_gear
-            ActionInternalCommand.Messages.name -> R.drawable.messages
-            ActionInternalCommand.Camera.name -> R.drawable.camera
-            ActionInternalCommand.Gallery.name -> R.drawable.gallery
-            ActionInternalCommand.GoToPage.name -> R.drawable.go_to_page
-            ActionInternalCommand.OpenAPage.name -> R.drawable.open_a_page
-            InternalCategories.SettingsSystem.name -> R.drawable.settings_gear
-            InternalCategories.SettingsOverall.name -> R.drawable.settings
-            else -> R.drawable.placeholder
+        var result:Int = R.drawable.placeholder
+        try {
+            if(whichIs != null){
+                result = when{
+                    whichIs == ActionInternalCommand.AllApps.name -> R.drawable.all_apps
+                    whichIs == ActionInternalCommand.Emergency.name -> R.drawable.emergency
+                    whichIs == "SOS" -> R.drawable.emergency
+                    whichIs == ActionInternalCommand.Telephone.name -> R.drawable.telephone
+                    whichIs == ActionInternalCommand.Clock.name -> R.drawable.clock
+                    whichIs == ActionInternalCommand.Contacts.name -> R.drawable.contacts
+                    whichIs == ActionInternalCommand.Preferences.name -> R.drawable.preferences
+                    whichIs == ActionInternalCommand.Settings.name -> R.drawable.settings
+                    whichIs == ActionInternalCommand.SystemSettings.name -> R.drawable.settings_gear
+                    whichIs == ActionInternalCommand.Messages.name -> R.drawable.messages
+                    whichIs == ActionInternalCommand.Camera.name -> R.drawable.camera
+                    whichIs == ActionInternalCommand.Gallery.name -> R.drawable.gallery
+                    whichIs == ActionInternalCommand.GoToPage.name -> R.drawable.go_to_page
+                    whichIs == ActionInternalCommand.OpenAPage.name -> R.drawable.open_a_page
+                    whichIs == InternalCategories.SettingsSystem.name -> R.drawable.settings_gear
+                    whichIs == InternalCategories.SettingsOverall.name -> R.drawable.settings
+                    whichIs.startsWith("Settings") -> ActionGoToSystemSetting.valueOf(whichIs.replaceFirst("Settings","")).icon
+                    else -> R.drawable.placeholder
+                }
+            }
+        } catch (e:Exception){
+            e.printStackTrace()
         }
+        return result
     }
 }

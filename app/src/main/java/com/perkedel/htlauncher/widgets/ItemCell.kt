@@ -2,6 +2,7 @@
 
 package com.perkedel.htlauncher.widgets
 
+import android.app.Notification.Action
 import android.content.ContentResolver
 import android.content.Context
 import android.content.pm.ApplicationInfo
@@ -92,6 +93,7 @@ import com.perkedel.htlauncher.data.ActionData
 import com.perkedel.htlauncher.data.ItemData
 import com.perkedel.htlauncher.data.PageData
 import com.perkedel.htlauncher.enumerations.ActionDataLaunchType
+import com.perkedel.htlauncher.enumerations.ActionGoToSystemSetting
 import com.perkedel.htlauncher.enumerations.ActionInternalCommand
 import com.perkedel.htlauncher.enumerations.InternalCategories
 import com.perkedel.htlauncher.enumerations.PageViewStyle
@@ -140,6 +142,7 @@ fun ItemCell(
 //    configuration: Configuration = LocalConfiguration.current,
 //    isCompact: Boolean = windowInfo.screenWidthInfo is WindowInfo.WindowType.Compact,
 //    isOrientation: Int = configuration.orientation,
+    preventCreateNewFile:Boolean = false,
 ){
 //    val tts by rememberTextToSpeech()
     // Load file
@@ -165,7 +168,7 @@ fun ItemCell(
                 readTheItemFile,
                 json = json,
                 context = context,
-                ignoreFile = false,
+                ignoreFile = !preventCreateNewFile,
             )
         }
     }
@@ -235,86 +238,126 @@ fun ItemCell(
         // CRASH
 //        selectImage = ActionInternalCommand.valueOf(itemOfIt.action[0].action).icon
 //        selectLabel = stringResource(ActionInternalCommand.valueOf(itemOfIt.action[0].action).label)
+
+        var settingIcon:Int = R.drawable.mavrickle
+        var settingLabel:String ="SETTING???"
+//        LaunchedEffect(itemOfIt.action[0].action) {
+            try{
+                settingIcon = ActionGoToSystemSetting.valueOf(itemOfIt.action[0].action.replaceFirst("Settings","")).icon
+            } catch (_:Exception) {
+            }
+            try{
+                settingLabel = context.resources.getString(ActionGoToSystemSetting.valueOf(itemOfIt.action[0].action.replaceFirst("Settings","")).label)
+            } catch (_:Exception){
+
+            }
+//        }
         selectImage =
             if(itemOfIt.action.isNotEmpty() && itemOfIt.action[0].action.isNotBlank()) {
-                when (itemOfIt.action[0].action) {
+//                when (itemOfIt.action[0].action) {
+                when {
                     // https://stackoverflow.com/questions/68932422/loading-local-drawables-with-coil-compose
                     // WOW Codeium you got it!! (Result these to refer ActionInternalCommand.???.image as the first two)
-                    stringResource(ActionInternalCommand.AllApps.id) -> ActionInternalCommand.AllApps.image
-                    stringResource(ActionInternalCommand.Camera.id) -> ActionInternalCommand.Camera.image
-                    stringResource(ActionInternalCommand.Telephone.id) -> ActionInternalCommand.Telephone.image
-                    stringResource(ActionInternalCommand.Gallery.id) -> ActionInternalCommand.Gallery.image
-                    stringResource(ActionInternalCommand.Clock.id) -> ActionInternalCommand.Clock.image
-                    stringResource(ActionInternalCommand.Contacts.id) -> ActionInternalCommand.Contacts.image
-                    stringResource(ActionInternalCommand.Messages.id) -> ActionInternalCommand.Messages.image
-                    stringResource(ActionInternalCommand.Emergency.id) -> ActionInternalCommand.Emergency.image
-                    stringResource(ActionInternalCommand.Settings.id) -> ActionInternalCommand.Settings.image
-                    stringResource(ActionInternalCommand.SystemSettings.id) -> ActionInternalCommand.SystemSettings.image
-                    stringResource(ActionInternalCommand.Preferences.id) -> ActionInternalCommand.Preferences.image
-                    stringResource(ActionInternalCommand.GoToPage.id) -> ActionInternalCommand.GoToPage.image
-                    stringResource(ActionInternalCommand.OpenAPage.id) -> ActionInternalCommand.OpenAPage.image
-                    stringResource(ActionInternalCommand.Aria.id) -> ActionInternalCommand.Aria.image
-                    stringResource(InternalCategories.SettingsSystem.id) -> InternalCategories.SettingsSystem.image
-                    stringResource(InternalCategories.SettingsOverall.id) -> InternalCategories.SettingsOverall.image
+                    itemOfIt.action[0].action == stringResource(ActionInternalCommand.AllApps.id) -> ActionInternalCommand.AllApps.image
+                    itemOfIt.action[0].action == stringResource(ActionInternalCommand.Camera.id) -> ActionInternalCommand.Camera.image
+                    itemOfIt.action[0].action == stringResource(ActionInternalCommand.Telephone.id) -> ActionInternalCommand.Telephone.image
+                    itemOfIt.action[0].action == stringResource(ActionInternalCommand.Gallery.id) -> ActionInternalCommand.Gallery.image
+                    itemOfIt.action[0].action == stringResource(ActionInternalCommand.Clock.id) -> ActionInternalCommand.Clock.image
+                    itemOfIt.action[0].action == stringResource(ActionInternalCommand.Contacts.id) -> ActionInternalCommand.Contacts.image
+                    itemOfIt.action[0].action == stringResource(ActionInternalCommand.Messages.id) -> ActionInternalCommand.Messages.image
+                    itemOfIt.action[0].action == stringResource(ActionInternalCommand.Emergency.id) -> ActionInternalCommand.Emergency.image
+                    itemOfIt.action[0].action == stringResource(ActionInternalCommand.Settings.id) -> ActionInternalCommand.Settings.image
+                    itemOfIt.action[0].action == stringResource(ActionInternalCommand.SystemSettings.id) -> ActionInternalCommand.SystemSettings.image
+                    itemOfIt.action[0].action == stringResource(ActionInternalCommand.Preferences.id) -> ActionInternalCommand.Preferences.image
+                    itemOfIt.action[0].action == stringResource(ActionInternalCommand.GoToPage.id) -> ActionInternalCommand.GoToPage.image
+                    itemOfIt.action[0].action == stringResource(ActionInternalCommand.OpenAPage.id) -> ActionInternalCommand.OpenAPage.image
+                    itemOfIt.action[0].action == stringResource(ActionInternalCommand.Aria.id) -> ActionInternalCommand.Aria.image
+                    itemOfIt.action[0].action == stringResource(InternalCategories.SettingsSystem.id) -> InternalCategories.SettingsSystem.image
+                    itemOfIt.action[0].action == stringResource(InternalCategories.SettingsOverall.id) -> InternalCategories.SettingsOverall.image
+                    itemOfIt.action[0].action.startsWith("Settings") -> settingIcon
                     else -> R.drawable.placeholder
                 }
             } else R.drawable.mavrickle
         selectLabel = if(itemOfIt.action.isNotEmpty() && itemOfIt.action[0].action.isNotBlank()) {
-            when (itemOfIt.action[0].action) {
-                stringResource(ActionInternalCommand.AllApps.id) -> stringResource(
-                    ActionInternalCommand.AllApps.label
-                )
+//            if(!itemOfIt.action[0].action.startsWith("Settings")) {
+                when {
+//                when (itemOfIt.action[0].action) {
+                    itemOfIt.action[0].action ==stringResource(ActionInternalCommand.AllApps.id) -> stringResource(
+                        ActionInternalCommand.AllApps.label
+                    )
 
-                stringResource(ActionInternalCommand.Camera.id) -> stringResource(
-                    ActionInternalCommand.Camera.label
-                )
+                    itemOfIt.action[0].action ==stringResource(ActionInternalCommand.Camera.id) -> stringResource(
+                        ActionInternalCommand.Camera.label
+                    )
 
-                stringResource(ActionInternalCommand.Telephone.id) -> stringResource(
-                    ActionInternalCommand.Telephone.label
-                )
+                    itemOfIt.action[0].action ==stringResource(ActionInternalCommand.Telephone.id) -> stringResource(
+                        ActionInternalCommand.Telephone.label
+                    )
 
-                stringResource(ActionInternalCommand.Clock.id) -> stringResource(
-                    ActionInternalCommand.Clock.label
-                )
+                    itemOfIt.action[0].action ==stringResource(ActionInternalCommand.Clock.id) -> stringResource(
+                        ActionInternalCommand.Clock.label
+                    )
 
-                stringResource(ActionInternalCommand.Messages.id) -> stringResource(
-                    ActionInternalCommand.Messages.label
-                )
+                    itemOfIt.action[0].action ==stringResource(ActionInternalCommand.Messages.id) -> stringResource(
+                        ActionInternalCommand.Messages.label
+                    )
 
-                stringResource(ActionInternalCommand.Emergency.id) -> stringResource(
-                    ActionInternalCommand.Emergency.label
-                )
+                    itemOfIt.action[0].action ==stringResource(ActionInternalCommand.Emergency.id) -> stringResource(
+                        ActionInternalCommand.Emergency.label
+                    )
 
-                stringResource(ActionInternalCommand.Gallery.id) -> stringResource(
-                    ActionInternalCommand.Gallery.label
-                )
+                    itemOfIt.action[0].action ==stringResource(ActionInternalCommand.Gallery.id) -> stringResource(
+                        ActionInternalCommand.Gallery.label
+                    )
 
-                stringResource(ActionInternalCommand.Settings.id) -> stringResource(
-                    ActionInternalCommand.Settings.label
-                )
+                    itemOfIt.action[0].action ==stringResource(ActionInternalCommand.Settings.id) -> stringResource(
+                        ActionInternalCommand.Settings.label
+                    )
 
-                stringResource(ActionInternalCommand.SystemSettings.id) -> stringResource(
-                    ActionInternalCommand.SystemSettings.label
-                )
+                    itemOfIt.action[0].action ==stringResource(ActionInternalCommand.SystemSettings.id) -> stringResource(
+                        ActionInternalCommand.SystemSettings.label
+                    )
 
-                stringResource(ActionInternalCommand.Preferences.id) -> stringResource(
-                    ActionInternalCommand.Preferences.label
-                )
+                    itemOfIt.action[0].action ==stringResource(ActionInternalCommand.Preferences.id) -> stringResource(
+                        ActionInternalCommand.Preferences.label
+                    )
 
-                stringResource(ActionInternalCommand.Contacts.id) -> stringResource(
-                    ActionInternalCommand.Contacts.label
-                )
+                    itemOfIt.action[0].action ==stringResource(ActionInternalCommand.Contacts.id) -> stringResource(
+                        ActionInternalCommand.Contacts.label
+                    )
 
-                stringResource(InternalCategories.SettingsSystem.id) -> stringResource(
-                    InternalCategories.SettingsSystem.label
-                )
+                    itemOfIt.action[0].action ==stringResource(InternalCategories.SettingsSystem.id) -> stringResource(
+                        InternalCategories.SettingsSystem.label
+                    )
 
-                stringResource(InternalCategories.SettingsOverall.id) -> stringResource(
-                    InternalCategories.SettingsOverall.label
-                )
+                    itemOfIt.action[0].action ==stringResource(InternalCategories.SettingsOverall.id) -> stringResource(
+                        InternalCategories.SettingsOverall.label
+                    )
 
-                else -> itemOfIt.action[0].action
-            }
+                    itemOfIt.action[0].action.startsWith("Settings") -> {
+//                        stringResource(
+//                            ActionGoToSystemSetting.valueOf(
+//                                itemOfIt.action[0].action.replaceFirst(
+//                                    "Settings",
+//                                    ""
+//                                )
+//                            ).label
+//                        )
+                        settingLabel
+                    }
+
+                    else -> itemOfIt.action[0].action
+                }
+//            } else {
+//                stringResource(
+//                    ActionGoToSystemSetting.valueOf(
+//                        itemOfIt.action[0].action.replaceFirst(
+//                            "Settings",
+//                            ""
+//                        )
+//                    ).label
+//                )
+//            }
         } else handoverText
     }
     val selectCompartmentType:String = if(itemOfIt.action.isNotEmpty()){
