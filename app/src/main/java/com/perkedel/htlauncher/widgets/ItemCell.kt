@@ -239,18 +239,30 @@ fun ItemCell(
 //        selectImage = ActionInternalCommand.valueOf(itemOfIt.action[0].action).icon
 //        selectLabel = stringResource(ActionInternalCommand.valueOf(itemOfIt.action[0].action).label)
 
-        var settingIcon:Int = R.drawable.mavrickle
-        var settingLabel:String ="SETTING???"
+        var settingIcon: Int = R.drawable.mavrickle
+        var settingLabel: String = "SETTING???"
 //        LaunchedEffect(itemOfIt.action[0].action) {
-            try{
-                settingIcon = ActionGoToSystemSetting.valueOf(itemOfIt.action[0].action.replaceFirst("Settings","")).icon
-            } catch (_:Exception) {
-            }
-            try{
-                settingLabel = context.resources.getString(ActionGoToSystemSetting.valueOf(itemOfIt.action[0].action.replaceFirst("Settings","")).label)
-            } catch (_:Exception){
+        try {
+            settingIcon = ActionGoToSystemSetting.valueOf(
+                itemOfIt.action[0].action.replaceFirst(
+                    "Settings",
+                    ""
+                )
+            ).icon
+        } catch (_: Exception) {
+        }
+        try {
+            settingLabel = context.resources.getString(
+                ActionGoToSystemSetting.valueOf(
+                    itemOfIt.action[0].action.replaceFirst(
+                        "Settings",
+                        ""
+                    )
+                ).label
+            )
+        } catch (_: Exception) {
 
-            }
+        }
 //        }
         selectImage =
             if(itemOfIt.action.isNotEmpty() && itemOfIt.action[0].action.isNotBlank()) {
@@ -275,6 +287,7 @@ fun ItemCell(
                     itemOfIt.action[0].action == stringResource(InternalCategories.SettingsSystem.id) -> InternalCategories.SettingsSystem.image
                     itemOfIt.action[0].action == stringResource(InternalCategories.SettingsOverall.id) -> InternalCategories.SettingsOverall.image
                     itemOfIt.action[0].action.startsWith("Settings") -> settingIcon
+                    itemOfIt.action[0].action == stringResource(ActionInternalCommand.GetStarted.id) -> ActionInternalCommand.GetStarted.image
                     else -> R.drawable.placeholder
                 }
             } else R.drawable.mavrickle
@@ -345,7 +358,9 @@ fun ItemCell(
 //                        )
                         settingLabel
                     }
-
+                    itemOfIt.action[0].action == stringResource(ActionInternalCommand.GetStarted.id) -> stringResource(
+                        ActionInternalCommand.GetStarted.label
+                    )
                     else -> itemOfIt.action[0].action
                 }
 //            } else {
@@ -361,11 +376,32 @@ fun ItemCell(
         } else handoverText
     }
     val selectCompartmentType:String = if(itemOfIt.action.isNotEmpty()){
-        when(itemOfIt.action[0].type){
-            ActionDataLaunchType.LauncherActivity -> stringResource(R.string.aria_label_LauncherActivity,selectLabel)
-            ActionDataLaunchType.ShellOpen -> stringResource(R.string.aria_label_ShellOpen,selectLabel)
-            ActionDataLaunchType.Activity -> stringResource(R.string.aria_label_Activity,selectLabel)
-            ActionDataLaunchType.Internal ->{
+        when (itemOfIt.action[0].type) {
+            ActionDataLaunchType.LauncherActivity -> stringResource(
+                R.string.aria_label_LauncherActivity,
+                selectLabel
+            )
+
+            ActionDataLaunchType.ShellOpen -> stringResource(
+                R.string.aria_label_ShellOpen,
+                selectLabel
+            )
+
+            ActionDataLaunchType.Activity -> stringResource(
+                R.string.aria_label_Activity,
+                selectLabel
+            )
+            ActionDataLaunchType.Category -> {
+//                when (itemOfIt.action[0].action) {
+//                    else -> try {
+//                        context.resources.getString(InternalCategories.valueOf(itemOfIt.action[0].action.replaceFirst("Category","")).label)
+//                    } catch (_:Exception){
+//                        ""
+//                    }
+//                }
+                selectLabel
+            }
+            ActionDataLaunchType.Internal -> {
                 // NO SOLUTION
                 // if enum not found, crash
                 // https://stackoverflow.com/questions/69163458/java-lang-illegalargumentexception-no-enum-constant-found
@@ -374,15 +410,19 @@ fun ItemCell(
                 // https://stackoverflow.com/questions/77933152/using-mutablestateof-with-enums-kotlin-jetpack-composable
                 // https://stackoverflow.com/questions/74860799/how-to-catch-an-error-in-jetpack-compose
 
-//            try {
+                try {
 //                stringResource(ActionInternalCommand.valueOf(itemOfIt.action[0].action).label)
-//            } catch (e:Exception){
-//                ""
-//            }
-                when(itemOfIt.action[0].action){
-                    stringResource(ActionInternalCommand.AllApps.id)-> stringResource(ActionInternalCommand.AllApps.label)
-                    else -> selectLabel
+                    context.resources.getString(ActionInternalCommand.valueOf(itemOfIt.action[0].action).label)
+                } catch (_: Exception) {
+                    selectLabel
                 }
+//                when (itemOfIt.action[0].action) {
+//                    stringResource(ActionInternalCommand.AllApps.id) -> stringResource(
+//                        ActionInternalCommand.AllApps.label
+//                    )
+//
+//                    else -> selectLabel
+//                }
             }
 
             else -> selectLabel
@@ -390,6 +430,7 @@ fun ItemCell(
     } else selectLabel
 
     val selectAria:String = if(itemOfIt.useAria && itemOfIt.aria.isNotEmpty()) itemOfIt.aria else selectCompartmentType
+//    val selectAria:String = if(itemOfIt.useAria && itemOfIt.aria.isNotEmpty()) itemOfIt.aria else selectLabel
 
     val gridViewStyle: @Composable ()->Unit = {
         Surface(

@@ -121,6 +121,7 @@
     <string name="editor_screen">Editor</string>
     <string name="items_explorer_screen">Editing</string>
     <string name="open_page_screen">Page</string>
+    <string name="get_started_screen">Get Started</string>
     <string name="back_button">Back</string>
     <string name="more_menu_button">Menu</string>
     <string name="aria_label_LauncherActivity">%s Application</string>
@@ -211,6 +212,7 @@
     <string name="file_manager_item_file" translatable="false">File_Manager</string>
     <string name="emergency_item_file" translatable="false">SOS</string>
     <string name="home_screen_page_file" translatable="false">Home</string>
+    <string name="dummy_page_file" translatable="false">Dummy</string>
 
     <!--  Filename & Directory label  -->
     <string name="home_screen_file_label">Home Screen</string>
@@ -424,6 +426,7 @@
     <string name="internal_commands_GoToPage" translatable="false">GoToPage</string>
     <string name="internal_commands_OpenAPage" translatable="false">OpenAPage</string>
     <string name="internal_commands_aria" translatable="false">Aria</string>
+    <string name="internal_commands_get_started" translatable="false">GetStarted</string>
     <string name="internal_commands_all_apps_label" translatable="true">All Apps</string>
     <string name="internal_commands_camera_label" translatable="true">Camera</string>
     <string name="internal_commands_gallery_label" translatable="true">Gallery</string>
@@ -438,6 +441,7 @@
     <string name="internal_commands_system_settings_label" translatable="true">System Settings</string>
     <string name="internal_commands_preferences_label" translatable="true">Launcher Configs</string>
     <string name="internal_commands_clock_label" translatable="true">Clock</string>
+    <string name="internal_commands_get_started_label" translatable="true">Get Started</string>
 
     <!--  Internal Categories  -->
     <string name="internal_categories_settings_overall" translatable="false">CategorySettingsOverall</string>

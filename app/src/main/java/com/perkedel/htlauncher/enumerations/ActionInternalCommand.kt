@@ -38,4 +38,5 @@ enum class ActionInternalCommand(@StringRes val id:Int = 0, @StringRes val label
     Aria(id = R.string.internal_commands_aria, label = R.string.internal_commands_aria_label, image = R.drawable.aria, icon = Icons.Default.Accessibility), // Read aloud label or aria field on click
     GoToPage(id = R.string.internal_commands_GoToPage, label = R.string.internal_commands_GoToPage_label, image = R.drawable.go_to_page, icon = Icons.Default.Pages), // Go to page which in this homescreen
     OpenAPage(id = R.string.internal_commands_OpenAPage, label = R.string.internal_commands_OpenAPage_label, image = R.drawable.open_a_page, icon = Icons.AutoMirrored.Default.MenuOpen), // Open a launcher page in a dialog
+    GetStarted(id = R.string.internal_commands_get_started, label = R.string.internal_commands_get_started_label, image = R.drawable.get_started, icon = Icons.AutoMirrored.Default.MenuOpen), // OOBE setup
 }

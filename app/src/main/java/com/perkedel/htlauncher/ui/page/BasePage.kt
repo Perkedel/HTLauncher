@@ -225,9 +225,16 @@ fun BasePage(
                         }
                         // Rest of the items
                         repeat(times = pageOfIt.items.size){
+//                            val isCategory = uiState.itemList[pageOfIt.items[it]]?.isCategory ?: false
+                            val isCategory = viewModel.getItemData(
+                                pageOfIt.items[it],
+                                context = context,
+                                ignoreFile = false,
+                                forceReload = false
+                            ).isCategory
                             item(
 //                            span = if(uiState.itemList[pageOfIt.items[it]]?.isCategory == true) {GridItemSpan(this.maxLineSpan)} else null
-                                span = { if(uiState.itemList[pageOfIt.items[it]]?.isCategory == true) GridItemSpan(this.maxLineSpan) else GridItemSpan(1) }
+                                span = { if(isCategory) GridItemSpan(this.maxLineSpan) else GridItemSpan(1) }
                             ){
                                 ItemCell(
                                     readTheItemData = viewModel.getItemData(

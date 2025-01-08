@@ -24,6 +24,11 @@ object HTLauncherHardcodes {
     val HOMESCREEN_FILE:HomepagesWeHave = HomepagesWeHave(
 
     )
+    val HOMESCREEN_FILE_DUMMY:HomepagesWeHave = HomepagesWeHave(
+        pagesPath = listOf(
+            "Dummy",
+        )
+    )
     val HOMEPAGE_FILE:PageData = PageData(
         name = "Home",
         isHome = true,
@@ -38,6 +43,25 @@ object HTLauncherHardcodes {
             "Settings",
             "AllApps"
         )
+    )
+    val HOMEPAGE_FILE_DUMMY:PageData = PageData(
+        name = "Dummy",
+        isHome = true,
+        items = listOf(
+            "GetStarted",
+            "Telephone",
+            "Contacts",
+            "Messages",
+            "Camera",
+            "Gallery",
+            "Clock",
+            "SOS",
+            "Settings",
+            "AllApps"
+        )
+    )
+    val POC_APPS_PAGE:PageData = PageData(
+
     )
     val ORGANIZER_PAGE_FILE:PageData = PageData(
         name = "Organizer",
@@ -120,7 +144,18 @@ object HTLauncherHardcodes {
             )
         )
     )
-
+    val GET_STARTED_FILE:ItemData = ItemData(
+        name = "GetStarted",
+        label = "GetStarted",
+        aria = "GetStarted",
+        action = listOf(
+            ActionData(
+                name = "GetStarted",
+                action = "GetStarted",
+                type = ActionDataLaunchType.Internal,
+            )
+        )
+    )
 
     val ALARM_APP_IMPLEMENTATIONS:Map<String,SearchableApps> = mapOf(
         // https://stackoverflow.com/a/4281243/9079640

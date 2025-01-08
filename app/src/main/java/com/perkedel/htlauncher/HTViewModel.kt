@@ -187,7 +187,7 @@ class HTViewModel(
 //        systemUiController.isStatusBarVisible = false
 
             // You must Folders!!
-            val homeSafData:HomepagesWeHave = HTLauncherHardcodes.HOMESCREEN_FILE
+            var homeSafData:HomepagesWeHave = HTLauncherHardcodes.HOMESCREEN_FILE
             var homeSafFileUri:Uri = Uri.EMPTY
             if(!initing) {
 
@@ -228,6 +228,7 @@ class HTViewModel(
 
 
                 } else {
+                    homeSafData = HTLauncherHardcodes.HOMESCREEN_FILE_DUMMY
                     Log.d("InitFileLoader", "Save Dir Not Selected")
                 }
 
@@ -362,6 +363,7 @@ class HTViewModel(
 
                         val predeterminedPage: PageData = when(i){
                             context.resources.getString(R.string.home_screen_page_file) -> HTLauncherHardcodes.HOMEPAGE_FILE
+                            context.resources.getString(R.string.dummy_page_file) -> HTLauncherHardcodes.HOMEPAGE_FILE_DUMMY
                             "Settings" -> HTLauncherHardcodes.SETTINGS_PAGE_FILE
                             else -> PageData(
                                 name = i,
@@ -419,7 +421,8 @@ class HTViewModel(
                                         j == ActionInternalCommand.SystemSettings.name ||
                                         j == ActionInternalCommand.Preferences.name ||
                                         j == InternalCategories.SettingsSystem.name ||
-                                        j == InternalCategories.SettingsOverall.name
+                                        j == InternalCategories.SettingsOverall.name ||
+                                        j == ActionInternalCommand.GetStarted.name
 //                        Log.d("ItemLoader","Item is internal command $j")
 //                        val itemIsCategory:Boolean =
 //                            j == InternalCategories.SettingsSystem.name ||
@@ -483,6 +486,13 @@ class HTViewModel(
                     setIsReady(into = true)
                     initing = true
                     updateIniting(initing)
+                } else {
+                    // add dummy
+                    uiStating.pageList["Dummy"] = HTLauncherHardcodes.HOMEPAGE_FILE_DUMMY
+                    uiStating.itemList["GetStarted"] = HTLauncherHardcodes.GET_STARTED_FILE
+//                    setIsReady(into = true)
+//                    initing = true
+//                    updateIniting(initing)
                 }
 
             } else {
@@ -759,10 +769,12 @@ class HTViewModel(
                     of == context.resources.getString(ActionInternalCommand.Preferences.id) ||
                     of == context.resources.getString(InternalCategories.SettingsSystem.id) ||
                     of == context.resources.getString(InternalCategories.SettingsOverall.id) ||
-                    of.startsWith("Settings")
+                    of.startsWith("Settings") ||
+                    of == context.resources.getString(ActionInternalCommand.GetStarted.id)
 //        val itemIsCategory:Boolean =
 //            of == context.resources.getString(InternalCategories.SettingsSystem.id) ||
 //                    of == context.resources.getString(InternalCategories.SettingsOverall.id)
+        val itemIsCategory:Boolean = of.startsWith("Category")
 //        if(itemIsInternalCommand) Log.d("GetItemData","Internal Command ${of}")
 //        if(itemIsCategory) Log.d("GetItemData","Internal Category ${of}")
 //        Log.d("GetItemData","Item $of requested")
@@ -789,6 +801,7 @@ class HTViewModel(
                         type = ActionDataLaunchType.Internal,
                     )
                 ),
+                isCategory = itemIsCategory
             )
 //            "AllApps" -> HTLauncherHardcodes.ALLAPPS_FILE
 //            "Telephone" -> HTLauncherHardcodes.TELEPHONE_FILE

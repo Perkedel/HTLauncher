@@ -19,3 +19,21 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+
+# Gemini
+# java.lang.IllegalArgumentException:  Cannot find class with name "com.perkedel.htlauncher. enumerations. PageViewStyle" .  Ensure that the serialName for this argument is the default fully qualified name
+# https://stackoverflow.com/questions/22399572/java-lang-classnotfoundexception-didnt-find-class-on-path-dexpathlist
+-keep class com.perkedel.htlauncher.enumerations.PageViewStyle { *; }
+-keep class com.perkedel.htlauncher.enumerations.PageGridType { *; }
+-keep class com.perkedel.htlauncher.enumerations.ShowWhichIcon { *; }
+-keep class com.perkedel.htlauncher.enumerations.ThirdButtonPosition { *; }
+-keep class com.perkedel.htlauncher.enumerations.Screen { *; }
+-keep class com.perkedel.htlauncher.enumerations.ItemDetailPaneNavigate { *; }
+-keep class com.perkedel.htlauncher.enumerations.ItemExtraPaneNavigate { *; }
+-keep class com.perkedel.htlauncher.enumerations.InternalCategories { *; }
+-keep class com.perkedel.htlauncher.enumerations.EditWhich { *; }
+-keep class com.perkedel.htlauncher.enumerations.ConfigSelected { *; }
+-keep class com.perkedel.htlauncher.enumerations.ButtonTypes { *; }
+-keep class com.perkedel.htlauncher.enumerations.ActionGoToSystemSetting { *; }
+-keep class com.perkedel.htlauncher.enumerations.ActionDataLaunchType { *; }
+-keeppackagenames com.perkedel.htlauncher.enumerations

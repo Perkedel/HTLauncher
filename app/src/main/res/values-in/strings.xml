@@ -89,6 +89,7 @@
     <string name="editor_screen">Editor</string>
     <string name="items_explorer_screen">Mengedit</string>
     <string name="open_page_screen">Halaman</string>
+    <string name="get_started_screen">Ayo Mulai</string>
     <string name="back_button">Kembali</string>
     <string name="more_menu_button">Menu</string>
     <string name="aria_label_LauncherActivity">Aplikasi %s</string>
@@ -384,6 +385,8 @@
     <string name="internal_commands_GoToPage_label" translatable="true">Pergi ke Halaman</string>
     <string name="internal_commands_OpenAPage_label" translatable="true">Buka Halaman</string>
     <string name="internal_commands_clock_label" translatable="true">Jam</string>
+    <string name="internal_commands_get_started_label" translatable="true">Ayo Mulai</string>
+
 
     <!--  Internal Categories  -->
     <string name="internal_categories_settings_overall_label" translatable="true">Pengaturan Keseluruhan</string>

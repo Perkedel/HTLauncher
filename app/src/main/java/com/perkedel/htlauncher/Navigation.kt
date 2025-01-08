@@ -253,7 +253,9 @@ fun Navigation(
 //    )
     val currentScreen:String = backStackEntry?.destination?.route ?: Screen.HomeScreen.name
     var hideTopBar: MutableState<Boolean> = rememberSaveable { mutableStateOf(false) }
+    var selectedSaveDirMan:MutableState<Uri> = rememberSaveable { mutableStateOf(Uri.parse("")) }
     val htuiState : HTUIState by anViewModel.uiState.collectAsState()
+//    val htuiState : HTUIState = rememberSaveable { mutableStateOf(anViewModel.uiState.collectAsState()) }
 //    val context: Context = LocalContext.current
 
     // https://www.tutorialspoint.com/how-to-get-the-build-version-number-of-an-android-application
@@ -313,6 +315,11 @@ fun Navigation(
         }
     }
     LaunchedEffect(
+        selectedSaveDirMan.value
+    ) {
+
+    }
+    LaunchedEffect(
         key1 = hideTopBar.value
     ) {
         setXrMode(hideTopBar.value)
@@ -361,6 +368,7 @@ fun Navigation(
             Intent.FLAG_GRANT_WRITE_URI_PERMISSION
     val saveDirResolver = context.contentResolver
     val saveDirLauncher = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocumentTree()) { dirUri ->
+        Log.d("SaveDirLauncher","Select Save Dir ${dirUri}")
         if (dirUri != null){
             println("Selected Save Dir `${dirUri}`")
 //            saveDirResult.value = dirUri
@@ -377,73 +385,72 @@ fun Navigation(
                     val saveDir = stringPreferencesKey("saveDir")
                     dataStore[saveDir] = dirUri.toString()
                 }
-            }
+                anViewModel.preloadFiles(context,saveDirResolver,htuiState, listOfFolder = listOfFolder, folders = folders, json = json, force = true)
 
-            println("About to launch a test!")
-            coroutineScope.launch {
+                println("About to launch a test!")
                 println("Let's try test.json!")
                 println("Parse URI! ${Uri.parse(totalUriTest)}")
                 println("Oh yeah!")
-                try {
-                    // https://stackoverflow.com/a/24869904/9079640
-                    // Java.nio is only available since API 26. Min was 21, crash!
+                val doTest:Boolean = false
+                if(doTest){
+                    try {
+                        // https://stackoverflow.com/a/24869904/9079640
+                        // Java.nio is only available since API 26. Min was 21, crash!
 
 //                val tempFile = kotlin.io.path.createTempFile()
 //                println(runCatching {
 //                val urei = DocumentFile.fromTreeUri(context,Uri.parse("${htuiState.selectedSaveDir}")!!)!!.findFile("test.json")!!.uri
 //                val compatPath =
-                    var urei:Uri
+                        var urei:Uri
 //                if(Build.VERSION.SDK_INT >= 26) {
-                    urei = getATextFile(
-                        dirUri = dirUri,
-                        context = context,
-                        fileName = "test.json",
-                        initData = json.encodeToString<TestJsonData>(TestJsonData(
-                            test = "This is a file"
-                        )),
-                        hardOverwrite = true,
-                    )
-                    println("Urei! ${urei}")
-                    jsonTestRaw.value = openATextFile(
+                        urei = getATextFile(
+                            dirUri = dirUri,
+                            context = context,
+                            fileName = "test.json",
+                            initData = json.encodeToString<TestJsonData>(TestJsonData(
+                                test = "This is a file"
+                            )),
+                            hardOverwrite = true,
+                        )
+                        println("Urei! ${urei}")
+                        jsonTestRaw.value = openATextFile(
 //                    Uri.withAppendedPath(htuiState.selectedSaveDir, "test.json"),
 //                    htuiState.selectedSaveDir!!.path,
 //                    fromTreeUri(context, Uri.withAppendedPath(htuiState.selectedSaveDir, "test.json"))!!.uri,
 //                    Uri.parse(totalUriTest), // FUCK YOU WHY CAN'T YOU GIVE ME FUCKING EXAMPLE!??!?!
-                        uri = urei, // FRUCKING FRNALLY!!! THANK YOU MPV KT
-                        contentResolver = saveDirResolver,
-                        newLine = true,
-                    )
-                    // https://stackoverflow.com/a/75573771/9079640
-                    // https://stackoverflow.com/questions/77073202/getting-unexpected-json-token-at-offset-0-with-kotlin-serialization
+                            uri = urei, // FRUCKING FRNALLY!!! THANK YOU MPV KT
+                            contentResolver = saveDirResolver,
+                            newLine = true,
+                        )
+                        // https://stackoverflow.com/a/75573771/9079640
+                        // https://stackoverflow.com/questions/77073202/getting-unexpected-json-token-at-offset-0-with-kotlin-serialization
 //                    Gson().fromJson(jsonTestRaw.value, TypeToken<TestJsonData>(){}.type)
 //                    println("JSON Test:\n${jsonTestRaw.value}")
 //                    println("Find Parser!\n\n${Json.parseToJsonElement(jsonTestRaw.value)}")
-                    println("JSON ABRUR \n${jsonTestRaw.value}")
-                    anViewModel.changeTestResult(jsonTestRaw.value)
+                        println("JSON ABRUR \n${jsonTestRaw.value}")
+                        anViewModel.changeTestResult(jsonTestRaw.value)
 //                })
 //                }
-                } catch (e:Exception){
-                    println("WERROR EXCEPTION")
-                    e.printStackTrace()
-                } catch (e:IOException){
-                    println("WERROR IOEXCEPTION")
-                    e.printStackTrace()
-                }
+                    } catch (e:Exception){
+                        println("WERROR EXCEPTION")
+                        e.printStackTrace()
+                    } catch (e:IOException){
+                        println("WERROR IOEXCEPTION")
+                        e.printStackTrace()
+                    }
 
-                println("Okay Parser Found, let's interpret!")
-                try{
+                    println("Okay Parser Found, let's interpret!")
+                    try{
 //                anViewModel.injectTestJsonResult(Json.parseToJsonElement(jsonTestRaw.value))
-                    anViewModel.injectTestJsonResult(json.decodeFromString<TestJsonData>(jsonTestRaw.value))
+                        anViewModel.injectTestJsonResult(json.decodeFromString<TestJsonData>(jsonTestRaw.value))
 
-                    println("READ THE INJECT JSON ${htuiState.testJsonElement}")
+                        println("READ THE INJECT JSON ${htuiState.testJsonElement}")
 //                println("& TEST VALUE IS `${htuiState.testJsonElement.jsonObject.getValue("test")}`")
-                } catch (e:Exception){
-                    println("WERROR EXCEPTION JSON")
-                    e.printStackTrace()
+                    } catch (e:Exception){
+                        println("WERROR EXCEPTION JSON")
+                        e.printStackTrace()
+                    }
                 }
-            }
-            coroutineScope.launch {
-                anViewModel.preloadFiles(context,saveDirResolver,htuiState, listOfFolder = listOfFolder, folders = folders, json = json, force = true)
             }
         } else {
             println("No Save Dir Selected")
@@ -949,6 +956,11 @@ fun Navigation(
                                 )
                             }
                         )
+                    }
+                    composable(
+                        route = Screen.GetStarted.name
+                    ) {
+                        Text("Get Started")
                     }
                     composable(route = Screen.AllAppsScreen.name,
                         enterTransition = {
@@ -1975,6 +1987,9 @@ fun onLaunchAction(
                                 handover = tts,
                                 message = readout,
                             )
+                        }
+                        containAction == context.resources.getString(ActionInternalCommand.GetStarted.id) -> {
+                            navController.navigate(Screen.GetStarted.name)
                         }
                         else -> {}
                     }
