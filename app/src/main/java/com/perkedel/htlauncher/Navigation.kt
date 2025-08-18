@@ -509,7 +509,7 @@ fun Navigation(
         coroutineScope.launch {
 //            if(htuiState.selectedSaveDir != null) {
 //                anViewModel.setIsReady(false)
-                if (!initing) {
+                if (!initing && htuiState.selectedSaveDir != null) {
                     anViewModel.preloadFiles(
                         context = context,
                         contentResolver = saveDirResolver,
@@ -525,7 +525,7 @@ fun Navigation(
                 }
 //                anViewModel.setIsReady(true)
 //            } else {
-////                anViewModel.setIsReady(true)
+//                anViewModel.setIsReady(true)
 //            }
         }
 
