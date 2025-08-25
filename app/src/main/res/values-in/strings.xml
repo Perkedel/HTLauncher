@@ -22,7 +22,8 @@
     <string name="action_telltime">Waktu menunjukan pukul %s, %s</string>
     <string name="action_tellbattery">Baterai kini berada dalam tingkat %d%%</string>
     <string name="action_tellcarrier">Operator Anda %s</string>
-    <string name="action_tellsignal">Kekuatan Sinyal %s, yaitu RSSI %d dBm dan ASU %d unit</string>
+    <string name="action_tellsignal">Kekuatan Sinyal %s, yaitu RSSI %d dBm dan ASU %d unit. Jenis sinyal adalah %s</string>
+    <string name="action_tellsignal_type_unknown">Tidak diketahui</string>
     <string name="action_batterymedium">Baterai sedang, pengecasan disarankan.</string>
     <string name="action_batterylow">Baterai mau habis, segera cas!</string>
     <string name="action_batteryfull">Baterai sudah penuh, silahkan cabut charger.</string>
@@ -76,6 +77,17 @@
     <string name="action_month_11_short">NOV</string>
     <string name="action_month_12_short">DES</string>
 
+    <!--  First Time  -->
+    <string name="FirstTimer_Welcome">Selamat Datang di %s!</string>
+    <string name="FirstTimer_Welcome_Description">
+        "Anda harus menyetel direktori Save di storage Anda.\n"
+        "Kami sarankan untuk menyetel ke direktori berikut:\n\n"
+        "`PenyimpananInternal/%s`\n\n"
+    </string>
+    <string name="FirstTimer_Welcome_SetupSaveButton">Setel Save Dir</string>
+    <string name="FirstTimer_Welcome_SettingButton">Pengaturan</string>
+    <string name="FirstTimer_Welcome_DemoButton">Coba Demo</string>
+
     <!--  Home Screen  -->
     <string name="action_load">Muat</string>
     <string name="action_retry">Retry</string>
@@ -85,6 +97,7 @@
     <string name="whole_apps">Seluruh Aplikasi</string>
     <string name="recent_apps">Aplikasi Terbaru</string>
     <string name="configuration_screen">Konfigurasi</string>
+    <string name="purchase_screen">Beli Versi Penuh</string>
     <string name="about_screen">Tentang</string>
     <string name="editor_screen">Editor</string>
     <string name="items_explorer_screen">Mengedit</string>
@@ -97,11 +110,16 @@
     <string name="aria_label_ShellOpen">Buka %s</string>
 
     <!--  Home More Menu  -->
+    <string name="Home_more_goToPage">Pergi Ke Halaman</string>
     <string name="Home_more_edit">Ubah Tombol Peluncur</string>
     <string name="Home_more_configuration">Konfigurasi Peluncur</string>
     <string name="Home_more_sys_setting">Pengaturan Sistem</string>
     <string name="Home_more_all_apps">Semua Aplikasi</string>
     <string name="Home_more_fullscreen">Layar Penuh</string>
+
+    <!--  Jump to page  -->
+    <string name="GoToPage_Title">Pergi Ke Halaman</string>
+    <string name="GoToPage_Description">Silahkan pilih dari nomor halaman yang ingin dituju</string>
 
     <!--  Configurations  -->
     <string name="default_button">Default</string>
@@ -132,6 +150,7 @@
     <string name="click_here_to_check_update_snippet">Klik disini untuk periksa update</string>
     <string name="donation_option">Donasi</string>
     <string name="donation_option_desc">Anda sudah memiliki VERSI PENUH</string>
+    <string name="donation_option_desc_not_yet">Beli Sekarang!</string>
     <string name="quick_start_option">Quick Start Guide</string>
     <string name="language_option">Bahasa</string>
     <string name="display_option">Tampilan</string>
@@ -431,6 +450,8 @@
     </plurals>
 
     <!--  Purchase  -->
+    <string name="purchase_title">Status Kekayaan</string>
+    <string name="purchase_I_am_rich_title">Instalasi `I am Rich`:</string>
     <string name="purchase_offer_title">Tawaran</string>
     <string name="purchase_pro_title">VERSI PENUH</string>
     <string name="purchase_cost_changeable">Rp 2.000,00</string>
@@ -438,4 +459,5 @@
     <string name="purchase_not_yet_say">BELI SEKARANG</string>
     <string name="purchase_done_now_say">DIMILIKI</string>
     <string name="purchase_contact">Silahkan hubungi kami di %s jika Anda mengalami kendala lisensi.</string>
+    <string name="purchase_keep_installed">Mohon jaga `I am Rich` tetap terpasang agar dapat menikmati semua fitur yang ada di Launcher ini.</string>
 </resources>

@@ -43,6 +43,7 @@ import com.perkedel.htlauncher.ui.theme.HTLauncherTheme
 import com.perkedel.htlauncher.ui.theme.rememberColorScheme
 import com.perkedel.htlauncher.widgets.HTHorizontalPageButtonShim
 import com.perkedel.htlauncher.widgets.HTHorizontalPageIndicators
+import com.perkedel.htlauncher.widgets.WelcomeFirstTimeCard
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
@@ -55,6 +56,9 @@ fun HomeScreen(
     handoverPagerState: PagerState = rememberPagerState(pageCount = {10}),
     onAllAppButtonClicked: () -> Unit = {},
     onMoreMenuButtonClicked: () -> Unit = {},
+    onChooseSaveDir: () -> Unit = {},
+    onGoToSetting: () -> Unit = {},
+    onTryDemo: () -> Unit = {},
     modifier: Modifier = Modifier.fillMaxSize(),
     hideTopBar: Boolean = true,
     context: Context = LocalContext.current,
@@ -189,7 +193,17 @@ fun HomeScreen(
 //            ) {
 //                Text(text = "Loading")
 //            }
-            HTLoading()
+            if(uiState.selectedSaveDir !=null){
+                HTLoading()
+            } else
+            {
+                WelcomeFirstTimeCard(
+                    onGoToSetting = onGoToSetting,
+                    onChooseSaveDir = onChooseSaveDir,
+                    onTryDemo = onTryDemo,
+                )
+            }
+
         }
     }
 

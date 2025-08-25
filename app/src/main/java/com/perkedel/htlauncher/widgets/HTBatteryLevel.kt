@@ -24,9 +24,11 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.BatteryStd
 import androidx.compose.material.icons.filled.ElectricBolt
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
@@ -36,6 +38,7 @@ import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.ProgressIndicatorDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -48,15 +51,22 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.hapticfeedback.HapticFeedback
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.LocalInspectionMode
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import coil3.compose.AsyncImage
 import com.perkedel.htlauncher.R
+import com.perkedel.htlauncher.enumerations.BatteryIconTypes
+import com.perkedel.htlauncher.enumerations.BatteryStrengthTypes
 import com.perkedel.htlauncher.func.SystemBroadcastReceiver
 import com.perkedel.htlauncher.modules.rememberTextToSpeech
 import com.perkedel.htlauncher.modules.ttsSpeakOrStop
@@ -72,7 +82,9 @@ import com.perkedel.htlauncher.ui.theme.rememberColorScheme
 @Composable
 fun HTBatteryLevel(
     modifier: Modifier = Modifier,
+    maxSquareSize: Dp =  24.dp,
     context: Context = LocalContext.current,
+    batteryIconTypes: BatteryIconTypes = BatteryIconTypes.ProgressBatteryIcon,
     circular:Boolean = false,
     tts: MutableState<TextToSpeech?> = rememberTextToSpeech(),
     onClick: ()->Unit = {},
@@ -99,11 +111,12 @@ fun HTBatteryLevel(
             level * 100 / scale.toFloat()
         }
         val isChargingGet:Boolean? = batteryStatus?.let { intent ->
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
-                intent.getBooleanExtra(BatteryManager.EXTRA_CHARGING_STATUS, false)
-            } else {
-                intent.getIntExtra(BatteryManager.EXTRA_PLUGGED, -1) >= BatteryManager.BATTERY_PLUGGED_AC
-            }
+//            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+//                intent.getBooleanExtra(BatteryManager.EXTRA_CHARGING_STATUS, false)
+//            } else {
+//                intent.getIntExtra(BatteryManager.EXTRA_PLUGGED, -1) >= BatteryManager.BATTERY_PLUGGED_AC
+//            }
+            intent.getIntExtra(BatteryManager.EXTRA_PLUGGED, -1) >= BatteryManager.BATTERY_PLUGGED_AC
         }
         temperature = batteryStatus?.getIntExtra(BatteryManager.EXTRA_TEMPERATURE, 0) ?: 0
 //        chargeRemaining =
@@ -126,6 +139,40 @@ fun HTBatteryLevel(
         animationSpec = ProgressIndicatorDefaults.ProgressAnimationSpec,
         label = "BatteryAnimatedLevel",
     )
+
+    val batteryStrengthLevelType:BatteryStrengthTypes =
+        if(batteryLevel < 1)
+            BatteryStrengthTypes.DeadBatteryStrength
+        else if(batteryLevel in 2..10)
+            BatteryStrengthTypes.CriticalBatteryStrength
+        else if(batteryLevel in 11..20)
+            BatteryStrengthTypes.LowBatteryStrength
+        else if(batteryLevel in 21..30)
+            BatteryStrengthTypes.MediumBatteryStrength
+        else if(batteryLevel in 31..60)
+            BatteryStrengthTypes.HalfBatteryStrength
+        else if(batteryLevel in 61..75)
+            BatteryStrengthTypes.AlmostBatteryStrength
+        else if(batteryLevel in 76..97)
+            BatteryStrengthTypes.HighBatteryStrength
+        else if(batteryLevel > 98)
+            BatteryStrengthTypes.FullBatteryStrength
+        else
+            BatteryStrengthTypes.UnknownBatteryStrength
+
+    val batteryIcon:Int =
+        when(batteryStrengthLevelType)
+        {
+            BatteryStrengthTypes.DeadBatteryStrength -> R.drawable.baseline_battery_0_bar_24
+            BatteryStrengthTypes.CriticalBatteryStrength -> R.drawable.baseline_battery_1_bar_24
+            BatteryStrengthTypes.LowBatteryStrength -> R.drawable.baseline_battery_2_bar_24
+            BatteryStrengthTypes.MediumBatteryStrength -> R.drawable.baseline_battery_3_bar_24
+            BatteryStrengthTypes.HalfBatteryStrength -> R.drawable.baseline_battery_4_bar_24
+            BatteryStrengthTypes.AlmostBatteryStrength -> R.drawable.baseline_battery_5_bar_24
+            BatteryStrengthTypes.HighBatteryStrength -> R.drawable.baseline_battery_6_bar_24
+            BatteryStrengthTypes.FullBatteryStrength -> R.drawable.baseline_battery_full_24
+            else -> R.drawable.baseline_battery_unknown_24
+        }
 
     val linearTrackColor: Color =
         if(batteryLevel > 50)
@@ -226,45 +273,49 @@ fun HTBatteryLevel(
         ,
         contentAlignment = Alignment.Center,
     ){
-        if(circular){
-            CircularProgressIndicator(
-                modifier = Modifier,
-                progress = { animateLevel },
-                color = circularColor,
-                trackColor = circularTrackColor
-            )
-            if(isCharging){
-                Icon(
-                    imageVector = Icons.Default.ElectricBolt,
-                    contentDescription = "",
-                    modifier = Modifier
-                        .size(16.dp)
+        // https://stackoverflow.com/a/53138234/9079640
+        when(batteryIconTypes)
+        {
+            BatteryIconTypes.ProgressBatteryIcon -> {
+                if(circular){
+                    CircularProgressIndicator(
+                        modifier = Modifier,
+                        progress = { animateLevel },
+                        color = circularColor,
+                        trackColor = circularTrackColor
+                    )
+                    if(isCharging){
+                        Icon(
+                            imageVector = Icons.Default.ElectricBolt,
+                            contentDescription = "",
+                            modifier = Modifier
+                                .size(16.dp)
 //                        .fillMaxWidth()
-                        .align(Alignment.BottomEnd)
-                    ,
+                                .align(Alignment.BottomEnd)
+                            ,
 //                    tint = rememberColorScheme().tertiaryContainer
-                )
-            }
-            OutlinedText(
-                text = "${batteryLevel}",
+                        )
+                    }
+                    OutlinedText(
+                        text = "${batteryLevel}",
 //                outlineColor = textOutlineColor,
 //                fillColor = textFillColor,
-                outlineDrawStyle = Stroke(
-                    width = 1f,
-                )
-            )
-        } else {
-            LinearProgressIndicator(
-                modifier = Modifier.height(32.dp),
-                progress = { animateLevel },
-                color = linearColor,
-                trackColor = linearTrackColor
-            )
-            Row(
-                modifier = Modifier,
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                if(isCharging){
+                        outlineDrawStyle = Stroke(
+                            width = 1f,
+                        )
+                    )
+                } else {
+                    LinearProgressIndicator(
+                        modifier = Modifier.height(32.dp),
+                        progress = { animateLevel },
+                        color = linearColor,
+                        trackColor = linearTrackColor
+                    )
+                    Row(
+                        modifier = Modifier,
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        if(isCharging){
 //                    OutlinedText(
 //                        text = "⚡",
 //                        outlineColor = textOutlineColor,
@@ -273,23 +324,89 @@ fun HTBatteryLevel(
 //                            width = 1f,
 //                        )
 //                    )
-                    Icon(
-                        imageVector = Icons.Default.ElectricBolt,
-                        contentDescription = "",
-                        tint = textFillColor
+                            Icon(
+                                imageVector = Icons.Default.ElectricBolt,
+                                contentDescription = "",
+                                tint = textFillColor
+                            )
+                        }
+                        OutlinedText(
+                            text = "${batteryLevel}",
+                            outlineColor = textOutlineColor,
+                            fillColor = textFillColor,
+                            outlineDrawStyle = Stroke(
+                                width = 1f,
+                            )
+                        )
+                    }
+
+                }
+            }
+            BatteryIconTypes.IconBatteryIcon -> {
+                Row {
+//                    Icon(
+//                        imageVector = Icons.Default.BatteryStd,
+//                        contentDescription = ""
+//                    )
+                    Box(
+                        modifier = Modifier
+                            .sizeIn(
+                                minHeight = 0.dp,
+                                minWidth = 0.dp,
+                                maxHeight = maxSquareSize,
+                                maxWidth = maxSquareSize,
+                            )
+                    )
+                    {
+                        AsyncImage(
+                            modifier = Modifier
+                            ,
+                            model = batteryIcon,
+                            contentDescription = "",
+                            colorFilter = ColorFilter.tint(rememberColorScheme().onBackground),
+                            error = painterResource(R.drawable.mavrickle),
+                            placeholder = painterResource(R.drawable.baseline_battery_unknown_24)
+                        )
+                    }
+
+                    if(isCharging)
+                    {
+                        Box(
+                            modifier = Modifier
+                                .sizeIn(
+                                    minHeight = 0.dp,
+                                    minWidth = 0.dp,
+                                    maxHeight = maxSquareSize,
+                                    maxWidth = maxSquareSize,
+                                )
+                        ){
+//                            Icon(
+//                                imageVector = Icons.Default.ElectricBolt,
+//                                contentDescription = "",
+//                            )
+                            AsyncImage(
+                                modifier = Modifier
+                                ,
+                                model = R.drawable.baseline_electric_bolt_24,
+                                contentDescription = "",
+                                colorFilter = ColorFilter.tint(rememberColorScheme().onBackground),
+                                error = painterResource(R.drawable.mavrickle),
+                                placeholder = painterResource(R.drawable.baseline_electric_bolt_24)
+                            )
+                        }
+                    }
+
+                    OutlinedText(
+                        text = "${batteryLevel}",
+                        outlineDrawStyle = Stroke(
+                            width = 1f,
+                        )
                     )
                 }
-                OutlinedText(
-                    text = "${batteryLevel}",
-                    outlineColor = textOutlineColor,
-                    fillColor = textFillColor,
-                    outlineDrawStyle = Stroke(
-                        width = 1f,
-                    )
-                )
             }
-
+            else -> {}
         }
+
     }
 
 }
@@ -329,6 +446,10 @@ fun HTBatteryLevelPreview(){
 
                                     ,
                                     circular = true,
+                                )
+                                HTBatteryLevel(
+                                    modifier = Modifier,
+                                    batteryIconTypes = BatteryIconTypes.IconBatteryIcon
                                 )
                             }
 

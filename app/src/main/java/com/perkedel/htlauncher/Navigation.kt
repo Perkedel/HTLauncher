@@ -132,10 +132,13 @@ import com.perkedel.htlauncher.ui.navigation.AllAppsScreen
 import com.perkedel.htlauncher.ui.navigation.Configurationing
 import com.perkedel.htlauncher.ui.navigation.ItemsExplorer
 import com.perkedel.htlauncher.ui.navigation.LevelEditor
+import com.perkedel.htlauncher.ui.navigation.PurchaseScreen
 import com.perkedel.htlauncher.ui.navigation.StandalonePageScreen
 import com.perkedel.htlauncher.ui.theme.HTLauncherTheme
 import com.perkedel.htlauncher.ui.theme.rememberColorScheme
+import com.perkedel.htlauncher.widgets.ChangeSaveDirDialog
 import com.perkedel.htlauncher.widgets.ContainsSharedTransition
+import com.perkedel.htlauncher.widgets.GoToPageDialog
 import com.perkedel.htlauncher.widgets.HTButton
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
@@ -478,7 +481,10 @@ fun Navigation(
 
 
     var initing:Boolean by rememberSaveable { mutableStateOf(false) }
-    LaunchedEffect(htuiState.selectedSaveDir) {
+    LaunchedEffect(
+        htuiState.selectedSaveDir,
+        htuiState.coreConfigJson,
+    ) {
 //        val initing = htuiState.inited
 //        initing = htuiState.inited
         initing = false
@@ -519,8 +525,12 @@ fun Navigation(
                         json = json,
 //                    force = true,
                     )
-                    initing = true
+//                    if(htuiState.selectedSaveDir != null)
+                        initing = true
                 } else {
+//                    anViewModel.setIsReady(true)
+                }
+                if(initing && htuiState.selectedSaveDir != null){
                     anViewModel.setIsReady(true)
                 }
 //                anViewModel.setIsReady(true)
@@ -705,6 +715,7 @@ fun Navigation(
                         currentScreen == Screen.AllAppsScreen.name -> stringResource(R.string.all_apps)
                         currentScreen == Screen.ConfigurationScreen.name -> stringResource(R.string.configuration_screen)
                         currentScreen == Screen.AboutScreen.name -> stringResource(R.string.about_screen)
+                        currentScreen == Screen.PurchaseScreen.name -> stringResource(R.string.purchase_screen)
                         currentScreen == Screen.LevelEditor.name -> stringResource(R.string.editor_screen)
                         currentScreen == Screen.ItemsExplorer.name -> "${stringResource(R.string.items_explorer_screen)} ${stringResource(htuiState.toEditWhatFile.label)}"
                         currentScreen.startsWith("${context.packageName}.data.PageData") -> {
@@ -826,6 +837,9 @@ fun Navigation(
                             scaleIn()
                         }
                     ) {
+                        val attemptChangeSaveDir = remember { mutableStateOf(false) }
+                        val areYouSureChangeSaveDir = remember { mutableStateOf(false) }
+                        val attemptGoToPage = remember {mutableStateOf(false)}
                         LaunchedEffect(true) {
 
                         }
@@ -884,10 +898,97 @@ fun Navigation(
                                         handoverPagerState = homePagerState,
                                         tts = tts,
                                     )
+                                },
+                                onTryDemo = {
+                                    // Force set the isReady to true
+                                    coroutineScope.launch {
+                                        anViewModel.setIsReady(true)
+                                    }
+                                },
+                                onChooseSaveDir = {
+                                    //attemptChangeSaveDir.value = true
+                                    anViewModel.openChangeSaveDir(true)
+                                },
+                                onGoToSetting = {
+                                    // GO TO SETTING!!!
+                                    // Configurations
+                                    navController.navigate(Screen.ConfigurationScreen.name)
                                 }
                             )
                         }
+//                        if(attemptChangeSaveDir.value) {
+//                            if (htuiState.selectedSaveDir != null && htuiState.selectedSaveDir.toString().isNotEmpty()) {
+//                                areYouSureChangeSaveDir.value = true
+//                            } else {
+//                                saveDirLauncher.launch(null)
+//                                attemptChangeSaveDir.value = false
+//                            }
+//                        }
+                        // copy are you sure
+                        if (areYouSureChangeSaveDir.value) {
+//                            ChangeSaveDirDialog(
+//                                attemptChangeSaveDir = attemptChangeSaveDir,
+//                                areYouSureChangeSaveDir = areYouSureChangeSaveDir,
+//                                saveDirLauncher = saveDirLauncher,
+//                                htuiState = htuiState,
+//                                tts = tts,
+//                                viewModel = anViewModel,
+//                            )
+//                            HTAlertDialog(
+//                                onDismissRequest = {
+//                                    areYouSureChangeSaveDir.value = false
+//                                    attemptChangeSaveDir.value = false
+//                                },
+//                                swapButton = true,
+//                                icon = {
+//                                    Icon(
+//                                        Icons.Default.Folder,
+//                                        contentDescription = "Folder Icon"
+//                                    )
+//                                },
+//                                title = stringResource(R.string.change_savedir_dialog),
+//                                text = "${stringResource(R.string.change_savedir_description)}:"
+////                            "Your Config Folder is currently at:\n${""
+////                                if (htuiState.selectedSaveDir != null && htuiState.selectedSaveDir.toString()
+////                                        .isNotEmpty()
+////                                ) htuiState.selectedSaveDir else stringResource(R.string.value_unselected)
+////                            +""}"
+//                                ,
+//                                confirmText = stringResource(R.string.change_savedir_change),
+//                                dismissText = stringResource(R.string.dismiss_button),
+//                                onConfirm = {
+//                                    saveDirLauncher.launch(null)
+//                                    areYouSureChangeSaveDir.value = false
+//                                    attemptChangeSaveDir.value = false
+//                                },
+//                                tts = tts,
+//                            ){
+//                                val decompose = stringResource(R.string.value_unselected)
+//                                val say = remember {  if (htuiState.selectedSaveDir != null && htuiState.selectedSaveDir.toString()
+//                                        .isNotEmpty()
+//                                ) htuiState.selectedSaveDir.toString() else decompose}
+//                                OutlinedTextField(
+//                                    value = say,
+//                                    trailingIcon = {
+//                                        Icon(Icons.Default.Folder, "")
+//                                    },
+//                                    label = { Text(stringResource(R.string.directory_option)) },
+//                                    onValueChange = {
+////                                    say = it
+//                                    },
+//                                    enabled = false,
+//                                )
+//                            }
+                        } else {
+                            // Close dialog cancel
+//                            attemptChangeSaveDir.value = false
+                        }
 
+//                        if(attemptGoToPage.value)
+//                        {
+//                            // Show jump page dialog
+//
+//                        }
 
                         LaunchedEffect(true) {
 
@@ -954,7 +1055,8 @@ fun Navigation(
                                     handoverPagerState = homePagerState,
                                     tts = tts,
                                 )
-                            }
+                            },
+
                         )
                     }
                     composable(
@@ -1068,7 +1170,7 @@ fun Navigation(
                                 view.playSoundEffect(SoundEffectConstants.CLICK)
                                 when(configSelect){
                                     ConfigSelected.Donation -> {
-
+                                        navController.navigate(Screen.PurchaseScreen.name)
                                     }
                                     ConfigSelected.LevelEditor -> {
                                         navController.navigate(Screen.LevelEditor.name)
@@ -1084,7 +1186,8 @@ fun Navigation(
                             onChooseSaveDir = {
                                 view.playSoundEffect(SoundEffectConstants.CLICK)
 //                            areYouSureChangeSaveDir.value = true
-                                attemptChangeSaveDir.value = true
+//                                attemptChangeSaveDir.value = true
+                                anViewModel.openChangeSaveDir(true)
                             },
                             onOpenTextFile = { uri, contentResolver ->
                                 view.playSoundEffect(SoundEffectConstants.CLICK)
@@ -1111,60 +1214,68 @@ fun Navigation(
                             viewModel = anViewModel,
                             tts = tts,
                         )
-                        if(attemptChangeSaveDir.value) {
-                            if (htuiState.selectedSaveDir != null && htuiState.selectedSaveDir.toString().isNotEmpty()) {
-                                areYouSureChangeSaveDir.value = true
-                            } else {
-                                saveDirLauncher.launch(null)
-                                attemptChangeSaveDir.value = false
-                            }
-                        }
+//                        if(attemptChangeSaveDir.value) {
+//                            if (htuiState.selectedSaveDir != null && htuiState.selectedSaveDir.toString().isNotEmpty()) {
+//                                areYouSureChangeSaveDir.value = true
+//                            } else {
+//                                saveDirLauncher.launch(null)
+//                                attemptChangeSaveDir.value = false
+//                            }
+//                        }
                         if (areYouSureChangeSaveDir.value) {
-                            HTAlertDialog(
-                                onDismissRequest = {
-                                    areYouSureChangeSaveDir.value = false
-                                    attemptChangeSaveDir.value = false
-                                },
-                                swapButton = true,
-                                icon = {
-                                    Icon(
-                                        Icons.Default.Folder,
-                                        contentDescription = "Folder Icon"
-                                    )
-                                },
-                                title = stringResource(R.string.change_savedir_dialog),
-                                text = "${stringResource(R.string.change_savedir_description)}:"
-//                            "Your Config Folder is currently at:\n${""
-//                                if (htuiState.selectedSaveDir != null && htuiState.selectedSaveDir.toString()
+//                            ChangeSaveDirDialog(
+//                                attemptChangeSaveDir = attemptChangeSaveDir,
+//                                areYouSureChangeSaveDir = areYouSureChangeSaveDir,
+//                                saveDirLauncher = saveDirLauncher,
+//                                htuiState = htuiState,
+//                                tts = tts,
+//                                viewModel = anViewModel,
+//                            )
+//                            HTAlertDialog(
+//                                onDismissRequest = {
+//                                    areYouSureChangeSaveDir.value = false
+//                                    attemptChangeSaveDir.value = false
+//                                },
+//                                swapButton = true,
+//                                icon = {
+//                                    Icon(
+//                                        Icons.Default.Folder,
+//                                        contentDescription = "Folder Icon"
+//                                    )
+//                                },
+//                                title = stringResource(R.string.change_savedir_dialog),
+//                                text = "${stringResource(R.string.change_savedir_description)}:"
+////                            "Your Config Folder is currently at:\n${""
+////                                if (htuiState.selectedSaveDir != null && htuiState.selectedSaveDir.toString()
+////                                        .isNotEmpty()
+////                                ) htuiState.selectedSaveDir else stringResource(R.string.value_unselected)
+////                            +""}"
+//                                ,
+//                                confirmText = stringResource(R.string.change_savedir_change),
+//                                dismissText = stringResource(R.string.dismiss_button),
+//                                onConfirm = {
+//                                    saveDirLauncher.launch(null)
+//                                    areYouSureChangeSaveDir.value = false
+//                                    attemptChangeSaveDir.value = false
+//                                },
+//                                tts = tts,
+//                            ){
+//                                val decompose = stringResource(R.string.value_unselected)
+//                                val say = remember {  if (htuiState.selectedSaveDir != null && htuiState.selectedSaveDir.toString()
 //                                        .isNotEmpty()
-//                                ) htuiState.selectedSaveDir else stringResource(R.string.value_unselected)
-//                            +""}"
-                                ,
-                                confirmText = stringResource(R.string.change_savedir_change),
-                                dismissText = stringResource(R.string.dismiss_button),
-                                onConfirm = {
-                                    saveDirLauncher.launch(null)
-                                    areYouSureChangeSaveDir.value = false
-                                    attemptChangeSaveDir.value = false
-                                },
-                                tts = tts,
-                            ){
-                                val decompose = stringResource(R.string.value_unselected)
-                                val say = remember {  if (htuiState.selectedSaveDir != null && htuiState.selectedSaveDir.toString()
-                                        .isNotEmpty()
-                                ) htuiState.selectedSaveDir.toString() else decompose}
-                                OutlinedTextField(
-                                    value = say,
-                                    trailingIcon = {
-                                        Icon(Icons.Default.Folder, "")
-                                    },
-                                    label = { Text(stringResource(R.string.directory_option)) },
-                                    onValueChange = {
-//                                    say = it
-                                    },
-                                    enabled = false,
-                                )
-                            }
+//                                ) htuiState.selectedSaveDir.toString() else decompose}
+//                                OutlinedTextField(
+//                                    value = say,
+//                                    trailingIcon = {
+//                                        Icon(Icons.Default.Folder, "")
+//                                    },
+//                                    label = { Text(stringResource(R.string.directory_option)) },
+//                                    onValueChange = {
+////                                    say = it
+//                                    },
+//                                    enabled = false,
+//                                )
+//                            }
                         } else {
                             // Close dialog cancel
                             attemptChangeSaveDir.value = false
@@ -1544,6 +1655,47 @@ fun Navigation(
                             )
                         }
                     }
+                    composable(route = Screen.PurchaseScreen.name,
+                        enterTransition = {
+                            slideIntoContainer(
+                                towards = AnimatedContentTransitionScope.SlideDirection.Left,
+                                animationSpec = tween(),
+                            )
+                        },
+                        exitTransition = {
+                            slideOutOfContainer(
+                                towards = AnimatedContentTransitionScope.SlideDirection.Left,
+                                animationSpec = tween(),
+                            )
+                        },
+                        popEnterTransition = {
+                            slideIntoContainer(
+                                towards = AnimatedContentTransitionScope.SlideDirection.Right,
+                                animationSpec = tween()
+                            )
+                        },
+                        popExitTransition = {
+                            slideOutOfContainer(
+                                towards = AnimatedContentTransitionScope.SlideDirection.Right,
+                                animationSpec = tween()
+                            )
+                        }
+                    ) {
+                        PurchaseScreen(
+                            navController = navController,
+                            context = context,
+                            pm = pm,
+                            colorScheme = colorScheme,
+                            haptic = haptic,
+                            coroutineScope = coroutineScope,
+                            snackbarHostState = snackbarHostState,
+                            onSnackbarResult = { snackbarResult ->
+                                {
+
+                                }
+                            },
+                        )
+                    }
                 }
             }
         }
@@ -1554,11 +1706,17 @@ fun Navigation(
             onChosenMenu = {
                 // https://stackoverflow.com/a/53138234
                 when (it) {
+                    "goToPage" -> {
+                        anViewModel.openGoToPage(true)
+                    }
+
                     "edit" -> {
                         // Edit
+                        navController.navigate(Screen.LevelEditor.name)
                     }
 
                     "configuration" -> {
+                        // GO TO SETTING!!!
                         // Configurations
                         navController.navigate(Screen.ConfigurationScreen.name)
                     }
@@ -1593,6 +1751,44 @@ fun Navigation(
 //                                setStatusBarVisibility(false,systemUiController)
             }
         )
+    }
+    if (htuiState.openGoToPage) {
+        GoToPageDialog(
+            howManyPagesYouHave = htuiState.coreConfigJson?.pagesPath?.size!!,
+            configFile = htuiState.coreConfigJson,
+            onSelectPage = {
+                    newPageGo ->
+                coroutineScope.launch {
+                    homePagerState.animateScrollToPage(newPageGo)
+                }
+                anViewModel.openGoToPage(false)
+            },
+            onCancel = {
+                anViewModel.openGoToPage(false)
+            }
+        )
+    }
+    if (htuiState.openChangeSaveDir) {
+        if (htuiState.selectedSaveDir != null && htuiState.selectedSaveDir.toString().isNotEmpty()) {
+            //areYouSureChangeSaveDir.value = true
+            anViewModel.openChangeSaveDirConfirm(true)
+        } else {
+            saveDirLauncher.launch(null)
+            //attemptChangeSaveDir.value = false
+            anViewModel.openChangeSaveDir(false)
+        }
+
+    }
+    if( htuiState.openChangeSaveDirConfirm)
+    {
+        ChangeSaveDirDialog(
+            saveDirLauncher = saveDirLauncher,
+            htuiState = htuiState,
+            tts = tts,
+            viewModel = anViewModel,
+        )
+    } else {
+        anViewModel.openChangeSaveDir(false)
     }
 }
 

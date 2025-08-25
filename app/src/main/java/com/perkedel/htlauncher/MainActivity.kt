@@ -78,6 +78,8 @@ class MainActivity : ComponentActivity() {
     }
     private val restOfPermission:Array<String> = arrayOf(
         Manifest.permission.READ_PHONE_STATE,
+//        Manifest.permission.POST_NOTIFICATIONS,
+//        Manifest.permission.ACCESS_COARSE_LOCATION
     )
 
     val htViewModel:HTViewModel = HTViewModel()

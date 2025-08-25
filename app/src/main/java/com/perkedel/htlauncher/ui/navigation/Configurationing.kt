@@ -86,6 +86,7 @@ import my.nanihadesuka.compose.LazyColumnScrollbar
 @Composable
 fun Configurationing(
     navController: NavController = rememberNavController(),
+    expectedRichPackage:String = "com.perkedel.iamrich",
     context: Context = LocalContext.current,
     view: View = LocalView.current,
     pm: PackageManager = context.packageManager,
@@ -143,6 +144,14 @@ fun Configurationing(
 //        userScrollEnabled = true
 //    ) { }
 
+    var richExists:Boolean = false // is this installed
+
+    try{
+        richExists = pm.getPackageInfo(expectedRichPackage, 0) != null
+    } catch (e:Exception)
+    {
+        richExists = false
+    }
 
     ProvidePreferenceLocals {
         val lazyListState = rememberLazyListState()
@@ -175,7 +184,7 @@ fun Configurationing(
                             onLongClick = {
                                 ttsSpeak(
                                     handover = tts,
-                                    message = "${context.resources.getString(R.string.donation_option)}. ${context.resources.getString(R.string.donation_option_desc)}"
+                                    message = "${context.resources.getString(R.string.donation_option)}. ${context.resources.getString(if(richExists) R.string.donation_option_desc else R.string.donation_option_desc_not_yet)}"
                                 )
                                 haptic.performHapticFeedback(HapticFeedbackType.LongPress)
                             },

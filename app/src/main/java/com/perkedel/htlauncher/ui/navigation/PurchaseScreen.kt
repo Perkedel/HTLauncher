@@ -43,6 +43,7 @@ import com.perkedel.htlauncher.modules.ttsSpeak
 import com.perkedel.htlauncher.ui.previews.HTPreviewAnnotations
 import com.perkedel.htlauncher.ui.theme.HTLauncherTheme
 import com.perkedel.htlauncher.ui.theme.rememberColorScheme
+import com.perkedel.htlauncher.widgets.PurchaseEmblemBox
 import com.perkedel.htlauncher.widgets.SettingCategoryBar
 import kotlinx.coroutines.CoroutineScope
 import me.zhanghai.compose.preference.ProvidePreferenceLocals
@@ -76,6 +77,11 @@ fun PurchaseScreen(
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
         ) {
+            item{
+                PurchaseEmblemBox(
+                    modifier = Modifier.fillMaxWidth(),
+                )
+            }
             item {
                 SettingCategoryBar(
                     title = stringResource(R.string.purchase_offer_title)

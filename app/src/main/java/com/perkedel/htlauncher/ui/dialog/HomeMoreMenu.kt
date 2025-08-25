@@ -2,6 +2,8 @@ package com.perkedel.htlauncher.ui.dialog
 
 import android.app.Activity
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -12,6 +14,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Apps
 import androidx.compose.material.icons.filled.Build
+import androidx.compose.material.icons.filled.DoubleArrow
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Fullscreen
 import androidx.compose.material.icons.filled.Menu
@@ -20,8 +23,10 @@ import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -35,8 +40,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.xr.compose.spatial.SpatialDialog
 import com.perkedel.htlauncher.R
+import com.perkedel.htlauncher.enumerations.BatteryIconTypes
 import com.perkedel.htlauncher.ui.previews.HTPreviewAnnotations
 import com.perkedel.htlauncher.ui.theme.HTLauncherTheme
+import com.perkedel.htlauncher.widgets.HTBatteryLevel
+import com.perkedel.htlauncher.widgets.HTSignalStrength
+import com.perkedel.htlauncher.widgets.HTViewClock
 import me.zhanghai.compose.preference.ProvidePreferenceLocals
 import me.zhanghai.compose.preference.switchPreference
 import me.zhanghai.compose.preference.preference
@@ -93,14 +102,23 @@ fun HomeMoreMenu (
 //                        summary = { Text(text = if (it) "On" else "Off") }
 //                    )
                     preference(
-                        key = "edit",
-                        title = { Text(text = stringResource(R.string.Home_more_edit) ) },
-                        icon = { Icon(imageVector = Icons.Filled.Edit, contentDescription = null) },
+                        key = "goToPage",
+                        title = { Text(text = stringResource(R.string.Home_more_goToPage) ) },
+                        icon = { Icon(imageVector = Icons.Filled.DoubleArrow, contentDescription = null) },
 //                        summary = { Text(text = "") },
                         onClick = {
-                            onChosenMenu("edit")
+                            onChosenMenu("goToPage")
                         }
                     )
+//                    preference(
+//                        key = "edit",
+//                        title = { Text(text = stringResource(R.string.Home_more_edit) ) },
+//                        icon = { Icon(imageVector = Icons.Filled.Edit, contentDescription = null) },
+////                        summary = { Text(text = "") },
+//                        onClick = {
+//                            onChosenMenu("edit")
+//                        }
+//                    )
                     preference(
                         key = "configuration",
                         title = { Text(text = stringResource(R.string.Home_more_configuration)) },
@@ -137,6 +155,31 @@ fun HomeMoreMenu (
                             onChosenMenu("all_apps")
                         }
                     )
+                    item(){
+                        OutlinedCard(
+                            elevation = CardDefaults.cardElevation(defaultElevation = 5.dp),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(12.dp)
+                            ,
+                        ) {
+                            Row {
+                                HTViewClock(
+                                    minimalized = true,
+                                )
+                                Spacer(
+                                    modifier = Modifier.weight(1f)
+                                )
+                                HTSignalStrength(
+                                    inlineNetworkType = true,
+                                    maxSquareSize = 24.dp,
+                                )
+                                HTBatteryLevel(
+                                    batteryIconTypes = BatteryIconTypes.IconBatteryIcon,
+                                )
+                            }
+                        }
+                    }
                 }
             }
 

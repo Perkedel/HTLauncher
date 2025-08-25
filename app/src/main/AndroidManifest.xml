@@ -5,11 +5,16 @@
     <!--  https://developer.android.com/develop/xr/jetpack-xr-sdk/add-xr-to-existing  -->
     <uses-sdk tools:overrideLibrary="androidx.xr.scenecore, androidx.xr.compose, com.google.ar.imp.apibindings"/>
 
+    <!--  Network & location for signal strength  -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.INTERNET" /> <!-- <uses-sdk -->
+
+    <!--  Internet used for Async Image if you chose to load images from the internet  -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <!-- <uses-sdk -->
     <!-- https://github.com/Neamar/KISS/blob/master/app/src/main/AndroidManifest.xml -->
+    <!--  Query all packages lets you see installed apps for All apps menu & this certain app check  -->
     <uses-permission
         android:name="android.permission.QUERY_ALL_PACKAGES"
         tools:ignore="QueryAllPackagesPermission" /> <!-- android:targetSdkVersion="35" -->
@@ -23,11 +28,13 @@
     <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" />
     <uses-permission android:name="android.permission.READ_MEDIA_VISUAL_USER_SELECTED" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <!--  We edit setting based on JSON file you can manually edit. It is saved in your storage you chose  -->
     <uses-permission
         android:name="android.permission.WRITE_EXTERNAL_STORAGE"
         android:maxSdkVersion="32"
         tools:ignore="ScopedStorage" /> <!-- <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE" -->
     <!-- tools:ignore="ScopedStorage" /> -->
+    <!--  Have Launcher Widgets too!!!  -->
     <uses-permission
         android:name="android.permission.BIND_APPWIDGET"
         tools:ignore="ProtectedPermissions" />

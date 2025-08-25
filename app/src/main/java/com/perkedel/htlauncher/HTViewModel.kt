@@ -164,7 +164,8 @@ class HTViewModel(
 
 //        viewModelScope.launch {
 
-            var initing:Boolean = uiStating.inited
+//            var initing:Boolean = uiStating.inited
+            var initing = false
             Log.d("PreloadFiles","Inited is ${initing}")
             if(force){
                 // clear everything
@@ -176,6 +177,7 @@ class HTViewModel(
                 initing = false
             } else {
                 if(initing){
+//                    setIsReady(into = true)
                     return
                 }
             }
@@ -610,6 +612,38 @@ class HTViewModel(
         _uiState.update {
             currentState -> currentState.copy(
                 openMoreMenu = opened
+            )
+        }
+    }
+
+    fun openGoToPage(opened:Boolean = true){
+        _uiState.update {
+            currentState -> currentState.copy(
+                openGoToPage = opened
+            )
+        }
+    }
+
+    fun openChangeSaveDir(opened:Boolean = true){
+        _uiState.update {
+            currentState -> currentState.copy(
+                openChangeSaveDir = opened
+            )
+        }
+    }
+
+    fun openChangeSaveDirConfirm(opened:Boolean = true){
+        _uiState.update {
+            currentState -> currentState.copy(
+                openChangeSaveDirConfirm = opened
+            )
+        }
+    }
+
+    fun openPermissionRequest(opened:Boolean = true){
+        _uiState.update {
+            currentState -> currentState.copy(
+                openPermissionRequest = opened
             )
         }
     }

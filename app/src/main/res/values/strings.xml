@@ -54,9 +54,10 @@
     <!--  Clock  -->
     <!--  too lazy! tell codeium to do these labours!  -->
     <string name="action_telltime">Clock is at %s, %s</string>
-    <string name="action_tellbattery">Battery level currently is as %d%%</string>
+    <string name="action_tellbattery">Battery level currently is at %d%%</string>
     <string name="action_tellcarrier">Operator is %s</string>
-    <string name="action_tellsignal">Signal Strength is %s, which are RSSI of %d dBm and ASU %d unit</string>
+    <string name="action_tellsignal">Signal Strength is %s, which are RSSI of %d dBm and ASU %d unit. Signal type is %s</string>
+    <string name="action_tellsignal_type_unknown">Unknown</string>
     <string name="action_batterymedium">Medium Battery, charging recommended.</string>
     <string name="action_batterylow">Low Battery, recharge immediately!</string>
     <string name="action_batteryfull">Battery Fully Charged, please unplug charger.</string>
@@ -110,6 +111,18 @@
     <string name="action_month_11_short">NOV</string>
     <string name="action_month_12_short">DEC</string>
 
+    <!--  First Time  -->
+    <string name="FirstTimer_Welcome">Welcome to %s!</string>
+    <string name="FirstTimer_Welcome_Description">
+        "You will need to set your save directory in your storage.\n"
+        "We recommend that you set it in internal storage at:\n\n"
+        "`InternalStorage/%s`\n\n"
+    </string>
+    <string name="FirstTimer_Welcome_SetupSaveButton">Setup Save Dir</string>
+    <string name="FirstTimer_Welcome_SettingButton">Settings</string>
+    <string name="FirstTimer_Welcome_DemoButton">Try Demo</string>
+    <string name="FirstTimer_RecommendedDirectory" translatable="false">HTLauncher</string>
+
     <!--  Home Screen  -->
     <string name="home_screen">Home</string>
     <string name="default_screen">Default</string>
@@ -122,6 +135,7 @@
     <string name="items_explorer_screen">Editing</string>
     <string name="open_page_screen">Page</string>
     <string name="get_started_screen">Get Started</string>
+    <string name="purchase_screen">Buy Full Version</string>
     <string name="back_button">Back</string>
     <string name="more_menu_button">Menu</string>
     <string name="aria_label_LauncherActivity">%s Application</string>
@@ -129,11 +143,16 @@
     <string name="aria_label_ShellOpen">Open the %s</string>
 
     <!--  Home More Menu  -->
+    <string name="Home_more_goToPage">Go to Page</string>
     <string name="Home_more_edit">Edit Launcher Buttons</string>
     <string name="Home_more_configuration">Configure Launchers</string>
     <string name="Home_more_sys_setting">System Settings</string>
     <string name="Home_more_all_apps">All Apps</string>
     <string name="Home_more_fullscreen">Fullscreen</string>
+
+    <!--  Jump to page  -->
+    <string name="GoToPage_Title">Go to Page</string>
+    <string name="GoToPage_Description">Select which of these page numbers you\'d like to go to</string>
 
     <!--  Configurations  -->
     <string name="default_button">Default</string>
@@ -164,6 +183,7 @@
     <string name="click_here_to_check_update_snippet">Click here to check update</string>
     <string name="donation_option">Donation</string>
     <string name="donation_option_desc">You are already FULL VERSION</string>
+    <string name="donation_option_desc_not_yet">Buy Now!</string>
     <string name="quick_start_option">Quick Start Guide</string>
     <string name="language_option">Languages</string>
     <string name="display_option">Display</string>
@@ -190,7 +210,6 @@
     <string name="category_type_pages">Pages</string>
     <string name="category_type_functions">Functions</string>
     <string name="category_type_standards">Standards</string>
-
 
     <!--  Filename & Directory name  -->
     <string name="home_screen_file" translatable="false">HomeScreen</string>
@@ -503,6 +522,8 @@
     <string name="title_activity_item_editor">ItemEditorActivity</string>
 
     <!--  Purchase  -->
+    <string name="purchase_title">I am Rich Status</string>
+    <string name="purchase_I_am_rich_title">`I am Rich` installation:</string>
     <string name="purchase_offer_title">Offers</string>
     <string name="purchase_pro_title">FULL VERSION</string>
     <string name="purchase_cost_changeable">US$ 1.50</string>
@@ -510,4 +531,5 @@
     <string name="purchase_not_yet_say">BUY NOW</string>
     <string name="purchase_done_now_say">BOUGHT</string>
     <string name="purchase_contact">Please contact us at %s if you encounter difficulties with licensing.</string>
+    <string name="purchase_keep_installed">Please keep `I am Rich` installed to enjoy all features of this Launcher.</string>
 </resources>

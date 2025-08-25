@@ -17,6 +17,7 @@ import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -72,6 +73,7 @@ import java.util.Calendar
 @Composable
 fun HTViewClock(
     modifier: Modifier = Modifier,
+    minimalized:Boolean = false,
     context: Context = LocalContext.current,
     showDate:Boolean = false,
     showSecond:Boolean = false,
@@ -241,55 +243,73 @@ fun HTViewClock(
 //            join = StrokeJoin.Round,
 //        ),
 //    )
-    Column(
-        modifier = modifier
-            .combinedClickable(
-                onClick ={
-
-                    onClick()
-                },
-                onLongClick = {
-                    val readout = context.resources.getString(R.string.action_telltime,timeFormat,dateFormat)
-                    ttsSpeakOrStop(
-                        handover = tts,
-                        message = readout
-                    )
-                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                    Toast
-                        .makeText(
-                            context,
-                            readout,
-                            Toast.LENGTH_SHORT
-                        )
-                        .show()
-                    onLongClick()
-                },
+    if(minimalized)
+    {
+        Row {
+            //date
+            if(showDate) {
+            SinasamakiCounter(
+                modifier = Modifier,
+                count = clockTime.weekDay,
+                sayInstead = convertWeekDay(clockTime.weekDay, true, context),
+                useSayInstead = true,
+                singleRoll = true,
+                forceSlideIncrease = true,
             )
-        ,
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
+                Text(
+                    modifier = Modifier,
+                    text = ", ",
+                )
+                SinasamakiCounter(
+                    modifier = Modifier,
+                    count = clockTime.year,
+                    forceSlideIncrease = true,
+                )
+                Text(
+                    modifier = Modifier,
+                    text = "-",
+                )
+                SinasamakiCounter(
+                    modifier = Modifier,
+                    count = clockTime.month + 1,
+                    forceSlideIncrease = true,
+                )
+                Text(
+                    modifier = Modifier,
+                    text = "-",
+                )
+                SinasamakiCounter(
+                    modifier = Modifier,
+                    count = clockTime.day,
+                    forceSlideIncrease = true,
+                )
+
+                // space
+                Text(
+                    modifier = Modifier,
+                    text = " | ",
+                )
+            }
+
+            //time
             SinasamakiCounter(
                 modifier = Modifier,
                 count = clockTime.hours,
                 forceSlideIncrease = true,
-                style = MaterialTheme.typography.headlineLarge,
+
             )
             Text(
                 modifier = Modifier,
-                text = ".",
+                text = ":",
             )
             SinasamakiCounter(
                 modifier = Modifier,
                 count = clockTime.minutes,
                 forceSlideIncrease = true,
-                style = MaterialTheme.typography.headlineLarge,
             )
             Text(
                 modifier = Modifier,
-                text = ".",
+                text = ":",
             )
             SinasamakiCounter(
                 modifier = Modifier,
@@ -297,9 +317,67 @@ fun HTViewClock(
                 forceSlideIncrease = true,
             )
         }
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
+    } else
+    {
+        Column(
+            modifier = modifier
+                .combinedClickable(
+                    onClick ={
+
+                        onClick()
+                    },
+                    onLongClick = {
+                        val readout = context.resources.getString(R.string.action_telltime,timeFormat,dateFormat)
+                        ttsSpeakOrStop(
+                            handover = tts,
+                            message = readout
+                        )
+                        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                        Toast
+                            .makeText(
+                                context,
+                                readout,
+                                Toast.LENGTH_SHORT
+                            )
+                            .show()
+                        onLongClick()
+                    },
+                )
+            ,
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                SinasamakiCounter(
+                    modifier = Modifier,
+                    count = clockTime.hours,
+                    forceSlideIncrease = true,
+                    style = MaterialTheme.typography.headlineLarge,
+                )
+                Text(
+                    modifier = Modifier,
+                    text = ".",
+                )
+                SinasamakiCounter(
+                    modifier = Modifier,
+                    count = clockTime.minutes,
+                    forceSlideIncrease = true,
+                    style = MaterialTheme.typography.headlineLarge,
+                )
+                Text(
+                    modifier = Modifier,
+                    text = ".",
+                )
+                SinasamakiCounter(
+                    modifier = Modifier,
+                    count = clockTime.seconds,
+                    forceSlideIncrease = true,
+                )
+            }
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
 //            OutlinedCard(
 //
 //            ) {
@@ -315,43 +393,45 @@ fun HTViewClock(
 //                    )
 //                }
 //            }
-            SinasamakiCounter(
-                modifier = Modifier,
-                count = clockTime.weekDay,
-                sayInstead = convertWeekDay(clockTime.weekDay, true, context),
-                useSayInstead = true,
-                singleRoll = true,
-                forceSlideIncrease = true,
-            )
-            Text(
-                modifier = Modifier,
-                text = ", ",
-            )
-            SinasamakiCounter(
-                modifier = Modifier,
-                count = clockTime.year,
-                forceSlideIncrease = true,
-            )
-            Text(
-                modifier = Modifier,
-                text = "-",
-            )
-            SinasamakiCounter(
-                modifier = Modifier,
-                count = clockTime.month+1,
-                forceSlideIncrease = true,
-            )
-            Text(
-                modifier = Modifier,
-                text = "-",
-            )
-            SinasamakiCounter(
-                modifier = Modifier,
-                count = clockTime.day,
-                forceSlideIncrease = true,
-            )
+                SinasamakiCounter(
+                    modifier = Modifier,
+                    count = clockTime.weekDay,
+                    sayInstead = convertWeekDay(clockTime.weekDay, true, context),
+                    useSayInstead = true,
+                    singleRoll = true,
+                    forceSlideIncrease = true,
+                )
+                Text(
+                    modifier = Modifier,
+                    text = ", ",
+                )
+                SinasamakiCounter(
+                    modifier = Modifier,
+                    count = clockTime.year,
+                    forceSlideIncrease = true,
+                )
+                Text(
+                    modifier = Modifier,
+                    text = "-",
+                )
+                SinasamakiCounter(
+                    modifier = Modifier,
+                    count = clockTime.month+1,
+                    forceSlideIncrease = true,
+                )
+                Text(
+                    modifier = Modifier,
+                    text = "-",
+                )
+                SinasamakiCounter(
+                    modifier = Modifier,
+                    count = clockTime.day,
+                    forceSlideIncrease = true,
+                )
+            }
         }
     }
+
 
 }
 
@@ -456,6 +536,14 @@ fun HTViewClockPreview(){
                     ){
                         Row {
                             HTViewClock(
+                                modifier = Modifier
+                            )
+                            Spacer(
+                                modifier = Modifier
+                                    .weight(1f)
+                            )
+                            HTViewClock(
+                                minimalized = true,
                                 modifier = Modifier
                             )
                         }

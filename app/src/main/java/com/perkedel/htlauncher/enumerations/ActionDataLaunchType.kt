@@ -9,5 +9,6 @@ enum class ActionDataLaunchType(val type:String = "") {
     Glance(type = "Glance"), // The item is a homescreen widget
     Internal(type = "Internal"), // Internal command for this app.
     Category(type = "Category"), // turn the item into Category bar / Query Category name
-    None(type = "None"), // do nothing
+    Widget(type = "Widget"), // Open a widget in its own navigation
+    None(type = "None"), // do nothing. useful for small widget
 }

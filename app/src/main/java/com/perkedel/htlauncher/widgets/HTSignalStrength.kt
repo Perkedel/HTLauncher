@@ -52,6 +52,8 @@ import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
@@ -71,6 +73,8 @@ import kotlinx.coroutines.delay
 @Composable
 fun HTSignalStrength(
     modifier: Modifier = Modifier,
+    maxSquareSize:Dp =  48.dp,
+    inlineNetworkType:Boolean = false,
     context:Context = LocalContext.current,
     forWhichSim:Int = 0,
     showNumbers:Boolean = false,
@@ -132,7 +136,8 @@ fun HTSignalStrength(
                             R.string.action_tellsignal,
                             cellBarSay,
                             signalStatus.signalDbm,
-                            signalStatus.signalAsu
+                            signalStatus.signalAsu,
+                            if(cellNetworkSay != "" && cellNetworkSay != "?") cellNetworkSay else context.resources.getString(R.string.action_tellsignal_type_unknown)
                         )
                     }"
                     ttsSpeakOrStop(
@@ -157,21 +162,29 @@ fun HTSignalStrength(
         Row(
             verticalAlignment = Alignment.CenterVertically,
         ) {
+            if(inlineNetworkType)
+            {
+                Text(
+                    text = cellNetworkSay,
+                )
+            }
             Box(
                 modifier = Modifier
 //                    .size(48.dp)
                     .sizeIn(
                         minHeight = 0.dp,
                         minWidth = 0.dp,
-                        maxHeight = 48.dp,
-                        maxWidth = 48.dp,
+                        maxHeight = maxSquareSize,
+                        maxWidth = maxSquareSize,
                     )
                 ,
             ){
-                Text(
-                    text = cellNetworkSay,
-//                    fontSize = 24.sp,
-                )
+                if(!inlineNetworkType) {
+                    Text(
+                        text = cellNetworkSay,
+                        //                    fontSize = 24.sp,
+                    )
+                }
 //                Icon(
 //                    modifier = Modifier
 //                        .size(48.dp)
