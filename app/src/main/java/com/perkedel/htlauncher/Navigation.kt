@@ -1199,7 +1199,8 @@ fun Navigation(
                             },
                             onCheckPermission = {
                                 view.playSoundEffect(SoundEffectConstants.CLICK)
-                                attemptPermission.value = true
+//                                attemptPermission.value = true
+                                anViewModel.openPermissionRequest(true)
                             },
                             onClickVersion = {
                                 view.playSoundEffect(SoundEffectConstants.CLICK)
@@ -1282,86 +1283,86 @@ fun Navigation(
                         }
 
                         if (attemptPermission.value) {
-                            HTAlertDialog(
-                                title = stringResource(R.string.permission_dialog),
-                                text = stringResource(R.string.permission_description),
-                                thirdButton = true,
-                                confirmText = stringResource(R.string.permission_grant),
-                                thirdText = stringResource(R.string.permission_details),
-                                icon = {
-                                    Icon(Icons.Default.Security,"")
-                                },
-                                onConfirm = {
-                                    Log.d("PermissionDialog","Attempt to run permission grant!")
-                                    multiplePermissionLauncher.launch(permissionRequests)
-                                    Log.d("PermissionDialog","Is it done?")
-                                    attemptPermission.value = false
-                                },
-                                onThirdButton = {
-                                    startIntent(
-                                        context, Intent(
-                                            Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
-                                            Uri.fromParts("package", packageName, null)
-                                        )
-                                    )
-                                    attemptPermission.value = false
-                                },
-                                onDismissRequest = {
-                                    attemptPermission.value = false
-                                },
-                                tts = tts,
-                            )
+//                            HTAlertDialog(
+//                                title = stringResource(R.string.permission_dialog),
+//                                text = stringResource(R.string.permission_description),
+//                                thirdButton = true,
+//                                confirmText = stringResource(R.string.permission_grant),
+//                                thirdText = stringResource(R.string.permission_details),
+//                                icon = {
+//                                    Icon(Icons.Default.Security,"")
+//                                },
+//                                onConfirm = {
+//                                    Log.d("PermissionDialog","Attempt to run permission grant!")
+//                                    multiplePermissionLauncher.launch(permissionRequests)
+//                                    Log.d("PermissionDialog","Is it done?")
+//                                    attemptPermission.value = false
+//                                },
+//                                onThirdButton = {
+//                                    startIntent(
+//                                        context, Intent(
+//                                            Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+//                                            Uri.fromParts("package", packageName, null)
+//                                        )
+//                                    )
+//                                    attemptPermission.value = false
+//                                },
+//                                onDismissRequest = {
+//                                    attemptPermission.value = false
+//                                },
+//                                tts = tts,
+//                            )
                         } else {
 //                        attemptPermission.value = false
                         }
 
-                        anViewModel.visiblePermissionDialogQueue
-                            .reversed()
-                            .forEach{ permission ->
-                                PermissionDialog(
-                                    permissionsTextProvider = when(permission){
-                                        Manifest.permission.READ_EXTERNAL_STORAGE -> {
-                                            ReadFilePermissionTextProvider()
-                                        }
-                                        Manifest.permission.WRITE_EXTERNAL_STORAGE -> {
-                                            WriteFilePermissionTextProvider()
-                                        }
-                                        Manifest.permission.CAMERA -> {
-                                            CameraPermissionTextProvider()
-                                        }
-                                        Manifest.permission.RECORD_AUDIO -> {
-                                            RecordAudioPermissionTextProvider()
-                                        }
-                                        Manifest.permission.CALL_PHONE -> {
-                                            PhoneCallPermissionTextProvider()
-                                        }
-                                        Manifest.permission.READ_PHONE_STATE -> {
-                                            PhoneStatePermissionTextProvider()
-                                        }
-                                        else -> return@forEach
-                                    },
-                                    isPermanentlyDeclined = !shouldShowRequestPermissionRationale(
-                                        activityHandOver,
-                                        permission,
-                                    ),
-                                    onDismiss = anViewModel::dissmissPermissionDialog,
-                                    onOkClick = {
-                                        anViewModel.dissmissPermissionDialog()
-                                        multiplePermissionLauncher.launch(
-                                            arrayOf(permission)
-                                        )
-                                    },
-                                    onGoToAppSettingClick = {
-
-                                        startIntent(
-                                            context, Intent(
-                                                Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
-                                                Uri.fromParts("package", packageName, null)
-                                            )
-                                        )
-                                    }
-                                )
-                            }
+//                        anViewModel.visiblePermissionDialogQueue
+//                            .reversed()
+//                            .forEach{ permission ->
+//                                PermissionDialog(
+//                                    permissionsTextProvider = when(permission){
+//                                        Manifest.permission.READ_EXTERNAL_STORAGE -> {
+//                                            ReadFilePermissionTextProvider()
+//                                        }
+//                                        Manifest.permission.WRITE_EXTERNAL_STORAGE -> {
+//                                            WriteFilePermissionTextProvider()
+//                                        }
+//                                        Manifest.permission.CAMERA -> {
+//                                            CameraPermissionTextProvider()
+//                                        }
+//                                        Manifest.permission.RECORD_AUDIO -> {
+//                                            RecordAudioPermissionTextProvider()
+//                                        }
+//                                        Manifest.permission.CALL_PHONE -> {
+//                                            PhoneCallPermissionTextProvider()
+//                                        }
+//                                        Manifest.permission.READ_PHONE_STATE -> {
+//                                            PhoneStatePermissionTextProvider()
+//                                        }
+//                                        else -> return@forEach
+//                                    },
+//                                    isPermanentlyDeclined = !shouldShowRequestPermissionRationale(
+//                                        activityHandOver,
+//                                        permission,
+//                                    ),
+//                                    onDismiss = anViewModel::dissmissPermissionDialog,
+//                                    onOkClick = {
+//                                        anViewModel.dissmissPermissionDialog()
+//                                        multiplePermissionLauncher.launch(
+//                                            arrayOf(permission)
+//                                        )
+//                                    },
+//                                    onGoToAppSettingClick = {
+//
+//                                        startIntent(
+//                                            context, Intent(
+//                                                Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+//                                                Uri.fromParts("package", packageName, null)
+//                                            )
+//                                        )
+//                                    }
+//                                )
+//                            }
                     }
                     composable(route = Screen.AboutScreen.name,
                         enterTransition = {
@@ -1790,6 +1791,89 @@ fun Navigation(
     } else {
         anViewModel.openChangeSaveDir(false)
     }
+    if(htuiState.openPermissionRequest)
+    {
+        //attemptPermission.value
+        HTAlertDialog(
+            title = stringResource(R.string.permission_dialog),
+            text = stringResource(R.string.permission_description),
+            thirdButton = true,
+            confirmText = stringResource(R.string.permission_grant),
+            thirdText = stringResource(R.string.permission_details),
+            icon = {
+                Icon(Icons.Default.Security,"")
+            },
+            onConfirm = {
+                Log.d("PermissionDialog","Attempt to run permission grant!")
+                multiplePermissionLauncher.launch(permissionRequests)
+                Log.d("PermissionDialog","Is it done?")
+//                attemptPermission.value = false
+                anViewModel.openPermissionRequest(false)
+            },
+            onThirdButton = {
+                startIntent(
+                    context, Intent(
+                        Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+                        Uri.fromParts("package", packageName, null)
+                    )
+                )
+//                attemptPermission.value = false
+                anViewModel.openPermissionRequest(false)
+            },
+            onDismissRequest = {
+//                attemptPermission.value = false
+                anViewModel.openPermissionRequest(false)
+            },
+            tts = tts,
+        )
+    }
+    anViewModel.visiblePermissionDialogQueue
+        .reversed()
+        .forEach{ permission ->
+            PermissionDialog(
+                permissionsTextProvider = when(permission){
+                    Manifest.permission.READ_EXTERNAL_STORAGE -> {
+                        ReadFilePermissionTextProvider()
+                    }
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE -> {
+                        WriteFilePermissionTextProvider()
+                    }
+                    Manifest.permission.CAMERA -> {
+                        CameraPermissionTextProvider()
+                    }
+                    Manifest.permission.RECORD_AUDIO -> {
+                        RecordAudioPermissionTextProvider()
+                    }
+                    Manifest.permission.CALL_PHONE -> {
+                        PhoneCallPermissionTextProvider()
+                    }
+                    Manifest.permission.READ_PHONE_STATE -> {
+                        PhoneStatePermissionTextProvider()
+                    }
+                    else -> return@forEach
+                },
+                isPermanentlyDeclined = !shouldShowRequestPermissionRationale(
+                    activityHandOver,
+                    permission,
+                ),
+                onDismiss = anViewModel::dissmissPermissionDialog,
+                onOkClick = {
+                    anViewModel.dissmissPermissionDialog()
+                    multiplePermissionLauncher.launch(
+                        arrayOf(permission)
+                    )
+                },
+                onGoToAppSettingClick = {
+
+                    startIntent(
+                        context, Intent(
+                            Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+                            Uri.fromParts("package", packageName, null)
+                        )
+                    )
+                }
+            )
+        }
 }
 
 private fun goBackHome(
