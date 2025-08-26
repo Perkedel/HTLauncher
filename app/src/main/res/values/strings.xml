@@ -135,6 +135,7 @@
     <string name="items_explorer_screen">Editing</string>
     <string name="open_page_screen">Page</string>
     <string name="get_started_screen">Get Started</string>
+    <string name="widget_test_screen">Widget Test</string>
     <string name="purchase_screen">Buy Full Version</string>
     <string name="back_button">Back</string>
     <string name="more_menu_button">Menu</string>
@@ -200,6 +201,7 @@
     <string name="manual_option">User Manual</string>
     <string name="save_dir_option">Change Configuration Folder Location</string>
     <string name="debug_test_option">[DEBUG] Test Json</string>
+    <string name="debug_test_widget">[DEBUG] Test Widget</string>
     <string name="About_option">About</string>
     <string name="About_version_readout">HTLauncher is currently on %s iteration No. %d</string>
     <string name="iteration_option">Iteration</string>

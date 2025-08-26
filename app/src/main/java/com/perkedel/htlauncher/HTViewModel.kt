@@ -736,6 +736,22 @@ class HTViewModel(
         }
     }
 
+    fun setStandaloneWidgetIdSelected(of: Int){
+        _uiState.update {
+            currentState -> currentState.copy(
+                standaloneWidgetIdSelected = of
+            )
+        }
+    }
+
+    fun setStandaloneWidgetConfigMode(of: String){
+        _uiState.update {
+            currentState -> currentState.copy(
+                standaloneWidgetConfigMode = of
+            )
+        }
+    }
+
     fun getPageData(of:String = "", json:Json = Json{
         prettyPrint = true
         encodeDefaults = true
@@ -964,4 +980,6 @@ class HTViewModel(
             else -> R.drawable.open_a_page
         }
     }
+
+
 }

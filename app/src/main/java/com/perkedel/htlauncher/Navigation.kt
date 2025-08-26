@@ -3,6 +3,12 @@
 package com.perkedel.htlauncher
 
 import android.Manifest
+import android.app.Activity.RESULT_CANCELED
+import android.app.Activity.RESULT_OK
+import android.appwidget.AppWidgetHost
+import android.appwidget.AppWidgetManager
+import android.appwidget.AppWidgetProvider
+import android.appwidget.AppWidgetProviderInfo
 import android.content.ActivityNotFoundException
 import android.content.ComponentName
 import android.content.ContentResolver
@@ -31,7 +37,9 @@ import android.view.SoundEffectConstants
 import android.view.View
 import android.widget.Toast
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.ManagedActivityResultLauncher
 import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.ExperimentalSharedTransitionApi
@@ -134,6 +142,7 @@ import com.perkedel.htlauncher.ui.navigation.ItemsExplorer
 import com.perkedel.htlauncher.ui.navigation.LevelEditor
 import com.perkedel.htlauncher.ui.navigation.PurchaseScreen
 import com.perkedel.htlauncher.ui.navigation.StandalonePageScreen
+import com.perkedel.htlauncher.ui.navigation.StandaloneWidgetScreen
 import com.perkedel.htlauncher.ui.theme.HTLauncherTheme
 import com.perkedel.htlauncher.ui.theme.rememberColorScheme
 import com.perkedel.htlauncher.widgets.ChangeSaveDirDialog
@@ -149,6 +158,7 @@ import kotlinx.serialization.json.Json
 import java.io.BufferedReader
 import java.io.IOException
 import java.io.InputStreamReader
+import kotlin.math.log
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -178,6 +188,10 @@ fun Navigation(
         prettyPrint = true
         encodeDefaults = true
     },
+    appWidgetManager:AppWidgetManager = AppWidgetManager.getInstance(context),
+    appWidgetId: Int = 1,
+    appWidgetHost:AppWidgetHost = AppWidgetHost(context, appWidgetId),
+//    appWidgetInfo: AppWidgetProviderInfo = appWidgetManager.getAppWidgetInfo(appWidgetId),
     tts: MutableState<TextToSpeech?> = rememberTextToSpeech(),
     view: View = LocalView.current,
     inspectionMode:Boolean = LocalInspectionMode.current,
@@ -477,6 +491,70 @@ fun Navigation(
             println("No Test File Selected")
         }
     }
+//    var eAppWidgetInfo : AppWidgetProviderInfo = appWidgetManager.getAppWidgetInfo(appWidgetId+1)
+//    var eAppWidgetInfo : AppWidgetProviderInfo = appWidgetManager.getAppWidgetInfo(appWidgetId+1)
+    var widgetSelectLauncher: ManagedActivityResultLauncher<Intent, ActivityResult> = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {activityResult ->
+        Log.d("Widgeting","YOU ARE NOT SUPPOSED TO VIEW PROTOTYPE!")
+    }
+    widgetSelectLauncher = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { activityResult ->
+        // https://www.leonardofischer.com/hosting-android-widgets-my-appwidgethost-tutorial/
+        val resultCode = activityResult.resultCode
+//        val requestCode = activityResult.requestCode
+        val intentData = activityResult.data
+        val dataExtras = intentData?.extras
+        val requestCode = dataExtras?.getString("requestCode","") ?: ""
+//        val asdfasd = intentData.extras
+        Log.d("Widgeting","datas Intent ${intentData.toString()}")
+        Log.d("Widgeting", "Wants to ${requestCode} || ${htuiState.standaloneWidgetConfigMode}")
+        Log.d("Widgeting", "Widget Selected: ${dataExtras.toString()}")
+        var finalWidgetId:Int = dataExtras?.getInt(AppWidgetManager.EXTRA_APPWIDGET_ID, -1) ?: -1
+        Log.d("Widgeting","final id = ${finalWidgetId}")
+        val internAppWidgetInfo : AppWidgetProviderInfo = appWidgetManager.getAppWidgetInfo(finalWidgetId)
+        Log.d("Widgeting","internAppWidgetInfo ${internAppWidgetInfo.toString()}")
+        if(resultCode == RESULT_OK)
+        {
+            Log.d("Widgeting","Doing Result now")
+//            if(finalWidgetId != -1)
+//                anViewModel.setStandaloneWidgetIdSelected(finalWidgetId)
+            if(requestCode == "REQUEST_PICK_APPWIDGET" || htuiState.standaloneWidgetConfigMode == "REQUEST_PICK_APPWIDGET")
+            {
+//                val internAppWidgetInfo : AppWidgetProviderInfo = appWidgetManager.getAppWidgetInfo(finalWidgetId)
+                Log.d("Widgeting","Config the widget?")
+                if(internAppWidgetInfo.configure != null)
+                {
+                    Log.d("Widgeting","Let's go config!")
+                    val configingIntent: Intent = Intent(AppWidgetManager.ACTION_APPWIDGET_CONFIGURE)
+                    configingIntent.setComponent(internAppWidgetInfo.configure)
+                    configingIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, finalWidgetId)
+                    anViewModel.setStandaloneWidgetConfigMode("REQUEST_CREATE_APPWIDGET")
+                    Log.d("Widgeting","Launch the congiruataefa!")
+                    widgetSelectLauncher.launch(configingIntent)
+                } else {
+                    Log.d("Widgeting","No config! just create it!")
+//                    widgetSelectLauncher.launch(intentData)
+                    anViewModel.setStandaloneWidgetIdSelected(finalWidgetId)
+                    anViewModel.setStandaloneWidgetConfigMode("")
+                }
+            } else if (requestCode == "REQUEST_CREATE_APPWIDGET" || htuiState.standaloneWidgetConfigMode == "REQUEST_CREATE_APPWIDGET")
+            {
+//                val internAppWidgetInfo : AppWidgetProviderInfo = appWidgetManager.getAppWidgetInfo(finalWidgetId)
+                Log.d("Widgeting","@@@ Create the widget!")
+                anViewModel.setStandaloneWidgetIdSelected(finalWidgetId)
+                anViewModel.setStandaloneWidgetConfigMode("")
+            }
+        }
+        else if (resultCode == RESULT_CANCELED && intentData != null)
+        {
+            finalWidgetId = dataExtras?.getInt(AppWidgetManager.EXTRA_APPWIDGET_ID, -1) ?: -1
+            if (finalWidgetId == -1)
+            {
+                appWidgetHost.deleteAppWidgetId(finalWidgetId)
+
+            }
+            anViewModel.setStandaloneWidgetConfigMode("")
+        }
+//        anViewModel.setStandaloneWidgetConfigMode("")
+    }
 
 
 
@@ -695,6 +773,7 @@ fun Navigation(
         color = when{
             currentScreen == Screen.HomeScreen.name -> Color.Transparent
             currentScreen == Screen.AllAppsScreen.name -> Color.Transparent
+            currentScreen == Screen.WidgetTest.name -> Color.Transparent
             currentScreen.startsWith("${context.packageName}.data.PageData") -> Color.Transparent
             else -> colorScheme.background
         }
@@ -1113,6 +1192,81 @@ fun Navigation(
                             anViewModel = anViewModel
                         )
                     }
+                    composable(route = Screen.WidgetTest.name,
+                        enterTransition = {
+                            slideIntoContainer(
+                                towards = AnimatedContentTransitionScope.SlideDirection.Up,
+                                animationSpec = tween(),
+                            )
+                        },
+                        exitTransition = {
+                            slideOutOfContainer(
+                                towards = AnimatedContentTransitionScope.SlideDirection.Left,
+                                animationSpec = tween(),
+                            )
+                        },
+                        popEnterTransition = {
+                            slideIntoContainer(
+                                towards = AnimatedContentTransitionScope.SlideDirection.Right,
+                                animationSpec = tween()
+                            )
+                        },
+                        popExitTransition = {
+                            slideOutOfContainer(
+                                towards = AnimatedContentTransitionScope.SlideDirection.Down,
+                                animationSpec = tween()
+                            )
+                        }
+                    ) {
+                        LaunchedEffect(
+                            htuiState.standaloneWidgetIdSelected
+                        ) {
+                            Log.d("Widgeting", "Standalone Widget ID Selected: ${htuiState.standaloneWidgetIdSelected}")
+                        }
+                        StandaloneWidgetScreen(
+                            onAllAppButtonClicked = {
+                                navController.navigate(Screen.AllAppsScreen.name)
+                            },
+                            onMoreMenuButtonClicked = {
+                                anViewModel.openTheMoreMenu(true)
+
+                            },
+                            context = context,
+                            configuration = configuration,
+                            colorScheme = colorScheme,
+                            haptic = haptic,
+                            // DONE: handover the homescreen file json
+                            configFile = htuiState.coreConfigJson,
+                            viewModel = anViewModel,
+                            contentResolver = saveDirResolver,
+                            systemUiController = systemUiController,
+                            uiState = htuiState,
+                            coroutineScope = coroutineScope,
+                            isReady = htuiState.isReady,
+                            tts = tts,
+                            onLaunchOneOfAction = {
+                                onLaunchAction(
+                                    data = it,
+                                    context = context,
+                                    coroutineScope = coroutineScope,
+                                    pm = pm,
+                                    snackbarHostState = snackbarHostState,
+                                    contentResolver = saveDirResolver,
+                                    navController = navController,
+                                    viewModel = anViewModel,
+                                    uiState = htuiState,
+                                    inspectionMode = inspectionMode,
+                                    handoverPagerState = homePagerState,
+                                    tts = tts,
+                                )
+                            },
+                            widgetSelectLauncher = widgetSelectLauncher,
+                            appWidgetManager = appWidgetManager,
+                            appWidgetHost = appWidgetHost,
+//                            appWidgetId = appWidgetId,
+                            appWidgetId = htuiState.standaloneWidgetIdSelected,
+                        )
+                    }
                     composable(route = Screen.ConfigurationScreen.name,
                         enterTransition = {
                             slideIntoContainer(
@@ -1176,6 +1330,10 @@ fun Navigation(
                                         navController.navigate(Screen.LevelEditor.name)
                                     }
                                     ConfigSelected.ItemsExplorer -> {}
+                                    ConfigSelected.StandaloneWidget -> {
+                                        // test widget
+                                        navController.navigate(Screen.WidgetTest.name)
+                                    }
                                     else -> {}
                                 }
                             },
@@ -2219,7 +2377,7 @@ fun onLaunchAction(
 
                         }
                         containAction == context.resources.getString(ActionInternalCommand.Gallery.id) -> {
-
+                            //TODO: default app how do I get that?!
                         }
                         containAction == context.resources.getString(ActionInternalCommand.GoToPage.id) -> {
                             if(data[selectAction].args[0].isNotBlank()){
@@ -2301,6 +2459,16 @@ fun onLaunchAction(
             else -> {}
         }
     }
+}
+
+fun configureWidget(intentData: Intent)
+{
+    // https://www.leonardofischer.com/hosting-android-widgets-my-appwidgethost-tutorial/
+}
+
+fun createWidget(intentData: Intent)
+{
+
 }
 
 @PreviewFontScale

@@ -205,6 +205,11 @@ dependencies {
     // https://developer.android.com/jetpack/androidx/releases/xr-compose
     implementation(libs.androidx.compose)
     testImplementation(libs.androidx.compose.testing)
+
+    // Glance Widget!!!!
+    // https://youtu.be/bhrN7yFG0D4
+    implementation(libs.androidx.glance)
+    implementation(libs.androidx.glance.appwidget)
 }
 
 //composeCompiler {

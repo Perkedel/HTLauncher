@@ -28,6 +28,7 @@ enum class Screen (@StringRes val title: Int){
     LevelEditor(title = R.string.editor_screen),
     ItemsExplorer(title = R.string.items_explorer_screen),
     OpenAPage(title = R.string.open_page_screen),
+    WidgetTest(title = R.string.widget_test_screen),
     GetStarted(title = R.string.get_started_screen),
     PurchaseScreen(title = R.string.purchase_screen),
 }

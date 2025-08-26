@@ -45,6 +45,8 @@ data class HTUIState(
 //    val themesList:MutableMap<String,ItemData> = LinkedHashMap<String,ItemData>(),
     // TODO: Medias, Shortcuts
 //    val installedPackageInfo: MutableList<PackageInfo> = emptyList<PackageInfo>().toMutableList()
-    val installedPackageInfo: MutableMap<String,SearchableApps> = LinkedHashMap<String,SearchableApps>()
+    val installedPackageInfo: MutableMap<String,SearchableApps> = LinkedHashMap<String,SearchableApps>(),
+    val standaloneWidgetIdSelected:Int = 1,
+    val standaloneWidgetConfigMode:String = "",
 ) {
 }

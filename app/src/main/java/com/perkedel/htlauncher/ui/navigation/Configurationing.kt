@@ -44,6 +44,7 @@ import androidx.compose.material.icons.filled.Sms
 import androidx.compose.material.icons.filled.Sos
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.Translate
+import androidx.compose.material.icons.filled.Widgets
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -610,6 +611,32 @@ fun Configurationing(
                     },
                     icon = { Icon(imageVector = Icons.Default.Star, contentDescription = null) },
                     onClick = onChooseTextFile,
+                )
+
+                preference(
+                    modifier = Modifier
+                        .combinedClickable(
+                            onClick = {},
+                            onLongClick = {
+                                ttsSpeak(
+                                    handover = tts,
+                                    message = "${context.resources.getString(R.string.debug_test_widget)}. ${""}"
+                                )
+                                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                            },
+                            onLongClickLabel = context.resources.getString(R.string.debug_test_widget),
+                        )
+                    ,
+                    key = "debug_testWidget",
+                    title = { Text(text = stringResource(R.string.debug_test_widget) ) },
+                    summary = {
+//                    Text(text = "Selected: ${saveDirResult.value}" )
+                        Text(text = "WIDGET" )
+                    },
+                    icon = { Icon(imageVector = Icons.Default.Widgets, contentDescription = null) },
+                    onClick = {
+                        onSelectedConfigMenu(ConfigSelected.StandaloneWidget)
+                    },
                 )
 
                 footerPreference(

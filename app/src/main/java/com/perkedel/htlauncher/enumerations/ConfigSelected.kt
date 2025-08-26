@@ -21,4 +21,5 @@ enum class ConfigSelected(@StringRes val title: Int, val key:String = "") {
     Compatibility(title = R.string.default_screen, key = "compatibility"),
     RemoveDefault(title = R.string.default_screen, key = "remove_default"),
     UserManual(title = R.string.default_screen, key = "user_manual"),
+    StandaloneWidget(title = R.string.default_screen, key = "standalone_widget"),
 }

@@ -100,6 +100,7 @@
     <string name="purchase_screen">Beli Versi Penuh</string>
     <string name="about_screen">Tentang</string>
     <string name="editor_screen">Editor</string>
+    <string name="widget_test_screen">Tes Widget</string>
     <string name="items_explorer_screen">Mengedit</string>
     <string name="open_page_screen">Halaman</string>
     <string name="get_started_screen">Ayo Mulai</string>
@@ -167,6 +168,7 @@
     <string name="manual_option">Petunjuk Penggunaan</string>
     <string name="save_dir_option">Ubah Lokasi Folder Konfigurasi</string>
     <string name="debug_test_option">[DEBUG] Tes Json</string>
+    <string name="debug_test_widget">[DEBUG] Tes Widget</string>
     <string name="About_option">Tentang</string>
     <string name="About_version_readout">HTLauncher kini berada dalam versi %s iterasi ke-%d</string>
     <string name="iteration_option">Iterasi</string>

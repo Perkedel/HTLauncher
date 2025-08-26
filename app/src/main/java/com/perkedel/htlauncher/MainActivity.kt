@@ -6,6 +6,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import android.content.Context;
+import android.content.Intent
 import android.content.pm.PackageManager;
 import android.graphics.Color
 import android.os.Build
@@ -175,6 +176,11 @@ class MainActivity : ComponentActivity() {
 
         }
 
+
+        @Override
+        fun onActivityResult(requestCode:Int, resultCode:Int, data:Intent){
+
+        }
     }
 }
 
