@@ -17,5 +17,6 @@ data class SettingData(
     * 1 = Force On
     * 2 = Force Off
     * */
-
+    val portaitBarOnBottom:Boolean = false,
+    val landscapeBarOnRight:Boolean = false,
 )

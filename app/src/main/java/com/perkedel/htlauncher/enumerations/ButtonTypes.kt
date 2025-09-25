@@ -7,4 +7,5 @@ enum class ButtonTypes(@IntegerRes val buttonType:Int) {
     OutlineButton(buttonType = 1),
     TextButton(buttonType = 2),
     IconButton(buttonType = 3),
+    RawButton(buttonType = 4),
 }

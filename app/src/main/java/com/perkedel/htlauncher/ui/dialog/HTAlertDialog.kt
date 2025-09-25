@@ -23,6 +23,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Error
 import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
@@ -32,6 +33,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawWithCache
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -56,7 +58,9 @@ import com.perkedel.htlauncher.ui.previews.DialogPreviewKind
 import com.perkedel.htlauncher.ui.previews.DialogPreviewParameter
 import com.perkedel.htlauncher.ui.previews.HTPreviewAnnotations
 import com.perkedel.htlauncher.ui.theme.HTLauncherTheme
+import com.perkedel.htlauncher.ui.theme.rememberColorScheme
 import com.perkedel.htlauncher.widgets.HTButton
+import com.perkedel.htlauncher.widgets.HTCardDivider
 
 @Composable
 fun HTAlertDialog(
@@ -76,11 +80,21 @@ fun HTAlertDialog(
     title:String = "Alert",
     text:String = "This is alert",
 
+    // Text on the buttons
     confirmText:String = context.resources.getString(R.string.confirm_button), // YES
     dismissText:String = context.resources.getString(R.string.dismiss_button), // CANCEL
     thirdText:String = context.resources.getString(R.string.third_button), // NO
     // https://stackoverflow.com/questions/74044246/how-to-get-stringresource-if-not-in-a-composable-function
 
+    // Icon on the Buttons
+    confirmLeadingIcon: ImageVector? = null,
+    dismissLeadingIcon:ImageVector? = null,
+    thirdLeadingIcon:ImageVector? = null,
+    confirmTrailingIcon:ImageVector? = null,
+    dismissTrailingIcon:ImageVector? = null,
+    thirdTrailingIcon:ImageVector? = null,
+
+    fancyButtonDesign:Boolean = false,
     swapButton:Boolean = false,
     thirdButton:Boolean = false,
     thirdButtonPosition: ThirdButtonPosition = ThirdButtonPosition.Middle,
@@ -103,6 +117,9 @@ fun HTAlertDialog(
 
     content: @Composable () -> Unit = {},
 ){
+    // https://github.com/wxxsfxyzm/InstallerX-Revived/blob/main/app/src/main/java/com/rosan/installer/ui/page/main/widget/dialog/PositionDialog.kt
+    // https://github.com/Kwasow/Musekit/blob/main/app/src/main/java/com/kwasow/musekit/ui/components/SettingsSection.kt
+    // https://github.com/Kwasow/Musekit/blob/main/app/src/main/java/com/kwasow/musekit/ui/components/SettingsEntry.kt
     // https://developer.android.com/develop/xr/jetpack-xr-sdk/add-xr-to-existing
     SpatialDialog(
 //    BasicAlertDialog(
@@ -165,93 +182,247 @@ fun HTAlertDialog(
                             .fillMaxWidth()
                             .size(16.dp)
                     )
+                    if(fancyButtonDesign)
+                    {
+                        Card(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                            ,
+                            colors = CardDefaults.cardColors(rememberColorScheme().onPrimary)
+                        ) {
+                            Column {
+                                if(thirdButton && thirdButtonPosition == ThirdButtonPosition.Left){
+                                    HTButton(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                        ,
+                                        title = thirdText,
+                                        onClick = onThirdButton,
+                                        buttonType = ButtonTypes.RawButton,
+                                        enabled = enableThirdButton,
+                                        leftIcon = thirdLeadingIcon,
+                                        rightIcon = thirdTrailingIcon,
+                                        leftSpaceFar = true,
+                                        rightSpaceFar = true,
+                                    )
 
-                    Row(
-                        modifier = Modifier
-                            .align(Alignment.End)
-                            .horizontalScroll(rememberScrollState())
-                        ,
-                    ) {
-                        if(thirdButton && thirdButtonPosition == ThirdButtonPosition.Left){
-                            HTButton(
-                                title = thirdText,
-                                onClick = onThirdButton,
-                                buttonType = ButtonTypes.TextButton,
-                                enabled = enableThirdButton,
-                            )
+                                }
+
+                                if(swapButton){
+                                    if(confirmButton) {
+                                        HTButton(
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                            ,
+                                            title = confirmText,
+                                            onClick = if(!confirmButtonDismiss) onConfirm else onDismissRequest,
+                                            buttonType = ButtonTypes.RawButton,
+                                            enabled = enableConfirmButton,
+                                            leftIcon = confirmLeadingIcon,
+                                            rightIcon = confirmTrailingIcon,
+                                            leftSpaceFar = true,
+                                            rightSpaceFar = true,
+                                        )
+
+                                    }
+                                } else {
+                                    if(dismissButton) {
+                                        HTButton(
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                            ,
+                                            title = dismissText,
+                                            onClick = onDismissRequest,
+                                            buttonType = ButtonTypes.RawButton,
+                                            enabled = enableDismissButton,
+                                            leftIcon = dismissLeadingIcon,
+                                            rightIcon = dismissTrailingIcon,
+                                            leftSpaceFar = true,
+                                            rightSpaceFar = true,
+                                        )
+
+                                    }
+                                }
+
+                                HTCardDivider(
+                                    color = CardDefaults.cardColors().containerColor,
+                                )
+
+                                if(thirdButton && thirdButtonPosition == ThirdButtonPosition.Middle){
+                                    HTButton(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                        ,
+                                        title = thirdText,
+                                        onClick = onThirdButton,
+                                        buttonType = ButtonTypes.RawButton,
+                                        enabled = enableThirdButton,
+                                        leftIcon = thirdLeadingIcon,
+                                        rightIcon = thirdTrailingIcon,
+                                        leftSpaceFar = true,
+                                        rightSpaceFar = true,
+                                    )
+                                }
+
+                                HTCardDivider(
+                                    color = CardDefaults.cardColors().containerColor
+                                )
+
+                                if(swapButton){
+                                    if(dismissButton) {
+                                        HTButton(
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                            ,
+                                            title = dismissText,
+                                            onClick = onDismissRequest,
+                                            buttonType = ButtonTypes.RawButton,
+                                            enabled = enableDismissButton,
+                                            leftIcon = dismissLeadingIcon,
+                                            rightIcon = dismissTrailingIcon,
+                                            leftSpaceFar = true,
+                                            rightSpaceFar = true,
+                                        )
+                                    }
+                                }
+                                else {
+                                    if(confirmButton) {
+                                        HTButton(
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                            ,
+                                            title = confirmText,
+                                            onClick = if(!confirmButtonDismiss) onConfirm else onDismissRequest,
+                                            buttonType = ButtonTypes.RawButton,
+                                            enabled = enableConfirmButton,
+                                            leftIcon = confirmLeadingIcon,
+                                            rightIcon = confirmTrailingIcon,
+                                            leftSpaceFar = true,
+                                            rightSpaceFar = true,
+                                        )
+                                    }
+                                }
+
+                                if(thirdButton && thirdButtonPosition == ThirdButtonPosition.Right){
+                                    HTButton(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(12.dp)
+                                        ,
+                                        title = thirdText,
+                                        onClick = onThirdButton,
+                                        buttonType = ButtonTypes.RawButton,
+                                        enabled = enableThirdButton,
+                                        leftIcon = thirdLeadingIcon,
+                                        rightIcon = thirdTrailingIcon,
+                                        leftSpaceFar = true,
+                                        rightSpaceFar = true,
+                                    )
+                                }
+                            }
                         }
-
-                        if(swapButton){
-                            if(confirmButton) {
+                    } else {
+                        Row(
+                            modifier = Modifier
+                                .align(Alignment.End)
+                                .horizontalScroll(rememberScrollState())
+                            ,
+                        ) {
+                            if(thirdButton && thirdButtonPosition == ThirdButtonPosition.Left){
                                 HTButton(
-                                    title = confirmText,
-                                    onClick = if(!confirmButtonDismiss) onConfirm else onDismissRequest,
+                                    title = thirdText,
+                                    onClick = onThirdButton,
                                     buttonType = ButtonTypes.TextButton,
-                                    enabled = enableConfirmButton,
+                                    enabled = enableThirdButton,
+                                    leftIcon = thirdLeadingIcon,
+                                    rightIcon = thirdTrailingIcon,
                                 )
                             }
-                        } else {
-                            if(dismissButton) {
-                                HTButton(
-                                    title = dismissText,
-                                    onClick = onDismissRequest,
-                                    buttonType = ButtonTypes.TextButton,
-                                    enabled = enableDismissButton,
+
+                            if(swapButton){
+                                if(confirmButton) {
+                                    HTButton(
+                                        title = confirmText,
+                                        onClick = if(!confirmButtonDismiss) onConfirm else onDismissRequest,
+                                        buttonType = ButtonTypes.TextButton,
+                                        enabled = enableConfirmButton,
+                                        leftIcon = confirmLeadingIcon,
+                                        rightIcon = confirmTrailingIcon,
+                                    )
+                                }
+                            } else {
+                                if(dismissButton) {
+                                    HTButton(
+                                        title = dismissText,
+                                        onClick = onDismissRequest,
+                                        buttonType = ButtonTypes.TextButton,
+                                        enabled = enableDismissButton,
+                                        leftIcon = dismissLeadingIcon,
+                                        rightIcon = dismissTrailingIcon,
+                                    )
+                                }
+                            }
+
+                            if(leftSpaceApart) {
+                                Spacer(
+                                    modifier = Modifier
+                                        .weight(1f)
                                 )
                             }
-                        }
 
-                        if(leftSpaceApart) {
-                            Spacer(
-                                modifier = Modifier
-                                    .weight(1f)
-                            )
-                        }
-
-                        if(thirdButton && thirdButtonPosition == ThirdButtonPosition.Middle){
-                            HTButton(
-                                title = thirdText,
-                                onClick = onThirdButton,
-                                buttonType = ButtonTypes.TextButton,
-                                enabled = enableThirdButton,
-                            )
-                        }
-
-                        if(rightSpaceApart) {
-                            Spacer(
-                                modifier = Modifier
-                                    .weight(1f)
-                            )
-                        }
-
-                        if(swapButton){
-                            if(dismissButton) {
+                            if(thirdButton && thirdButtonPosition == ThirdButtonPosition.Middle){
                                 HTButton(
-                                    title = dismissText,
-                                    onClick = onDismissRequest,
+                                    title = thirdText,
+                                    onClick = onThirdButton,
                                     buttonType = ButtonTypes.TextButton,
-                                    enabled = enableDismissButton,
+                                    enabled = enableThirdButton,
+                                    leftIcon = thirdLeadingIcon,
+                                    rightIcon = thirdTrailingIcon,
                                 )
                             }
-                        }
-                        else {
-                            if(confirmButton) {
-                                HTButton(
-                                    title = confirmText,
-                                    onClick = if(!confirmButtonDismiss) onConfirm else onDismissRequest,
-                                    buttonType = ButtonTypes.TextButton,
-                                    enabled = enableConfirmButton,
+
+                            if(rightSpaceApart) {
+                                Spacer(
+                                    modifier = Modifier
+                                        .weight(1f)
                                 )
                             }
-                        }
 
-                        if(thirdButton && thirdButtonPosition == ThirdButtonPosition.Right){
-                            HTButton(
-                                title = thirdText,
-                                onClick = onThirdButton,
-                                buttonType = ButtonTypes.TextButton,
-                                enabled = enableThirdButton,
-                            )
+                            if(swapButton){
+                                if(dismissButton) {
+                                    HTButton(
+                                        title = dismissText,
+                                        onClick = onDismissRequest,
+                                        buttonType = ButtonTypes.TextButton,
+                                        enabled = enableDismissButton,
+                                        leftIcon = dismissLeadingIcon,
+                                        rightIcon = dismissTrailingIcon,
+                                    )
+                                }
+                            }
+                            else {
+                                if(confirmButton) {
+                                    HTButton(
+                                        title = confirmText,
+                                        onClick = if(!confirmButtonDismiss) onConfirm else onDismissRequest,
+                                        buttonType = ButtonTypes.TextButton,
+                                        enabled = enableConfirmButton,
+                                        leftIcon = confirmLeadingIcon,
+                                        rightIcon = confirmTrailingIcon,
+                                    )
+                                }
+                            }
+
+                            if(thirdButton && thirdButtonPosition == ThirdButtonPosition.Right){
+                                HTButton(
+                                    title = thirdText,
+                                    onClick = onThirdButton,
+                                    buttonType = ButtonTypes.TextButton,
+                                    enabled = enableThirdButton,
+                                    leftIcon = thirdLeadingIcon,
+                                    rightIcon = thirdTrailingIcon,
+                                )
+                            }
                         }
                     }
                 }

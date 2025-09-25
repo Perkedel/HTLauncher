@@ -160,10 +160,14 @@ fun HomeMoreMenu (
                             elevation = CardDefaults.cardElevation(defaultElevation = 5.dp),
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(12.dp)
+                                .padding(8.dp)
                             ,
                         ) {
-                            Row {
+                            Row(
+                                modifier = Modifier
+                                    .padding(8.dp)
+                                ,
+                            ) {
                                 HTViewClock(
                                     minimalized = true,
                                 )

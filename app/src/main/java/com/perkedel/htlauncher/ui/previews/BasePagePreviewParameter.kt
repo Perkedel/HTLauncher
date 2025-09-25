@@ -7,6 +7,8 @@ data class PagePreviewParameter(
     val gridType: PageGridType = PageGridType.Default,
     val fixedCount: Int = 3,
     val adaptiveSize: Int = 128,
+    val portraitBarOnBottom:Boolean = false,
+    val landscapeBarOnRight:Boolean = false,
 )
 
 class BasePagePreviewParameter: PreviewParameterProvider<PagePreviewParameter> {
@@ -19,5 +21,6 @@ class BasePagePreviewParameter: PreviewParameterProvider<PagePreviewParameter> {
             PagePreviewParameter(gridType = PageGridType.Fixed, fixedCount = 1),
             PagePreviewParameter(gridType = PageGridType.Fixed, fixedCount = 4),
             PagePreviewParameter(gridType = PageGridType.Fixed, fixedCount = 5),
+            PagePreviewParameter(portraitBarOnBottom = true, landscapeBarOnRight = true),
         )
 }

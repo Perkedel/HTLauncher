@@ -1,4 +1,4 @@
-import org.jetbrains.kotlin.ir.backend.js.compile
+//import org.jetbrains.kotlin.ir.backend.js.compile
 
 plugins {
     alias(libs.plugins.android.application)
@@ -20,12 +20,12 @@ plugins {
 
 android {
     namespace = "com.perkedel.htlauncher"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.perkedel.htlauncher"
-        minSdk = 21
-        targetSdk = 35
+        minSdk = 30 // was 21, pushed to 30 for glance & composeXR.
+        targetSdk = 36
         versionCode = 1
         versionName = "2025.8.0"
 
@@ -210,6 +210,12 @@ dependencies {
     // https://youtu.be/bhrN7yFG0D4
     implementation(libs.androidx.glance)
     implementation(libs.androidx.glance.appwidget)
+
+    // Shapes
+    // https://developer.android.com/jetpack/androidx/releases/graphics
+    implementation(libs.androidx.graphics.core)
+    implementation(libs.androidx.graphics.path)
+    implementation(libs.androidx.graphics.shapes)
 }
 
 //composeCompiler {

@@ -251,7 +251,7 @@ class ItemEditorActivity : ComponentActivity() {
     }
 }
 
-fun soPressBack(nav:ThreePaneScaffoldNavigator<Any>){
+suspend fun soPressBack(nav:ThreePaneScaffoldNavigator<Any>){
     if(!nav.canNavigateBack()){
 //        finis
     } else {
@@ -440,7 +440,10 @@ fun ItemEditorGreeting(
 //            saveNow()
 //            pressBackButton()
             if(navigator.canNavigateBack()){
-                navigator.navigateBack()
+                coroutineScope.launch {
+                    navigator.navigateBack()
+                }
+
             } else {
                 onBack()
             }
@@ -494,7 +497,10 @@ fun ItemEditorGreeting(
                 navigateUp = {
                     saveNow()
                     if(navigator.canNavigateBack()){
-                        navigator.navigateBack()
+                        coroutineScope.launch {
+                            navigator.navigateBack()
+                        }
+
                     } else {
                         onBack()
                     }
@@ -544,10 +550,13 @@ fun ItemEditorGreeting(
                             viewModel.updateActionData(actionData)
                             viewModel.selectDetailNavigate(ItemDetailPaneNavigate.EditingAction)
                             viewModel.setOpenActionData(true)
-                            navigator.navigateTo(
-                                pane = ListDetailPaneScaffoldRole.Detail,
-                                content = "Action ${idOf} ${viewModel.actionEdit}"
-                            )
+                            coroutineScope.launch {
+                                navigator.navigateTo(
+                                    pane = ListDetailPaneScaffoldRole.Detail,
+                                    contentKey = "Action ${idOf} ${viewModel.actionEdit}"
+                                )
+                            }
+
                         },
                         onRebuildItem = {
                             viewModel.updateItemData(it)
@@ -567,10 +576,13 @@ fun ItemEditorGreeting(
                             when(it){
                                 "reorder_items" -> {
                                     viewModel.selectDetailNavigate(ItemDetailPaneNavigate.ReorderItems)
-                                    navigator.navigateTo(
-                                        pane = ListDetailPaneScaffoldRole.Detail,
-                                        content = "Reorder Items"
-                                    )
+                                    coroutineScope.launch {
+                                        navigator.navigateTo(
+                                            pane = ListDetailPaneScaffoldRole.Detail,
+                                            contentKey = "Reorder Items"
+                                        )
+                                    }
+
                                 }
                                 else -> {}
                             }
@@ -589,10 +601,13 @@ fun ItemEditorGreeting(
                                 when(it) {
                                     "reorder_pages" -> {
                                         viewModel.selectDetailNavigate(ItemDetailPaneNavigate.ReorderPages)
-                                        navigator.navigateTo(
-                                            pane = ListDetailPaneScaffoldRole.Detail,
-                                            content = "Reorder Pages"
-                                        )
+                                        coroutineScope.launch {
+                                            navigator.navigateTo(
+                                                pane = ListDetailPaneScaffoldRole.Detail,
+                                                contentKey = "Reorder Pages"
+                                            )
+                                        }
+
                                     }
                                     else -> {}
                                 }
@@ -621,10 +636,12 @@ fun ItemEditorGreeting(
                                 modifier = Modifier,
                                 title = "Hello",
                                 onClick = {
-                                    navigator.navigateTo(
-                                        pane = ListDetailPaneScaffoldRole.Detail,
-                                        content = "Item aaa ${viewModel.rawContent}"
-                                    )
+                                    coroutineScope.launch {
+                                        navigator.navigateTo(
+                                            pane = ListDetailPaneScaffoldRole.Detail,
+                                            contentKey = "Item aaa ${viewModel.rawContent}"
+                                        )
+                                    }
                                 }
                             )
                         }
@@ -633,7 +650,7 @@ fun ItemEditorGreeting(
 
             },
             detailPane = {
-                val content = navigator.currentDestination?.content?.toString() ?: "idk"
+                val content = navigator.currentDestination?.contentKey?.toString() ?: "idk"
 //                val content: Any? = navigator.currentDestination?.content? ?: {
 //                    when{
 //                        viewModel.editType == EditWhich.Items -> {
@@ -680,14 +697,18 @@ fun ItemEditorGreeting(
                                             viewModel.setOpenActionData(false)
                                             Log.d("ItemEditorActivity","Total Action${viewModel.itemData?.action}")
                                             viewModel.selectDetailNavigate(ItemDetailPaneNavigate.Default)
-                                            navigator.navigateBack()
+                                            coroutineScope.launch {
+                                                navigator.navigateBack()
+                                            }
                                         },
                                         onSelectAction = {
                                             viewModel.selectExtraNavigate(ItemExtraPaneNavigate.SelectApp)
-                                            navigator.navigateTo(
-                                                pane = ListDetailPaneScaffoldRole.Extra,
-                                                content = "select action aaa ${viewModel.rawContent}"
-                                            )
+                                            coroutineScope.launch {
+                                                navigator.navigateTo(
+                                                    pane = ListDetailPaneScaffoldRole.Extra,
+                                                    contentKey = "select action aaa ${viewModel.rawContent}"
+                                                )
+                                            }
                                         },
                                         snackbarHostState = snackbarHostState,
                                     )
@@ -699,7 +720,9 @@ fun ItemEditorGreeting(
                                         onClose = {
                                             saveNow()
                                             viewModel.selectDetailNavigate(ItemDetailPaneNavigate.Default)
-                                            navigator.navigateBack()
+                                            coroutineScope.launch {
+                                                navigator.navigateBack()
+                                            }
                                         },
                                         onSwap = {
 //                                            Log.d("SwapPageItems","Here now list\n ${it}")
@@ -718,10 +741,12 @@ fun ItemEditorGreeting(
                                         },
                                         onTryAdd = {
                                             viewModel.selectExtraNavigate(ItemExtraPaneNavigate.AddItem)
-                                            navigator.navigateTo(
-                                                pane = ListDetailPaneScaffoldRole.Extra,
-                                                content = "Add Item to Page"
-                                            )
+                                            coroutineScope.launch {
+                                                navigator.navigateTo(
+                                                    pane = ListDetailPaneScaffoldRole.Extra,
+                                                    contentKey = "Add Item to Page"
+                                                )
+                                            }
                                         },
                                         snackbarHostState = snackbarHostState,
                                     )
@@ -733,7 +758,10 @@ fun ItemEditorGreeting(
                                         onClose = {
                                             saveNow()
                                             viewModel.selectDetailNavigate(ItemDetailPaneNavigate.Default)
-                                            navigator.navigateBack()
+                                            coroutineScope.launch {
+                                                navigator.navigateBack()
+                                            }
+
                                         },
                                         onSwap = {
 //                                            viewModel.changePageOrders(it)
@@ -745,10 +773,13 @@ fun ItemEditorGreeting(
                                         },
                                         onTryAdd = {
                                             viewModel.selectExtraNavigate(ItemExtraPaneNavigate.AddItem)
-                                            navigator.navigateTo(
-                                                pane = ListDetailPaneScaffoldRole.Extra,
-                                                content = "Add Page to Home"
-                                            )
+                                            coroutineScope.launch {
+                                                navigator.navigateTo(
+                                                    pane = ListDetailPaneScaffoldRole.Extra,
+                                                    contentKey = "Add Page to Home"
+                                                )
+                                            }
+
                                         },
                                         snackbarHostState = snackbarHostState,
                                     )
@@ -781,7 +812,7 @@ fun ItemEditorGreeting(
                 }
             },
             extraPane = {
-                val content = navigator.currentDestination?.content?.toString() ?: "aaa"
+                val content = navigator.currentDestination?.contentKey?.toString() ?: "aaa"
                 AnimatedPane {
                     when{
                         viewModel.itemExtraPaneNavigate == ItemExtraPaneNavigate.SelectApp -> {
@@ -793,7 +824,10 @@ fun ItemEditorGreeting(
                                     saveNow()
                                     viewModel.selectExtraNavigate(ItemExtraPaneNavigate.Default)
 //                                    viewModel.resyncItemDataAction()
-                                    navigator.navigateBack()
+                                    coroutineScope.launch {
+                                        navigator.navigateBack()
+                                    }
+
                                 },
                                 snackbarHostState = snackbarHostState,
                             )
@@ -838,7 +872,10 @@ fun ItemEditorGreeting(
                                         else -> {}
                                     }
                                     viewModel.selectExtraNavigate(ItemExtraPaneNavigate.Default)
-                                    navigator.navigateBack()
+                                    coroutineScope.launch {
+                                        navigator.navigateBack()
+                                    }
+
                                 },
                                 pm = context.packageManager,
                                 snackbarHostState = snackbarHostState,

@@ -52,10 +52,15 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.AddModerator
+import androidx.compose.material.icons.filled.Cancel
 import androidx.compose.material.icons.filled.Create
 import androidx.compose.material.icons.filled.Folder
+import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.Security
+import androidx.compose.material.icons.filled.SettingsApplications
 import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -1955,12 +1960,18 @@ fun Navigation(
         HTAlertDialog(
             title = stringResource(R.string.permission_dialog),
             text = stringResource(R.string.permission_description),
+            swapButton = true,
             thirdButton = true,
             confirmText = stringResource(R.string.permission_grant),
             thirdText = stringResource(R.string.permission_details),
+            confirmLeadingIcon = Icons.Default.AddModerator,
+            thirdLeadingIcon = Icons.AutoMirrored.Filled.List,
+            dismissLeadingIcon = Icons.Default.Cancel,
+            thirdTrailingIcon = Icons.Default.SettingsApplications,
             icon = {
                 Icon(Icons.Default.Security,"")
             },
+
             onConfirm = {
                 Log.d("PermissionDialog","Attempt to run permission grant!")
                 multiplePermissionLauncher.launch(permissionRequests)
@@ -1982,6 +1993,7 @@ fun Navigation(
 //                attemptPermission.value = false
                 anViewModel.openPermissionRequest(false)
             },
+            fancyButtonDesign = true,
             tts = tts,
         )
     }

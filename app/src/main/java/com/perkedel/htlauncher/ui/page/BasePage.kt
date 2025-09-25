@@ -8,7 +8,7 @@ import android.net.Uri
 import android.speech.tts.TextToSpeech
 import android.util.Log
 import android.widget.Toast
-import androidx.compose.foundation.CombinedClickableNode
+//import androidx.compose.foundation.CombinedClickableNode
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
@@ -55,9 +55,9 @@ import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.compose.ui.unit.dp
-import androidx.tv.foundation.PivotOffsets
-import androidx.tv.foundation.lazy.grid.TvLazyGridScope
-import androidx.tv.foundation.lazy.grid.TvLazyVerticalGrid
+//import androidx.tv.foundation.PivotOffsets
+//import androidx.tv.foundation.lazy.grid.TvLazyGridScope
+//import androidx.tv.foundation.lazy.grid.TvLazyVerticalGrid
 import com.perkedel.htlauncher.HTUIState
 import com.perkedel.htlauncher.HTViewModel
 import com.perkedel.htlauncher.R
@@ -111,6 +111,8 @@ fun BasePage(
     windowInfo: WindowInfo = rememberWindowInfo(),
     isCompact: Boolean = windowInfo.screenWidthInfo is WindowInfo.WindowType.Compact,
     isOrientation: Int = configuration.orientation,
+    portaitBarOnBottom:Boolean = if (uiState.coreConfigJson?.setting?.portaitBarOnBottom != null) uiState.coreConfigJson!!.setting.portaitBarOnBottom else false,
+    landscapeBarOnRight:Boolean = if (uiState.coreConfigJson?.setting?.landscapeBarOnRight != null) uiState.coreConfigJson!!.setting.landscapeBarOnRight else false,
     onLaunchOneOfAction: (List<ActionData>)->Unit = {}
 ){
     // Load this file!
@@ -168,6 +170,39 @@ fun BasePage(
         }
     }
 
+    val portraitFirstPageCard: @Composable () -> Unit ={
+        Row {
+            FirstPageCard(
+                handoverText = pageOfIt.name,
+                isCompact = isCompact,
+                isOnNumberWhat = isOnNumberWhat,
+                modifier = Modifier.weight(1f),
+                onMoreMenuButton = onMoreMenuButtonClicked,
+            )
+            Spacer(
+                modifier = Modifier
+                    .padding(8.dp)
+            )
+        }
+    }
+    val landscapeFirstPageCard: @Composable () -> Unit ={
+        Column(){
+            FirstPageCard(
+                handoverText = pageOfIt.name,
+                isCompact = isCompact,
+                isOnNumberWhat = isOnNumberWhat,
+                modifier = Modifier.weight(1f),
+                onMoreMenuButton = onMoreMenuButtonClicked,
+            )
+//                        Spacer(
+//                            modifier = Modifier
+//                                .weight(.05f)
+//                        )
+        }
+    }
+//    val portaitBarOnBottom:Boolean = if (uiState.coreConfigJson?.setting?.portaitBarOnBottom != null) uiState.coreConfigJson!!.setting.portaitBarOnBottom else false
+//    val landscapeBarOnRight:Boolean = if (uiState.coreConfigJson?.setting?.landscapeBarOnRight != null) uiState.coreConfigJson!!.setting.landscapeBarOnRight else false
+
     // https://youtu.be/UhnTTk3cwc4?si=5BoNxc4uZdM6y5nG
     // https://youtu.be/qP-ieASbqMY?si=JFoxgnsQyDf3iJob
     // https://youtu.be/NPmgnGFzopA?si=yOJydgvsQrLfsHKk
@@ -203,24 +238,11 @@ fun BasePage(
                     state = lazyListState,
                     content = {
                         // Permanent Card on first page
-                        if (isFirstPage || pageOfIt.isHome){
+                        if ((isFirstPage || pageOfIt.isHome) && !portaitBarOnBottom ){
                             item(
                                 span = { GridItemSpan(this.maxLineSpan) }
                             ){
-                                Row {
-                                    FirstPageCard(
-                                        handoverText = pageOfIt.name,
-                                        isCompact = isCompact,
-                                        isOnNumberWhat = isOnNumberWhat,
-                                        modifier = Modifier.weight(1f),
-                                        onMoreMenuButton = onMoreMenuButtonClicked,
-                                    )
-                                    Spacer(
-                                        modifier = Modifier
-                                            .padding(8.dp)
-                                    )
-                                }
-
+                                portraitFirstPageCard()
                             }
                         }
                         // Rest of the items
@@ -267,6 +289,14 @@ fun BasePage(
 //                            onClick = onLaunchOneOfAction,
 //                        )
 //                    }
+                        // if put on bottom
+                        if ((isFirstPage || pageOfIt.isHome) && portaitBarOnBottom ){
+                            item(
+                                span = { GridItemSpan(this.maxLineSpan) }
+                            ){
+                                portraitFirstPageCard()
+                            }
+                        }
                         item{
                             Spacer(
                                 modifier = Modifier
@@ -286,20 +316,8 @@ fun BasePage(
                 ,
             ) {
                 // Permanent Card on first page
-                if(isFirstPage || pageOfIt.isHome){
-                    Column(){
-                        FirstPageCard(
-                            handoverText = pageOfIt.name,
-                            isCompact = isCompact,
-                            isOnNumberWhat = isOnNumberWhat,
-                            modifier = Modifier.weight(1f),
-                            onMoreMenuButton = onMoreMenuButtonClicked,
-                        )
-//                        Spacer(
-//                            modifier = Modifier
-//                                .weight(.05f)
-//                        )
-                    }
+                if((isFirstPage || pageOfIt.isHome) && !landscapeBarOnRight){
+                    landscapeFirstPageCard()
                 }
                 LazyVerticalGridScrollbar(
                     state = lazyListState,
@@ -354,7 +372,10 @@ fun BasePage(
                         }
                     )
                 }
-
+                // if placed on right
+                if((isFirstPage || pageOfIt.isHome) && landscapeBarOnRight){
+                    landscapeFirstPageCard()
+                }
             }
         }
 
@@ -384,6 +405,8 @@ fun BasePagePreview(
             howManyItemsHere = 10,
             onMoreMenuButtonClicked = {},
             modifier = Modifier.navigationBarsPadding().statusBarsPadding(),
+            portaitBarOnBottom = data.portraitBarOnBottom,
+            landscapeBarOnRight = data.landscapeBarOnRight,
         )
     }
 }

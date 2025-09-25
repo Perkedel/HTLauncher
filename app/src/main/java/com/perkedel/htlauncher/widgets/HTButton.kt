@@ -6,13 +6,18 @@ import android.view.SoundEffectConstants
 import android.view.View
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Android
 import androidx.compose.material.icons.filled.ArrowCircleRight
@@ -34,16 +39,19 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.FocusState
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusEvent
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.perkedel.htlauncher.enumerations.ButtonTypes
 import com.perkedel.htlauncher.ui.previews.BooleanPreviewParameter
@@ -73,11 +81,16 @@ fun HTButton(
         * 0. Default
         * 1. Outline
         * 3. Text
+        * 4. Raw
         * */
     leftIcon:ImageVector? = null,
     rightIcon:ImageVector? = null,
     leftIconDescriptor:String = "",
     rightIconDescriptor:String = "",
+    leftSpacing:Dp = 2.dp,
+    rightSpacing: Dp = 2.dp,
+    leftSpaceFar:Boolean = false,
+    rightSpaceFar:Boolean = false,
     title:String = "",
 
     leadingIcon: @Composable() (() -> Unit)? = {
@@ -130,9 +143,33 @@ fun HTButton(
     content: @Composable() (RowScope.() -> Unit) = {
         if (leadingIcon != null) {
             leadingIcon()
+            if(leftSpaceFar)
+            {
+                Spacer(
+                    modifier = Modifier
+                        .weight(1f)
+                )
+            } else {
+                Spacer(
+                    modifier = Modifier
+                        .padding(leftSpacing)
+                )
+            }
         }
         Text(title)
         if (trailingIcon != null) {
+            if (rightSpaceFar)
+            {
+                Spacer(
+                    modifier = Modifier
+                        .weight(1f)
+                )
+            } else {
+                Spacer(
+                    modifier = Modifier
+                        .padding(rightSpacing)
+                )
+            }
             trailingIcon()
         }
     }
@@ -283,6 +320,26 @@ fun HTButton(
                     }
                 }
             },
+        )
+
+        ButtonTypes.RawButton ->  Row(
+            modifier = totalModifier.combinedClickable(
+                enabled = enabled,
+                onClick = onClick,
+                onLongClick = onLongClick,
+                onDoubleClick = onDoubleClick,
+                onClickLabel = onLongClickLabel,
+                interactionSource = interactionSource,
+
+            )
+                .background(
+                    color = if(thereforeInFocus) backgroundFocusColor else Color.Transparent
+                )
+                .padding(16.dp)
+            ,
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically,
+            content = content,
         )
 
         else -> Button(

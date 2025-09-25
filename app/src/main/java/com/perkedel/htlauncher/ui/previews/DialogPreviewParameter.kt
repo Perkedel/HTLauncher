@@ -9,6 +9,7 @@ data class DialogPreviewKind(
     val dismissButton:Boolean = true,
     val thirdButton:Boolean = true,
     val thirdButtonPosition: ThirdButtonPosition = ThirdButtonPosition.Middle,
+    val fancyButton: Boolean = false,
 )
 
 class DialogPreviewParameter: PreviewParameterProvider<DialogPreviewKind> {
@@ -27,5 +28,9 @@ class DialogPreviewParameter: PreviewParameterProvider<DialogPreviewKind> {
             DialogPreviewKind(thirdButtonPosition = ThirdButtonPosition.Left),
             DialogPreviewKind(thirdButtonPosition = ThirdButtonPosition.Middle),
             DialogPreviewKind(thirdButtonPosition = ThirdButtonPosition.Right),
+            DialogPreviewKind(confirmButton = true, dismissButton = true, thirdButton = true, fancyButton = true),
+            DialogPreviewKind(confirmButton = true, dismissButton = false, thirdButton = true, fancyButton = true),
+            DialogPreviewKind(confirmButton = false, dismissButton = true, thirdButton = true, fancyButton = true),
+            DialogPreviewKind(confirmButton = false, dismissButton = false, thirdButton = true, fancyButton = true),
         )
 }

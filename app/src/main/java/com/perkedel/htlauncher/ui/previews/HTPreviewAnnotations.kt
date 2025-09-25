@@ -21,6 +21,7 @@ import androidx.compose.ui.tooling.preview.PreviewFontScale
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.compose.ui.tooling.preview.Wallpapers
+import androidx.compose.ui.unit.dp
 import com.perkedel.htlauncher.ui.bars.HTAppBar
 import com.perkedel.htlauncher.ui.navigation.Configurationing
 import com.perkedel.htlauncher.ui.navigation.HomeScreen
@@ -176,6 +177,23 @@ annotation class PreviewPixelFold
 )
 annotation class PreviewMicrowave
 
+@Preview(name = "Giant Screen", heightDp = 2000, widthDp = 2000)
+@Preview(name = "Tiny Screen", heightDp = 1, widthDp = 1, fontScale = .001f, device = "spec:width=1dp,height=1dp,dpi=99999999")
+@Preview(name = "Micro Screen", heightDp = 10, widthDp = 10, fontScale = .1f, device = "spec:width=10dp,height=10dp,dpi=99999999")
+annotation class PreviewWeirdScreen
+
+@Preview(name = "75%", fontScale = .75f)
+@Preview(name = "50%", fontScale = .50f)
+@Preview(name = "25%", fontScale = .25f)
+@Preview(name = "10%", fontScale = .1f)
+@Preview(name = "5%", fontScale = .05f)
+annotation class PreviewSmallFontScale
+
+@Preview(name = "300%", fontScale = 3f)
+@Preview(name = "500%", fontScale = 5f)
+@Preview(name = "1000%", fontScale = 10f)
+annotation class PreviewLargeFontScale
+
 @Preview(
     name = "Car Infotainment Portrait",
     group = "Special Embedded",
@@ -257,8 +275,11 @@ annotation class PreviewEmbedded
 annotation class PreviewDevices
 
 @PreviewFontScale
+@PreviewSmallFontScale
+@PreviewLargeFontScale
 @PreviewLightDark
 @PreviewScreenSizes
+@PreviewWeirdScreen
 annotation class PreviewScreens
 
 @PreviewScreens

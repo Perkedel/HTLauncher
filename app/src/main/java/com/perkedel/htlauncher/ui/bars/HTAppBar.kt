@@ -5,11 +5,13 @@ package com.perkedel.htlauncher.ui.bars
 import android.view.SoundEffectConstants
 import android.view.View
 import androidx.compose.foundation.basicMarquee
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.MoreVert
@@ -41,6 +43,7 @@ import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
 import com.perkedel.htlauncher.R
 import com.perkedel.htlauncher.enumerations.Screen
+import com.perkedel.htlauncher.ui.previews.HTPreviewAnnotations
 import com.perkedel.htlauncher.ui.theme.HTLauncherTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -54,7 +57,10 @@ fun HTAppBar(
     icon: (@Composable () -> Unit)? = {
         iconModel?.let {
             AsyncImage(
-                modifier = Modifier.padding(8.dp),
+                modifier = Modifier
+                    .padding(8.dp)
+                    .sizeIn(maxWidth = 48.dp, maxHeight = 48.dp)
+                ,
                 model = it,
                 contentDescription = "",
                 placeholder = painterResource(R.drawable.placeholder),
@@ -173,11 +179,12 @@ private fun setShowTopBar(into:Boolean = true,handover:()->Boolean){
 
 }
 
-@PreviewFontScale
-@PreviewLightDark
-@PreviewScreenSizes
-@PreviewDynamicColors
-@Preview(showBackground = true)
+//@PreviewFontScale
+//@PreviewLightDark
+//@PreviewScreenSizes
+//@PreviewDynamicColors
+//@Preview(showBackground = true)
+@HTPreviewAnnotations
 @Composable
 fun HTAppBarPreview(){
     HTLauncherTheme {
