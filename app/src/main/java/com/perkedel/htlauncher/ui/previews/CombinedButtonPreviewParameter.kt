@@ -4,8 +4,9 @@ import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import com.perkedel.htlauncher.enumerations.ButtonTypes
 
 data class ButtonPreviewParams(
-    val buttonType:ButtonTypes,
-    val enabled:Boolean
+    val buttonType:ButtonTypes = ButtonTypes.DefaultButton,
+    val enabled:Boolean = true,
+    val farSpace:Boolean = false,
 )
 
 class CombinedButtonPreviewParameter: PreviewParameterProvider<ButtonPreviewParams> {
@@ -20,5 +21,7 @@ class CombinedButtonPreviewParameter: PreviewParameterProvider<ButtonPreviewPara
             ButtonPreviewParams(buttonType = ButtonTypes.TextButton, enabled = false),
             ButtonPreviewParams(buttonType = ButtonTypes.OutlineButton, enabled = false),
             ButtonPreviewParams(buttonType = ButtonTypes.IconButton, enabled = false),
+            ButtonPreviewParams(buttonType = ButtonTypes.RawButton, enabled = false, farSpace = true),
+            ButtonPreviewParams(buttonType = ButtonTypes.RawButton, enabled = true, farSpace = true),
         )
 }

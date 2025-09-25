@@ -387,7 +387,10 @@ fun HTButtonPreview(
             enabled = data.enabled,
             title = "Hello Button",
             leftIcon = Icons.Default.Android,
-            rightIcon = Icons.Default.ArrowCircleRight
+            rightIcon = Icons.Default.ArrowCircleRight,
+            leftSpaceFar = data.farSpace,
+            rightSpaceFar = data.farSpace,
+
         )
     }
 }

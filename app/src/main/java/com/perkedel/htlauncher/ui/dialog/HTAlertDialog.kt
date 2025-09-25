@@ -431,7 +431,8 @@ fun HTAlertDialog(
     )
 }
 
-@HTPreviewAnnotations
+//@HTPreviewAnnotations
+@Preview
 @Composable
 fun HTAlertDialogPreview(
     @PreviewParameter(DialogPreviewParameter::class) dialogKind:DialogPreviewKind
@@ -445,6 +446,7 @@ fun HTAlertDialogPreview(
                 modifier = Modifier.padding(innerPadding)
             ) {
                 HTAlertDialog(
+                    context = LocalContext.current,
                     title = "Alert\nOHno",
                     text = "Ho\nHu\nHi\nHe\nHa",
                     thirdButton = dialogKind.thirdButton,
